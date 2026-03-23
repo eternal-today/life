@@ -68,7 +68,7 @@ input,select,textarea{font-family:inherit;}
 .page.active{display:block;animation:fadeUp 0.3s ease both;}
 
 /* 홈 */
-.home-wrap{padding:0.75rem 1.25rem 2rem;}
+.home-wrap{padding:1rem 1.25rem 2rem;}
 
 /* 영역 그리드 */
 .area-grid{display:flex;flex-direction:column;gap:0.75rem;}
@@ -283,7 +283,7 @@ input,select,textarea{font-family:inherit;}
   html{font-size:28px;}
   .header-inner,.tab-bar-inner{max-width:1280px;margin-left:auto;margin-right:auto;padding-left:1.5rem;padding-right:1.5rem;}
   .date-strip-inner{max-width:1280px;margin-left:auto;margin-right:auto;padding-left:1.5rem;padding-right:1.5rem;}
-  .home-wrap,.detail-wrap{max-width:1280px;margin-left:auto;margin-right:auto;border-left:1px solid var(--border);border-right:1px solid var(--border);padding-left:1.5rem;padding-right:1.5rem;padding-top:1rem;padding-bottom:2rem;}
+  .home-wrap,.detail-wrap{max-width:1280px;margin-left:auto;margin-right:auto;border-left:1px solid var(--border);border-right:1px solid var(--border);padding-left:1.5rem;padding-right:1.5rem;padding-top:1.25rem;padding-bottom:2rem;}
   .ds-quote{display:block;}
   .tab-date-wrap{display:flex;}
   .tab-bar{top:2.75rem;}
@@ -321,10 +321,11 @@ input,select,textarea{font-family:inherit;}
     <button class="tab-btn" onclick="showPage('work',this)">회사</button>
     <button class="tab-btn" onclick="showPage('personal',this)">개인</button>
     <div class="tab-date-wrap">
-      <span class="ds-date" id="todayDate">—</span>
+      <span class="ds-quote">"Live each day as if you will live forever."</span>
       <span class="ds-sep">·</span>
       <span class="ds-meta" id="todayMeta"></span>
-      <span class="ds-quote">"Live each day as if you will live forever."</span>
+      <span class="ds-sep">·</span>
+      <span class="ds-date" id="todayDate">—</span>
     </div>
   </div>
 </div>
@@ -1071,6 +1072,74 @@ function rQuickMemoRecent(){
     const aTag=a?`<span class="qm-item-area tag" style="background:${a.bg};color:${a.c}">${a.l}</span>`:'';
     return`<div class="qm-item">${aTag}<span class="qm-item-text">${esc(m.content)}</span><span class="qm-item-time">${fdt(m.createdAt)}</span></div>`;
   }).join('');
+}
+
+function rSubs(){
+  const act=D.subs.filter(s=>s.active);
+  const mf=act.reduce((a,s)=>{
+    const krw=s.currency==='KRW'?s.fee:(s.feeKrw||0);
+    return a+(s.cycle==='월'?krw:Math.round(krw/12));
+  },0);
+  document.getElementById('sv1').textContent=fkrw(mf);
+  document.getElementById('sv2').textContent=fkrw(mf*12);
+  document.getElementById('sv3').textContent=act.length;
+  const icons={'엔터테인먼트':'▶','AI/개발':'◆','업무/생산성':'◉','헬스':'◎','통신비':'📡','보험':'🛡','대출/이자':'🏦','교육':'📚','관리비/공과금':'🏠','기타':'○'};
+  const csym={'KRW':'₩','USD':'$','EUR':'€','JPY':'¥','GBP':'£'};
+  const g=document.getElementById('subCards');
+  if(!act.length){g.innerHTML='<div class="loading-msg">정기 지출을 추가해보세요</div>';return;}
+  g.innerHTML=act.map(s=>{
+    const d=dUntil(s.renewDate),soon=d<=7;
+    const sym=csym[s.currency||'KRW']||'₩';
+    const feeDisplay=(!s.currency||s.currency==='KRW')?`${fkrw(s.fee)}원`:`${sym}${s.fee.toLocaleString()}`;
+    const krwNote=(s.currency&&s.currency!=='KRW'&&s.feeKrw)?` <span style="font-size:0.4rem;color:var(--text-m)">(≈${fkrw(s.feeKrw)}원)</span>`:'';
+    return`<div class="sub-card"><div class="sub-ico">${icons[s.category]||'○'}</div><div style="flex:1;min-width:0"><div class="sub-cn">${esc(s.service)}</div><div class="sub-cf">${feeDisplay}${krwNote} / ${s.cycle}간</div><div class="sub-cc">${esc(s.category)}${s.memo?` · ${esc(s.memo)}`:''}</div></div><div class="sub-cr"><div class="sub-rd">${fd(s.renewDate)}</div><span class="sub-rb" style="background:${soon?'#fef2f2':'var(--subtle)'};color:${soon?'var(--danger)':'var(--text-m)'}">${d<=0?'오늘':d+'일 후'}</span></div></div>`;
+  }).join('');
+}
+
+function rMemo(){
+  const list=[...D.memo].sort((a,b)=>(b.pinned-a.pinned)||(new Date(b.createdAt)-new Date(a.createdAt)));
+  const el=document.getElementById('memoList');
+  if(!list.length){el.innerHTML='<div class="empty-msg"><p>메모가 없습니다</p></div>';return;}
+  el.innerHTML=list.map(m=>{const a=AMAP[m.area];return`<div class="memo-card ${m.pinned?'pinned':''}"><div class="mc-top">${m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':''}${a?`<span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span>`:''}</div><div class="mc-text">${esc(m.content)}</div><div class="mc-foot">${fdt(m.createdAt)}</div></div>`;}).join('');
+}
+
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  else{const i={home:0,family:1,work:2,personal:3}[id];if(i!==undefined)document.querySelectorAll('.tab-btn')[i]?.classList.add('active');}
+  window.scrollTo(0,0);
+}
+function showSub(id,btn){
+  ['goals','invest','subs','memo'].forEach(k=>{const el=document.getElementById('sub-'+k);if(el)el.style.display=k===id?'':'none';});
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+function filterGoal(group,val,btn){gF[group]=val;btn.closest('.toolbar').querySelectorAll('.fp').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rGoalPage(group);}
+function openDrawer(){document.getElementById('dOverlay').classList.add('open');document.getElementById('drawer').classList.add('open');}
+function closeDrawer(){document.getElementById('dOverlay').classList.remove('open');document.getElementById('drawer').classList.remove('open');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.m-wrap').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+document.getElementById('qmText').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();saveQuickMemo();}});
+document.getElementById('iCost').addEventListener('input',updateInvPreview);
+document.getElementById('iCurrent').addEventListener('input',updateInvPreview);
+function openGoalModal(group){document.getElementById('gArea').value={family:'family',work:'work',personal:'growth'}[group]||'growth';openModal('goalModal');}
+async function testNotion(){await saveCfg();if(!cfg.token){showToast('Token을 입력해주세요','error');return;}try{await nFetch('users/me');showToast('✅ 연결 성공!','success');loadAll();}catch(e){showToast('❌ 연결 실패 — CORS 프록시를 확인해주세요','error');}}
+
+async function saveGoal(){
+  const title=document.getElementById('gTitle').value.trim();if(!title){showToast('제목을 입력해주세요','error');return;}
+  const btn=document.getElementById('bSaveGoal');btn.disabled=true;btn.textContent='저장 중...';
+  const area=document.getElementById('gArea').value;
+  const progress=safeProgress(document.getElementById('gProgress').value);
+  const due=document.getElementById('gDue').value;
+  const desc=document.getElementById('gDesc').value.slice(0,2000);
+  const g={id:'l'+Date.now(),title:title.slice(0,200),area,period:document.getElementById('gPeriod').value,progress,status:'진행중',due,desc};
+  if(cfg.token&&cfg.goals){try{await mkPage(cfg.goals,{Title:{title:[{text:{content:g.title}}]},Area:{select:{name:area}},Period:{select:{name:g.period}},Progress:{number:g.progress},Status:{select:{name:'진행중'}},Due:g.due?{date:{start:g.due}}:{date:null},Description:{rich_text:[{text:{content:g.desc}}]}});}catch(e){showToast('Notion 저장 실패','error');}}
+  D.goals.push(g);render();closeModal('goalModal');btn.disabled=false;btn.textContent='저장';
+  ['gTitle','gDesc'].forEach(id=>document.getElementById(id).value='');document.getElementById('gProgress').value='0';
+  showToast('✅ 목표 저장 완료!','success');
 }
 
 async function saveCfgAndCopyUrl(){
