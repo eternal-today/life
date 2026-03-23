@@ -28,24 +28,27 @@ input,select,textarea{font-family:inherit;}
 
 /* 헤더 */
 .app-header{background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--sh-xs);position:sticky;top:0;z-index:50;}
-.header-inner{display:flex;align-items:center;justify-content:space-between;padding:0.625rem 1.25rem;gap:0.75rem;}
-.header-logo-wrap{display:flex;align-items:center;gap:0.75rem;flex-shrink:0;}
-.header-logo{font-size:0.9rem;font-weight:700;color:var(--text-h);letter-spacing:-0.02em;white-space:nowrap;}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1.25rem;}
+.header-logo{font-size:1rem;font-weight:700;color:var(--text-h);letter-spacing:-0.02em;}
 .header-logo em{color:var(--text-m);font-style:normal;font-weight:400;}
-.header-date-wrap{display:flex;align-items:center;gap:0.375rem;}
-.header-date{font-size:0.52rem;font-weight:700;color:var(--text-h);}
-.header-meta{font-size:0.44rem;color:var(--text-m);font-weight:600;}
-.header-right{display:flex;align-items:center;gap:0.625rem;min-width:0;}
-.header-quote{font-size:0.44rem;color:var(--text-m);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none;}
-.sync-wrap{display:flex;align-items:center;gap:0.3rem;flex-shrink:0;}
+.header-right{display:flex;align-items:center;gap:0.625rem;}
+.sync-wrap{display:flex;align-items:center;gap:0.3rem;}
 .sync-dot{width:0.35rem;height:0.35rem;border-radius:50%;background:var(--text-m);flex-shrink:0;}
 .sync-dot.ok{background:var(--success);}
-.sync-txt{font-size:0.5rem;color:var(--text-m);font-weight:600;white-space:nowrap;}
-.btn-icon{width:2rem;height:2rem;border:1px solid var(--border);border-radius:var(--r-md);background:none;color:var(--text-s);font-size:0.7rem;display:flex;align-items:center;justify-content:center;transition:all var(--ease);flex-shrink:0;}
+.sync-txt{font-size:0.5rem;color:var(--text-m);font-weight:600;}
+.btn-icon{width:2rem;height:2rem;border:1px solid var(--border);border-radius:var(--r-md);background:none;color:var(--text-s);font-size:0.7rem;display:flex;align-items:center;justify-content:center;transition:all var(--ease);}
 .btn-icon:hover{background:var(--subtle);}
 .btn-icon:active{transform:scale(0.96);}
 
-/* 갱신 임박 알림 — 카드 아래 별도 영역 */
+/* 날짜 스트립 — 얇은 한 줄 */
+.date-strip{background:var(--subtle);border-bottom:1px solid var(--border);position:sticky;top:2.75rem;z-index:45;}
+.date-strip-inner{display:flex;align-items:center;gap:0.5rem;padding:0.35rem 1.25rem;overflow:hidden;}
+.ds-date{font-size:0.54rem;font-weight:700;color:var(--text-h);white-space:nowrap;}
+.ds-sep{font-size:0.44rem;color:var(--text-m);}
+.ds-meta{font-size:0.44rem;color:var(--text-m);font-weight:600;white-space:nowrap;}
+.ds-quote{font-size:0.44rem;color:var(--text-m);font-style:italic;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none;}
+
+/* 갱신 임박 알림 */
 .sub-alert-wrap{margin-top:0.625rem;display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;padding:0.5rem 0.75rem;background:var(--surface);border:1px solid #fecaca;border-radius:var(--r-md);box-shadow:var(--sh-xs);}
 .sub-alert-lbl{font-size:0.44rem;font-weight:700;color:var(--danger);white-space:nowrap;flex-shrink:0;}
 .sub-alert-items{display:flex;gap:0.375rem;flex-wrap:wrap;}
@@ -55,7 +58,7 @@ input,select,textarea{font-family:inherit;}
 .sub-alert-chip-day.today{font-weight:700;}
 
 /* 탭바 */
-.tab-bar{background:var(--subtle);border-bottom:1px solid var(--border);position:sticky;top:3rem;z-index:40;}
+.tab-bar{background:var(--subtle);border-bottom:1px solid var(--border);position:sticky;top:5.5rem;z-index:40;}
 .tab-bar-inner{display:flex;gap:0.25rem;padding:0.375rem 1.25rem;overflow-x:auto;scrollbar-width:none;}
 .tab-bar-inner::-webkit-scrollbar{display:none;}
 .tab-btn{flex-shrink:0;padding:0.5rem 1rem;border:none;border-radius:var(--r-md);background:transparent;font-size:0.55rem;font-weight:600;color:var(--text-s);transition:all var(--ease);white-space:nowrap;}
@@ -162,6 +165,11 @@ input,select,textarea{font-family:inherit;}
 .inv-stat-l{font-size:0.44rem;color:var(--text-m);font-weight:600;margin-bottom:0.25rem;}
 .inv-stat-v{font-size:0.85rem;font-weight:700;color:var(--text-h);}
 .inv-stat-s{font-size:0.42rem;color:var(--text-m);margin-top:0.15rem;}
+.inv-calc-preview{margin-top:0.625rem;padding:0.625rem 0.875rem;background:var(--subtle);border-radius:var(--r-sm);font-size:0.54rem;color:var(--text-s);min-height:1.8rem;display:flex;align-items:center;gap:0.5rem;}
+.inv-calc-preview .calc-rate{font-weight:700;font-size:0.6rem;}
+.inv-calc-preview .calc-profit{font-size:0.5rem;}
+.inv-edit-btn{background:none;border:1px solid var(--border);border-radius:var(--r-sm);padding:0.2rem 0.5rem;font-family:inherit;font-size:0.42rem;font-weight:600;color:var(--text-m);cursor:pointer;transition:all var(--ease);flex-shrink:0;}
+.inv-edit-btn:hover{background:var(--subtle);color:var(--text-s);}
 .pos{color:var(--success);font-weight:700;}.neg{color:var(--danger);font-weight:700;}
 .inv-tbl{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sh-xs);}
 .inv-tbl table{width:100%;border-collapse:collapse;}
@@ -275,8 +283,10 @@ input,select,textarea{font-family:inherit;}
 @media(min-width:1024px){
   html{font-size:28px;}
   .header-inner,.tab-bar-inner{max-width:1280px;margin-left:auto;margin-right:auto;padding-left:1.5rem;padding-right:1.5rem;}
+  .date-strip-inner{max-width:1280px;margin-left:auto;margin-right:auto;padding-left:1.5rem;padding-right:1.5rem;}
   .home-wrap,.detail-wrap{max-width:1280px;margin-left:auto;margin-right:auto;border-left:1px solid var(--border);border-right:1px solid var(--border);padding-left:1.5rem;padding-right:1.5rem;padding-top:1rem;padding-bottom:2rem;}
-  .header-quote{display:block;}
+  .ds-quote{display:block;}
+  .tab-bar{top:5.25rem;}
   .area-grid{flex-direction:row;align-items:stretch;gap:1rem;}
   .area-card{flex:1;}
   .area-header{padding:0.75rem 1.25rem;}
@@ -287,7 +297,7 @@ input,select,textarea{font-family:inherit;}
   .sub-cards{display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;}
   .memo-layout{flex-direction:row;align-items:start;}
   .memo-list{flex:1;}
-  .new-memo{width:16rem;flex-shrink:0;position:sticky;top:6rem;}
+  .new-memo{width:16rem;flex-shrink:0;position:sticky;top:7rem;}
   .m-wrap{align-items:center;}
   .modal{border-radius:var(--r-lg);max-width:28rem;padding:1.5rem;}
   .modal-handle{display:none;}
@@ -297,20 +307,21 @@ input,select,textarea{font-family:inherit;}
 <body>
 <header class="app-header">
   <div class="header-inner">
-    <div class="header-logo-wrap">
-      <div class="header-logo">Eternal <em>Today</em></div>
-      <div class="header-date-wrap">
-        <span class="header-date" id="todayDate">—</span>
-        <span class="header-meta" id="todayMeta"></span>
-      </div>
-    </div>
+    <div class="header-logo">Eternal <em>Today</em></div>
     <div class="header-right">
-      <span class="header-quote" id="headerQuote">"Live each day as if you will live forever."</span>
       <div class="sync-wrap"><div class="sync-dot" id="syncDot"></div><span class="sync-txt" id="syncTxt">데모</span></div>
       <button class="btn-icon" onclick="openDrawer()">⚙</button>
     </div>
   </div>
 </header>
+<div class="date-strip">
+  <div class="date-strip-inner">
+    <span class="ds-date" id="todayDate">—</span>
+    <span class="ds-sep">·</span>
+    <span class="ds-meta" id="todayMeta"></span>
+    <span class="ds-quote">"Live each day as if you will live forever."</span>
+  </div>
+</div>
 <div class="tab-bar">
   <div class="tab-bar-inner">
     <button class="tab-btn active" onclick="showPage('home',this)">대시보드</button>
@@ -530,7 +541,7 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div class="d-sec">
     <div class="d-lbl">DB 컬럼 구조</div>
-    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/예금/적금/펀드/기타) · Amount · ReturnRate · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category(엔터테인먼트/업무/생산성/AI/개발/헬스/통신비/보험/대출이자/교육/관리비공과금/기타) · Fee · Currency(KRW/USD/EUR/JPY/GBP) · FeeKRW(Number) · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · CreatedAt(Created time)</div>
+    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타) · CostPrice(Number) · CurrentPrice(Number) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category(엔터테인먼트/업무/생산성/AI/개발/헬스/통신비/보험/대출이자/교육/관리비공과금/기타) · Fee · Currency(KRW/USD/EUR/JPY/GBP) · FeeKRW(Number) · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · CreatedAt(Created time)</div>
   </div>
 </div>
 
@@ -553,17 +564,30 @@ input,select,textarea{font-family:inherit;}
 
 <div class="m-wrap" id="invModal"><div class="modal">
   <div class="modal-handle"></div>
-  <div class="m-title">자산 추가</div>
-  <div class="m-fr"><label class="m-fl">자산명</label><input class="m-fi" id="iAsset" placeholder="예: 삼성전자, KB정기예금"></div>
+  <div class="m-title" id="invModalTitle">자산 추가</div>
+  <input type="hidden" id="iEditId" value="">
+  <div class="m-fr"><label class="m-fl">자산명</label><input class="m-fi" id="iAsset" placeholder="예: 삼성전자, KB정기예금, 아파트"></div>
   <div class="m-row2" style="margin-bottom:0.75rem">
-    <div><label class="m-fl">분류</label><select class="m-sel" id="iCat"><option value="주식">주식</option><option value="예금">예금</option><option value="적금">적금</option><option value="펀드">펀드</option><option value="부동산">부동산</option><option value="기타">기타</option></select></div>
-    <div><label class="m-fl">금액 (원)</label><input class="m-fi" id="iAmount" type="number" placeholder="10000000"></div>
-  </div>
-  <div class="m-row2">
-    <div><label class="m-fl">수익률 (%)</label><input class="m-fi" id="iReturn" type="number" placeholder="5.2"></div>
+    <div><label class="m-fl">분류</label>
+      <select class="m-sel" id="iCat">
+        <option value="주식">주식</option>
+        <option value="ETF">ETF</option>
+        <option value="예금">예금</option>
+        <option value="적금">적금</option>
+        <option value="펀드">펀드</option>
+        <option value="부동산">부동산</option>
+        <option value="암호화폐">암호화폐</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
     <div><label class="m-fl">기준일</label><input class="m-fi" id="iDate" type="date"></div>
   </div>
-  <div class="m-acts"><button class="m-cancel" onclick="closeModal('invModal')">취소</button><button class="m-save" onclick="saveInv()">저장</button></div>
+  <div class="m-row2">
+    <div><label class="m-fl">취득가액 (원)</label><input class="m-fi" id="iCost" type="number" placeholder="10000000"></div>
+    <div><label class="m-fl">현재가격 (원)</label><input class="m-fi" id="iCurrent" type="number" placeholder="12000000"></div>
+  </div>
+  <div class="inv-calc-preview" id="iCalcPreview"></div>
+  <div class="m-acts"><button class="m-cancel" onclick="closeModal('invModal')">취소</button><button class="m-save" id="bSaveInv" onclick="saveInv()">저장</button></div>
 </div></div>
 
 <div class="m-wrap" id="subModal"><div class="modal">
@@ -768,7 +792,7 @@ async function loadAll(){
     setSS('loading');
     const[g,i,s,m]=await Promise.all([qDB(cfg.goals),qDB(cfg.invest),qDB(cfg.subs),qDB(cfg.memo)]);
     D.goals=g.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'growth').toLowerCase(),period:gp(p,'Period','select')||'월간',progress:gp(p,'Progress','number')||0,status:gp(p,'Status','select')||'진행중',due:gp(p,'Due','date'),desc:gp(p,'Description','text')}));
-    D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',amount:gp(p,'Amount','number')||0,returnRate:gp(p,'ReturnRate','number')||0,updatedAt:gp(p,'UpdatedAt','date')}));
+    D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',costPrice:gp(p,'CostPrice','number')||0,currentPrice:gp(p,'CurrentPrice','number')||0,updatedAt:gp(p,'UpdatedAt','date')}));
     D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,currency:gp(p,'Currency','select')||'KRW',feeKrw:gp(p,'FeeKRW','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),memo:gp(p,'Memo','text')||'',active:gp(p,'Active','check')!==false}));
     D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
     setSS('ok');
@@ -902,11 +926,35 @@ function rGoalPage(group){
   if(!list.length){grid.innerHTML='<div class="empty-msg" style="grid-column:1/-1"><p>목표가 없습니다</p><span>+ 목표 추가로 시작해보세요</span></div>';return;}
   grid.innerHTML=list.map(g=>{const a=AMAP[g.area]||AMAP.growth;return`<div class="goal-card"><div class="gc-stripe" style="background:${a.c}"></div><div class="gc-top"><span class="gc-tag tag" style="background:${a.bg};color:${a.c}">${a.l}</span><span class="gc-period">${g.period}</span></div><div class="gc-title">${esc(g.title)}</div>${g.desc?`<div class="gc-desc">${esc(g.desc)}</div>`:''}<div class="gc-pw"><div class="gc-pf" style="width:${g.progress}%;background:${a.c}"></div></div><div class="gc-foot"><span>${g.progress}% 달성</span><span>${g.due?fd(g.due):'—'}</span></div></div>`;}).join('');}
 
+function calcReturn(cost,cur){
+  if(!cost||cost===0)return 0;
+  return Math.round((cur-cost)/cost*1000)/10;
+}
 function rInvest(){
-  const tot=D.invest.reduce((a,i)=>a+i.amount,0);const bc=c=>D.invest.filter(i=>i.category===c).reduce((a,i)=>a+i.amount,0);
-  document.getElementById('iv1').textContent=fkrw(tot);document.getElementById('iv2').textContent=fkrw(bc('주식'));document.getElementById('iv3').textContent=fkrw(bc('예금')+bc('적금'));document.getElementById('iv4').textContent=fkrw(tot-bc('주식')-bc('예금')-bc('적금'));
-  const t=document.getElementById('invTable');if(!D.invest.length){t.innerHTML='<div class="loading-msg">자산 정보를 추가해보세요</div>';return;}
-  t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>금액</th><th>수익률</th><th>기준일</th></tr></thead><tbody>${D.invest.map(i=>`<tr><td style="font-weight:600">${esc(i.asset)}</td><td><span class="tag" style="background:var(--subtle);color:var(--text-s)">${esc(i.category)}</span></td><td>${fkrw(i.amount)}원</td><td class="${i.returnRate>=0?'pos':'neg'}">${i.returnRate>=0?'+':''}${i.returnRate}%</td><td style="color:var(--text-m)">${fd(i.updatedAt)}</td></tr>`).join('')}</tbody></table>`;}
+  const tot=D.invest.reduce((a,i)=>a+(i.currentPrice||0),0);
+  const totCost=D.invest.reduce((a,i)=>a+(i.costPrice||0),0);
+  const totRate=totCost?Math.round((tot-totCost)/totCost*1000)/10:0;
+  const bc=c=>D.invest.filter(i=>i.category===c).reduce((a,i)=>a+(i.currentPrice||0),0);
+  document.getElementById('iv1').textContent=fkrw(tot);
+  document.getElementById('iv2').textContent=fkrw(bc('주식')+(bc('ETF')||0));
+  document.getElementById('iv3').textContent=fkrw(bc('예금')+bc('적금'));
+  document.getElementById('iv4').textContent=fkrw(tot-bc('주식')-bc('ETF')-bc('예금')-bc('적금'));
+  const t=document.getElementById('invTable');
+  if(!D.invest.length){t.innerHTML='<div class="loading-msg">자산 정보를 추가해보세요</div>';return;}
+  const rateHtml=totCost?`<span class="${totRate>=0?'pos':'neg'}">${totRate>=0?'+':''}${totRate}%</span>`:'—';
+  t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>취득가액</th><th>현재가격</th><th>수익률</th><th>기준일</th><th></th></tr></thead><tbody>${D.invest.map(i=>{
+    const rate=calcReturn(i.costPrice,i.currentPrice);
+    const profit=i.currentPrice-(i.costPrice||0);
+    return`<tr>
+      <td style="font-weight:600">${esc(i.asset)}</td>
+      <td><span class="tag" style="background:var(--subtle);color:var(--text-s)">${esc(i.category)}</span></td>
+      <td>${i.costPrice?fkrw(i.costPrice)+'원':'—'}</td>
+      <td>${i.currentPrice?fkrw(i.currentPrice)+'원':'—'}</td>
+      <td class="${rate>=0?'pos':'neg'}">${i.costPrice?`${rate>=0?'+':''}${rate}%<br><span style="font-size:0.44rem;font-weight:400">${profit>=0?'+':''}${fkrw(Math.abs(profit))}원</span>`:'—'}</td>
+      <td style="color:var(--text-m)">${fd(i.updatedAt)}</td>
+      <td><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button></td>
+    </tr>`;
+  }).join('')}</tbody><tfoot><tr><td colspan="4" style="padding:0.625rem 0.875rem;font-size:0.44rem;color:var(--text-m)">총 수익률</td><td class="${totRate>=0?'pos':'neg'}" style="padding:0.625rem 0.875rem">${rateHtml}</td><td colspan="2"></td></tr></tfoot></table>`;}
 
 function rSubs(){
   const act=D.subs.filter(s=>s.active);
@@ -958,6 +1006,8 @@ function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.m-wrap').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 document.getElementById('qmText').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();saveQuickMemo();}});
+document.getElementById('iCost').addEventListener('input',updateInvPreview);
+document.getElementById('iCurrent').addEventListener('input',updateInvPreview);
 function openGoalModal(group){document.getElementById('gArea').value={family:'family',work:'work',personal:'growth'}[group]||'growth';openModal('goalModal');}
 async function testNotion(){await saveCfg();if(!cfg.token){showToast('Token을 입력해주세요','error');return;}try{await nFetch('users/me');showToast('✅ 연결 성공!','success');loadAll();}catch(e){showToast('❌ 연결 실패 — CORS 프록시를 확인해주세요','error');}}
 
@@ -975,12 +1025,56 @@ async function saveGoal(){
   showToast('✅ 목표 저장 완료!','success');
 }
 async function saveInv(){
-  const asset=document.getElementById('iAsset').value.trim();if(!asset){showToast('자산명을 입력해주세요','error');return;}
-  const amount=safeInt(document.getElementById('iAmount').value,0,10000000000000);
-  const returnRate=Math.min(Math.max(safeFloat(document.getElementById('iReturn').value),-100),10000);
-  const inv={id:'l'+Date.now(),asset:asset.slice(0,100),category:document.getElementById('iCat').value,amount,returnRate,updatedAt:document.getElementById('iDate').value};
-  if(cfg.token&&cfg.invest){try{await mkPage(cfg.invest,{Asset:{title:[{text:{content:inv.asset}}]},Category:{select:{name:inv.category}},Amount:{number:inv.amount},ReturnRate:{number:inv.returnRate},UpdatedAt:inv.updatedAt?{date:{start:inv.updatedAt}}:{date:null}});}catch(e){}}
-  D.invest.push(inv);render();closeModal('invModal');['iAsset','iAmount','iReturn'].forEach(id=>document.getElementById(id).value='');showToast('✅ 자산 저장 완료!','success');
+  const asset=document.getElementById('iAsset').value.trim();
+  if(!asset){showToast('자산명을 입력해주세요','error');return;}
+  const costPrice=safeInt(document.getElementById('iCost').value,0,10000000000000);
+  const currentPrice=safeInt(document.getElementById('iCurrent').value,0,10000000000000);
+  const editId=document.getElementById('iEditId').value;
+  const inv={id:editId||'l'+Date.now(),asset:asset.slice(0,100),category:document.getElementById('iCat').value,costPrice,currentPrice,updatedAt:document.getElementById('iDate').value};
+  if(cfg.token&&cfg.invest){
+    try{
+      if(editId){
+        await nFetch(`pages/${editId}`,'PATCH',{properties:{Asset:{title:[{text:{content:inv.asset}}]},Category:{select:{name:inv.category}},CostPrice:{number:inv.costPrice},CurrentPrice:{number:inv.currentPrice},UpdatedAt:inv.updatedAt?{date:{start:inv.updatedAt}}:{date:null}}});
+      } else {
+        await mkPage(cfg.invest,{Asset:{title:[{text:{content:inv.asset}}]},Category:{select:{name:inv.category}},CostPrice:{number:inv.costPrice},CurrentPrice:{number:inv.currentPrice},UpdatedAt:inv.updatedAt?{date:{start:inv.updatedAt}}:{date:null}});
+      }
+    }catch(e){showToast('Notion 저장 실패','error');}
+  }
+  if(editId){
+    const idx=D.invest.findIndex(i=>i.id===editId);
+    if(idx>-1) D.invest[idx]=inv;
+  } else {
+    D.invest.push(inv);
+  }
+  render();closeModal('invModal');
+  ['iAsset','iCost','iCurrent'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('iEditId').value='';
+  document.getElementById('invModalTitle').textContent='자산 추가';
+  showToast(`✅ 자산 ${editId?'수정':'저장'} 완료!`,'success');
+}
+
+function editInv(id){
+  const inv=D.invest.find(i=>i.id===id);
+  if(!inv)return;
+  document.getElementById('invModalTitle').textContent='자산 수정';
+  document.getElementById('iEditId').value=inv.id;
+  document.getElementById('iAsset').value=inv.asset;
+  document.getElementById('iCat').value=inv.category;
+  document.getElementById('iCost').value=inv.costPrice||'';
+  document.getElementById('iCurrent').value=inv.currentPrice||'';
+  document.getElementById('iDate').value=inv.updatedAt||'';
+  updateInvPreview();
+  openModal('invModal');
+}
+
+function updateInvPreview(){
+  const cost=safeInt(document.getElementById('iCost').value,0,10000000000000);
+  const cur=safeInt(document.getElementById('iCurrent').value,0,10000000000000);
+  const el=document.getElementById('iCalcPreview');
+  if(!cost||!cur){el.textContent='취득가액과 현재가격을 입력하면 수익률이 자동 계산됩니다.';return;}
+  const rate=calcReturn(cost,cur);
+  const profit=cur-cost;
+  el.innerHTML=`수익률 <span class="calc-rate ${rate>=0?'pos':'neg'}">${rate>=0?'+':''}${rate}%</span> <span class="calc-profit">(${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)</span>`;
 }
 async function saveSub(){
   const service=document.getElementById('sService').value.trim();if(!service){showToast('서비스명을 입력해주세요','error');return;}
