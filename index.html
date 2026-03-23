@@ -483,8 +483,11 @@ input,select,textarea{font-family:inherit;}
   <button class="d-close" onclick="closeDrawer()">✕</button>
   <div class="d-title">설정</div>
   <div class="d-sec">
-    <div class="d-lbl">📌 저장 방법</div>
-    <div class="d-note">설정값이 이 페이지 URL에 암호화되어 저장됩니다.<br>아래 버튼으로 저장 후 <b>URL을 북마크</b>하면 어떤 기기/브라우저에서든 동일하게 작동합니다.</div>
+    <div class="d-lbl">📌 저장 안내</div>
+    <div class="d-note">
+      <b>Notion Token</b>은 이 탭에서만 유지됩니다. 탭을 닫으면 재입력이 필요합니다.<br><br>
+      나머지 설정값은 <b>💾 저장 후 URL 복사</b>를 눌러 북마크에 추가하면 어떤 기기/브라우저에서든 자동으로 불러옵니다.
+    </div>
     <button class="d-btn" onclick="saveCfgAndCopyUrl()">💾 저장 후 URL 복사</button>
   </div>
   <div class="d-sec">
@@ -595,84 +598,85 @@ function initDate(){
 
 const CFG_KEYS=['token','goals','invest','subs','memo','proxy','calFamily','calWork','calPersonal'];
 const CFG_IDS =['cToken','cGoals','cInvest','cSubs','cMemo','cProxy','cCalFamily','cCalWork','cCalPersonal'];
+const HASH_KEYS=['goals','invest','subs','memo','proxy','calFamily','calWork','calPersonal'];
+const HASH_IDS =['cGoals','cInvest','cSubs','cMemo','cProxy','cCalFamily','cCalWork','cCalPersonal'];
 
-// 암호화 키 — Notion Token 앞 16자를 시드로 사용
-// Token이 없으면 고정 fallback (localStorage 하위 호환용)
-async function getCryptoKey(seed){
-  const material=new TextEncoder().encode((seed||'EternalTodayFallback').padEnd(32).slice(0,32));
-  const base=await crypto.subtle.importKey('raw',material,{name:'PBKDF2'},false,['deriveKey']);
+/* ── AES-GCM 암호화 (Token 제외한 설정값용) ── */
+async function getCryptoKey(){
+  const raw=new TextEncoder().encode('EternalToday-Hash-2026');
+  const base=await crypto.subtle.importKey('raw',raw,{name:'PBKDF2'},false,['deriveKey']);
   return crypto.subtle.deriveKey(
-    {name:'PBKDF2',salt:new TextEncoder().encode('EternalSalt2026'),iterations:100000,hash:'SHA-256'},
+    {name:'PBKDF2',salt:new TextEncoder().encode('ET-Salt'),iterations:100000,hash:'SHA-256'},
     base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']
   );
 }
-async function encryptCfg(obj){
+async function encryptObj(obj){
   try{
-    const seed=obj.token?obj.token.slice(0,16):'';
-    const key=await getCryptoKey(seed);
+    const key=await getCryptoKey();
     const iv=crypto.getRandomValues(new Uint8Array(12));
-    const data=new TextEncoder().encode(JSON.stringify(obj));
-    const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data);
-    const buf=new Uint8Array(iv.length+enc.byteLength);
-    buf.set(iv);buf.set(new Uint8Array(enc),iv.length);
+    const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(obj)));
+    const buf=new Uint8Array(12+enc.byteLength);
+    buf.set(iv);buf.set(new Uint8Array(enc),12);
     return btoa(String.fromCharCode(...buf));
   }catch(e){return '';}
 }
-async function decryptCfg(str,seed){
+async function decryptObj(str){
   try{
     const buf=Uint8Array.from(atob(str),c=>c.charCodeAt(0));
-    const iv=buf.slice(0,12);const data=buf.slice(12);
-    const key=await getCryptoKey(seed||'');
-    const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,data);
+    const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(0,12)},await getCryptoKey(),buf.slice(12));
     return JSON.parse(new TextDecoder().decode(dec));
   }catch(e){return null;}
 }
 
+/* ── 설정 로드 ── */
 async function loadCfg(){
+  // 1. Token → sessionStorage (탭 닫으면 삭제)
+  try{
+    const t=sessionStorage.getItem('et_token')||'';
+    cfg.token=t;
+    const el=document.getElementById('cToken');
+    if(el)el.value=t;
+  }catch(e){}
+
+  // 2. 나머지 → URL 해시 복호화
   const hash=location.hash.slice(1);
   if(hash){
-    // Token 앞 16자를 시드로 복호화 시도 (여러 시드 순서대로)
-    // 첫 시도: localStorage에 남아있는 token으로 시드 추측
-    let seed='';
-    try{seed=localStorage.getItem('el_t_seed')||'';}catch(e){}
-    let obj=await decryptCfg(hash,seed);
-    // 실패 시 빈 시드로 재시도 (fallback)
-    if(!obj) obj=await decryptCfg(hash,'');
+    const obj=await decryptObj(hash);
     if(obj){
-      CFG_KEYS.forEach((k,i)=>{cfg[k]=obj[k]||'';const el=document.getElementById(CFG_IDS[i]);if(el)el.value=cfg[k];});
+      HASH_KEYS.forEach((k,i)=>{
+        cfg[k]=obj[k]||'';
+        const el=document.getElementById(HASH_IDS[i]);
+        if(el)el.value=cfg[k];
+      });
       return;
     }
   }
-  // 하위 호환: localStorage (Token 제외)
-  try{
-    const LS={cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};
-    Object.entries(LS).forEach(([id,k])=>{
-      const v=localStorage.getItem(k)||'';
-      const key=CFG_KEYS[CFG_IDS.indexOf(id)];
-      if(key){cfg[key]=v;const el=document.getElementById(id);if(el)el.value=v;}
-    });
-  }catch(e){}
-}
 
-async function saveCfg(){
-  CFG_KEYS.forEach((k,i)=>{const el=document.getElementById(CFG_IDS[i]);if(el)cfg[k]=el.value;});
-  const enc=await encryptCfg(cfg);
-  if(enc){
-    history.replaceState(null,'','#'+enc);
-    // Token 시드 힌트만 저장 (Token 전체는 저장 안 함)
-    try{if(cfg.token)localStorage.setItem('el_t_seed',cfg.token.slice(0,16));}catch(e){}
-    showToast('✅ 설정이 URL에 저장됐습니다. 이 URL을 북마크하세요!','success');
-  }
-  // localStorage에 Token 제외한 값만 저장 (하위 호환)
+  // 3. 하위 호환 — localStorage (기존 사용자)
   try{
     const LS={cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};
     Object.entries(LS).forEach(([id,lk])=>{
       const k=CFG_KEYS[CFG_IDS.indexOf(id)];
-      if(k)localStorage.setItem(lk,cfg[k]||'');
+      if(k){cfg[k]=localStorage.getItem(lk)||'';const el=document.getElementById(id);if(el)el.value=cfg[k];}
     });
-    // Token은 localStorage에서 제거
-    localStorage.removeItem('el_t');
   }catch(e){}
+}
+
+/* ── 설정 저장 ── */
+async function saveCfg(){
+  CFG_KEYS.forEach((k,i)=>{const el=document.getElementById(CFG_IDS[i]);if(el)cfg[k]=el.value.trim();});
+
+  // Token → sessionStorage만 (URL/localStorage 저장 안 함)
+  try{
+    sessionStorage.setItem('et_token',cfg.token);
+    localStorage.removeItem('el_t'); // 기존 잔재 제거
+  }catch(e){}
+
+  // 나머지 → URL 해시 암호화
+  const hashObj={};
+  HASH_KEYS.forEach(k=>{hashObj[k]=cfg[k]||'';});
+  const enc=await encryptObj(hashObj);
+  if(enc) history.replaceState(null,'','#'+enc);
 }
 
 async function nFetch(path,method='GET',body=null,retry=0){
@@ -905,8 +909,8 @@ async function saveCfgAndCopyUrl(){
   await saveCfg();
   const url=location.href;
   navigator.clipboard.writeText(url)
-    .then(()=>showToast('✅ URL이 복사됐습니다! 북마크에 추가하세요.','success'))
-    .catch(()=>showToast('URL: '+url,'success'));
+    .then(()=>showToast('✅ URL 복사 완료! 북마크에 추가하세요.','success'))
+    .catch(()=>showToast('저장됐습니다. 주소창 URL을 북마크해 주세요.','success'));
 }
 function copySettings(){
   saveCfgAndCopyUrl();
