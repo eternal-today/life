@@ -1007,14 +1007,67 @@ function rInvest(){
   document.getElementById('iv4').textContent=fkrw(totCurrent-bc('주식')-bc('ETF')-bc('예금')-bc('적금'));
   const t=document.getElementById('invTable');
   if(!D.invest.length){t.innerHTML='<div class="loading-msg">자산 정보를 추가해보세요</div>';return;}
-  const rateHtml=totCost?`<span class="${totRate>=0?'pos':'neg'}">${totRate>=0?'+':''}${totRate}%</span>`:'—';
   const sym=i=>CSYM[i.currency||'KRW']||'₩';
-  const rows=[
-    ...assets.map(i=>renderInvRow(i,sym)),
-    ...(debts.length?[`<tr><td colspan="11" style="padding:0.5rem 0.875rem;font-size:0.44rem;font-weight:700;color:var(--danger);background:#fef2f2;border-radius:4px">── 부채 ──</td></tr>`]:[]),
-    ...debts.map(i=>renderDebtRow(i,sym)),
-  ];
-  t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>통화</th><th>수량</th><th>취득단가</th><th>총취득(₩)</th><th>현재단가</th><th>현재총액(₩)</th><th>수익률</th><th>기준일</th><th></th></tr></thead><tbody>${rows.join('')}</tbody><tfoot><tr><td colspan="7" style="padding:0.625rem 0.875rem;font-size:0.44rem;color:var(--text-m)">총 자산 / 수익률</td><td style="padding:0.625rem 0.875rem;font-weight:700">${fkrw(totCurrent)}원</td><td class="${totRate>=0?'pos':'neg'}" style="padding:0.625rem 0.875rem">${rateHtml}</td><td colspan="2"></td></tr><tr><td colspan="7" style="padding:0.5rem 0.875rem;font-size:0.44rem;color:var(--danger)">총 부채</td><td style="padding:0.5rem 0.875rem;font-weight:700;color:var(--danger)">-${fkrw(totDebt)}원</td><td colspan="3"></td></tr><tr><td colspan="7" style="padding:0.5rem 0.875rem;font-size:0.44rem;font-weight:700">순 자산</td><td style="padding:0.5rem 0.875rem;font-weight:700;font-size:0.6rem" class="${netWorth>=0?'':'neg'}">${netWorth>=0?'':'-'}${fkrw(Math.abs(netWorth))}원</td><td colspan="3"></td></tr></tfoot></table>`;
+  const isMobile=window.innerWidth<1024;
+  if(isMobile){
+    const allItems=[
+      ...assets.map(i=>renderInvCard(i,sym,false)),
+      ...(debts.length?['<div style="padding:0.375rem 0;font-size:0.44rem;font-weight:700;color:var(--danger)">── 부채 ──</div>']:[]),
+      ...debts.map(i=>renderInvCard(i,sym,true)),
+    ];
+    const footer=`<div style="padding:0.625rem 0;border-top:1px solid var(--border);margin-top:0.25rem">
+      <div style="display:flex;justify-content:space-between;font-size:0.5rem;margin-bottom:0.25rem"><span style="color:var(--text-m)">총 자산</span><span style="font-weight:700">${fkrw(totCurrent)}원</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.5rem;margin-bottom:0.25rem"><span style="color:var(--danger)">총 부채</span><span style="font-weight:700;color:var(--danger)">-${fkrw(totDebt)}원</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.56rem"><span style="font-weight:700">순 자산</span><span style="font-weight:700" class="${netWorth>=0?'':'neg'}">${netWorth>=0?'':'-'}${fkrw(Math.abs(netWorth))}원</span></div>
+    </div>`;
+    t.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.5rem">${allItems.join('')}${footer}</div>`;
+  } else {
+    const rateHtml=totCost?`<span class="${totRate>=0?'pos':'neg'}">${totRate>=0?'+':''}${totRate}%</span>`:'—';
+    const rows=[
+      ...assets.map(i=>renderInvRow(i,sym)),
+      ...(debts.length?[`<tr><td colspan="11" style="padding:0.5rem 0.875rem;font-size:0.44rem;font-weight:700;color:var(--danger);background:#fef2f2;border-radius:4px">── 부채 ──</td></tr>`]:[]),
+      ...debts.map(i=>renderDebtRow(i,sym)),
+    ];
+    t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>통화</th><th>수량</th><th>취득단가</th><th>총취득(₩)</th><th>현재단가</th><th>현재총액(₩)</th><th>수익률</th><th>기준일</th><th></th></tr></thead><tbody>${rows.join('')}</tbody><tfoot><tr><td colspan="7" style="padding:0.625rem 0.875rem;font-size:0.44rem;color:var(--text-m)">총 자산 / 수익률</td><td style="padding:0.625rem 0.875rem;font-weight:700">${fkrw(totCurrent)}원</td><td class="${totRate>=0?'pos':'neg'}" style="padding:0.625rem 0.875rem">${rateHtml}</td><td colspan="2"></td></tr><tr><td colspan="7" style="padding:0.5rem 0.875rem;font-size:0.44rem;color:var(--danger)">총 부채</td><td style="padding:0.5rem 0.875rem;font-weight:700;color:var(--danger)">-${fkrw(totDebt)}원</td><td colspan="3"></td></tr><tr><td colspan="7" style="padding:0.5rem 0.875rem;font-size:0.44rem;font-weight:700">순 자산</td><td style="padding:0.5rem 0.875rem;font-weight:700;font-size:0.6rem" class="${netWorth>=0?'':'neg'}">${netWorth>=0?'':'-'}${fkrw(Math.abs(netWorth))}원</td><td colspan="3"></td></tr></tfoot></table>`;
+  }
+}
+
+function renderInvCard(i, sym, isDebt){
+  const qty=i.qty||1;
+  const costKrw=toKrw(i,'cost');
+  const curKrw=toKrw(i,'cur');
+  const totalCurKrw=curKrw*qty;
+  const totalCostKrw=costKrw*qty;
+  const rate=calcReturn(costKrw,curKrw);
+  const profit=totalCurKrw-totalCostKrw;
+  const isFx=i.currency&&i.currency!=='KRW';
+  const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
+  const bg=isDebt?'background:#fef9f9;border-color:#fecaca;':'';
+  const nameColor=isDebt?'color:var(--danger);':'';
+  return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:0.75rem;${bg}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.375rem">
+      <div>
+        <div style="font-weight:700;font-size:0.58rem;${nameColor}">${esc(i.asset)}</div>
+        ${i.memo?`<div style="font-size:0.42rem;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}
+      </div>
+      <span class="tag" style="background:${isDebt?'#fee2e2':'var(--subtle)'};color:${isDebt?'var(--danger)':'var(--text-s)'};flex-shrink:0;margin-left:0.5rem">${esc(i.category)}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.25rem 0.5rem;font-size:0.48rem;margin-bottom:0.5rem">
+      <div><span style="color:var(--text-m)">수량 </span>${qty.toLocaleString()} · ${i.currency||'KRW'}</div>
+      <div><span style="color:var(--text-m)">기준일 </span>${fd(i.updatedAt)}</div>
+      ${!isDebt&&i.costPrice?`<div><span style="color:var(--text-m)">취득단가 </span>${isFx?sym(i):''}${fkrw(i.costPrice)}</div>`:''}
+      <div><span style="color:var(--text-m)">${isDebt?'잔액 ':'현재단가 '}</span><span style="${isDebt?'color:var(--danger);font-weight:700':''}">${isDebt?'-':''} ${curDisp}</span></div>
+      ${totalCostKrw&&!isDebt?`<div><span style="color:var(--text-m)">총취득 </span>${fkrw(totalCostKrw)}원</div>`:''}
+      <div><span style="color:var(--text-m)">${isDebt?'총부채 ':'현재총액 '}</span><span style="font-weight:700;${isDebt?'color:var(--danger)':''}">${isDebt?'-':''}${fkrw(totalCurKrw)}원</span></div>
+      ${!isDebt&&costKrw?`<div style="grid-column:1/-1"><span style="color:var(--text-m)">수익률 </span><span class="${rate>=0?'pos':'neg'}">${rate>=0?'+':''}${rate}% (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)</span></div>`:''}
+    </div>
+    <div class="item-actions">
+      <button class="btn-ord" onclick="moveInv('${i.id}',-1)">↑</button>
+      <button class="btn-ord" onclick="moveInv('${i.id}',1)">↓</button>
+      <button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button>
+      <button class="btn-del" onclick="confirmDelInv('${i.id}','${esc(i.asset)}')">삭제</button>
+    </div>
+  </div>`;
 }
 
 function renderInvRow(i,sym){
