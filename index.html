@@ -700,7 +700,7 @@ function copySettings(){
   const text=`Token: ${cfg.token}\nGoals: ${cfg.goals}\nInvest: ${cfg.invest}\nSubs: ${cfg.subs}\nMemo: ${cfg.memo}\nProxy: ${cfg.proxy}`;
   navigator.clipboard.writeText(text).then(()=>showToast('설정값이 복사됐습니다. 메모장에 붙여넣어 보관하세요.','success')).catch(()=>showToast('복사 실패 — 직접 입력해 주세요','error'));
 }
-const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000);}
+function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000);}
 function fkrw(n){if(n>=100000000)return(n/100000000).toFixed(1)+'억';if(n>=10000)return Math.round(n/10000)+'만';return n.toLocaleString();}
 function fd(d){if(!d)return'—';return d.slice(0,10).replace(/-/g,'.');}
 function fdt(d){if(!d)return'';const dt=new Date(d);return`${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;}
