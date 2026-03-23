@@ -561,10 +561,23 @@ input,select,textarea{font-family:inherit;}
     <div><label class="m-fl">카테고리</label><select class="m-sel" id="sCat"><option value="엔터테인먼트">엔터테인먼트</option><option value="업무/생산성">업무/생산성</option><option value="AI/개발">AI/개발</option><option value="헬스">헬스</option><option value="기타">기타</option></select></div>
     <div><label class="m-fl">결제주기</label><select class="m-sel" id="sCycle"><option value="월">월간</option><option value="연">연간</option></select></div>
   </div>
-  <div class="m-row2">
-    <div><label class="m-fl">금액 (원)</label><input class="m-fi" id="sFee" type="number" placeholder="17000"></div>
-    <div><label class="m-fl">다음 갱신일</label><input class="m-fi" id="sRenew" type="date"></div>
+  <div class="m-row2" style="margin-bottom:0.75rem">
+    <div><label class="m-fl">금액</label><input class="m-fi" id="sFee" type="number" placeholder="17000"></div>
+    <div><label class="m-fl">통화</label>
+      <select class="m-sel" id="sCurrency">
+        <option value="KRW">₩ 원화 (KRW)</option>
+        <option value="USD">$ 달러 (USD)</option>
+        <option value="EUR">€ 유로 (EUR)</option>
+        <option value="JPY">¥ 엔화 (JPY)</option>
+        <option value="GBP">£ 파운드 (GBP)</option>
+      </select>
+    </div>
   </div>
+  <div class="m-row2" style="margin-bottom:0.75rem">
+    <div><label class="m-fl">다음 갱신일</label><input class="m-fi" id="sRenew" type="date"></div>
+    <div><label class="m-fl">원화 환산 금액 (선택)</label><input class="m-fi" id="sFeeKrw" type="number" placeholder="자동 표시용"></div>
+  </div>
+  <div class="m-fr"><label class="m-fl">메모 (선택)</label><input class="m-fi" id="sMemo" placeholder="예: 가족 공유, 회사 카드 결제 등"></div>
   <div class="m-acts"><button class="m-cancel" onclick="closeModal('subModal')">취소</button><button class="m-save" onclick="saveSub()">저장</button></div>
 </div></div>
 
@@ -730,7 +743,7 @@ async function loadAll(){
     const[g,i,s,m]=await Promise.all([qDB(cfg.goals),qDB(cfg.invest),qDB(cfg.subs),qDB(cfg.memo)]);
     D.goals=g.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'growth').toLowerCase(),period:gp(p,'Period','select')||'월간',progress:gp(p,'Progress','number')||0,status:gp(p,'Status','select')||'진행중',due:gp(p,'Due','date'),desc:gp(p,'Description','text')}));
     D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',amount:gp(p,'Amount','number')||0,returnRate:gp(p,'ReturnRate','number')||0,updatedAt:gp(p,'UpdatedAt','date')}));
-    D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),active:gp(p,'Active','check')!==false}));
+    D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,currency:gp(p,'Currency','select')||'KRW',feeKrw:gp(p,'FeeKRW','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),memo:gp(p,'Memo','text')||'',active:gp(p,'Active','check')!==false}));
     D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
     setSS('ok');
     render();
@@ -864,11 +877,40 @@ function rInvest(){
   t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>금액</th><th>수익률</th><th>기준일</th></tr></thead><tbody>${D.invest.map(i=>`<tr><td style="font-weight:600">${esc(i.asset)}</td><td><span class="tag" style="background:var(--subtle);color:var(--text-s)">${esc(i.category)}</span></td><td>${fkrw(i.amount)}원</td><td class="${i.returnRate>=0?'pos':'neg'}">${i.returnRate>=0?'+':''}${i.returnRate}%</td><td style="color:var(--text-m)">${fd(i.updatedAt)}</td></tr>`).join('')}</tbody></table>`;}
 
 function rSubs(){
-  const act=D.subs.filter(s=>s.active);const mf=act.reduce((a,s)=>a+(s.cycle==='월'?s.fee:Math.round(s.fee/12)),0);
-  document.getElementById('sv1').textContent=fkrw(mf);document.getElementById('sv2').textContent=fkrw(mf*12);document.getElementById('sv3').textContent=act.length;
+  const act=D.subs.filter(s=>s.active);
+  const mf=act.reduce((a,s)=>{
+    const krw=s.currency==='KRW'?s.fee:(s.feeKrw||0);
+    return a+(s.cycle==='월'?krw:Math.round(krw/12));
+  },0);
+  document.getElementById('sv1').textContent=fkrw(mf);
+  document.getElementById('sv2').textContent=fkrw(mf*12);
+  document.getElementById('sv3').textContent=act.length;
   const icons={'엔터테인먼트':'▶','AI/개발':'◆','업무/생산성':'◉','헬스':'◎','기타':'○'};
-  const g=document.getElementById('subCards');if(!act.length){g.innerHTML='<div class="loading-msg">구독 정보를 추가해보세요</div>';return;}
-  g.innerHTML=act.map(s=>{const d=dUntil(s.renewDate),soon=d<=7;return`<div class="sub-card"><div class="sub-ico">${icons[s.category]||'○'}</div><div style="flex:1;min-width:0"><div class="sub-cn">${esc(s.service)}</div><div class="sub-cf">${fkrw(s.fee)}원 / ${s.cycle}간</div><div class="sub-cc">${esc(s.category)}</div></div><div class="sub-cr"><div class="sub-rd">${fd(s.renewDate)}</div><span class="sub-rb" style="background:${soon?'#fef2f2':'var(--subtle)'};color:${soon?'var(--danger)':'var(--text-m)'}">${d<=0?'오늘':d+'일 후'}</span></div></div>`;}).join('');}
+  const csym={'KRW':'₩','USD':'$','EUR':'€','JPY':'¥','GBP':'£'};
+  const g=document.getElementById('subCards');
+  if(!act.length){g.innerHTML='<div class="loading-msg">구독 정보를 추가해보세요</div>';return;}
+  g.innerHTML=act.map(s=>{
+    const d=dUntil(s.renewDate),soon=d<=7;
+    const sym=csym[s.currency||'KRW']||'₩';
+    const feeDisplay=(!s.currency||s.currency==='KRW')
+      ?`${fkrw(s.fee)}원`
+      :`${sym}${s.fee.toLocaleString()}`;
+    const krwNote=(s.currency&&s.currency!=='KRW'&&s.feeKrw)
+      ?` <span style="font-size:0.4rem;color:var(--text-m)">(≈${fkrw(s.feeKrw)}원)</span>`:'';
+    return`<div class="sub-card">
+      <div class="sub-ico">${icons[s.category]||'○'}</div>
+      <div style="flex:1;min-width:0">
+        <div class="sub-cn">${esc(s.service)}</div>
+        <div class="sub-cf">${feeDisplay}${krwNote} / ${s.cycle}간</div>
+        <div class="sub-cc">${esc(s.category)}${s.memo?` · ${esc(s.memo)}`:''}</div>
+      </div>
+      <div class="sub-cr">
+        <div class="sub-rd">${fd(s.renewDate)}</div>
+        <span class="sub-rb" style="background:${soon?'#fef2f2':'var(--subtle)'};color:${soon?'var(--danger)':'var(--text-m)'}">${d<=0?'오늘':d+'일 후'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 function rMemo(){
   const list=[...D.memo].sort((a,b)=>(b.pinned-a.pinned)||(new Date(b.createdAt)-new Date(a.createdAt)));
@@ -911,9 +953,15 @@ async function saveInv(){
 async function saveSub(){
   const service=document.getElementById('sService').value.trim();if(!service){showToast('서비스명을 입력해주세요','error');return;}
   const fee=safeInt(document.getElementById('sFee').value,0,100000000);
-  const sub={id:'l'+Date.now(),service:service.slice(0,100),category:document.getElementById('sCat').value,fee,cycle:document.getElementById('sCycle').value,renewDate:document.getElementById('sRenew').value,active:true};
-  if(cfg.token&&cfg.subs){try{await mkPage(cfg.subs,{Service:{title:[{text:{content:sub.service}}]},Category:{select:{name:sub.category}},Fee:{number:sub.fee},Cycle:{select:{name:sub.cycle}},RenewDate:sub.renewDate?{date:{start:sub.renewDate}}:{date:null},Active:{checkbox:true}});}catch(e){}}
-  D.subs.push(sub);render();closeModal('subModal');['sService','sFee'].forEach(id=>document.getElementById(id).value='');showToast('✅ 구독 저장 완료!','success');
+  const currency=document.getElementById('sCurrency').value||'KRW';
+  const feeKrw=safeInt(document.getElementById('sFeeKrw').value,0,100000000000);
+  const memo=document.getElementById('sMemo').value.trim().slice(0,200);
+  const sub={id:'l'+Date.now(),service:service.slice(0,100),category:document.getElementById('sCat').value,fee,currency,feeKrw,cycle:document.getElementById('sCycle').value,renewDate:document.getElementById('sRenew').value,memo,active:true};
+  if(cfg.token&&cfg.subs){try{await mkPage(cfg.subs,{Service:{title:[{text:{content:sub.service}}]},Category:{select:{name:sub.category}},Fee:{number:sub.fee},Cycle:{select:{name:sub.cycle}},RenewDate:sub.renewDate?{date:{start:sub.renewDate}}:{date:null},Active:{checkbox:true},Currency:{select:{name:sub.currency}},FeeKRW:{number:sub.feeKrw||0},Memo:{rich_text:[{text:{content:sub.memo}}]}});}catch(e){}}
+  D.subs.push(sub);render();closeModal('subModal');
+  ['sService','sFee','sFeeKrw','sMemo'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sCurrency').value='KRW';
+  showToast('✅ 구독 저장 완료!','success');
 }
 async function saveMemo(){
   const content=document.getElementById('nmText').value.trim().slice(0,1000);if(!content)return;
