@@ -426,7 +426,7 @@ input,select,textarea{font-family:inherit;}
   <div class="subtabs">
     <button class="stab active" onclick="showSub('goals',this)">목표</button>
     <button class="stab" onclick="showSub('invest',this)">재테크</button>
-    <button class="stab" onclick="showSub('subs',this)">구독</button>
+    <button class="stab" onclick="showSub('subs',this)">정기지출</button>
     <button class="stab" onclick="showSub('memo',this)">메모</button>
   </div>
   <div id="sub-goals">
@@ -454,11 +454,11 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div id="sub-subs" style="display:none">
     <div class="sub-stats">
-      <div class="inv-stat"><div class="inv-stat-l">월 구독비</div><div class="inv-stat-v" id="sv1">—</div><div class="inv-stat-s">원</div></div>
+      <div class="inv-stat"><div class="inv-stat-l">월 정기지출</div><div class="inv-stat-v" id="sv1">—</div><div class="inv-stat-s">원</div></div>
       <div class="inv-stat"><div class="inv-stat-l">연간 환산</div><div class="inv-stat-v" id="sv2">—</div><div class="inv-stat-s">원</div></div>
-      <div class="inv-stat"><div class="inv-stat-l">서비스 수</div><div class="inv-stat-v" id="sv3">—</div><div class="inv-stat-s">개</div></div>
+      <div class="inv-stat"><div class="inv-stat-l">항목 수</div><div class="inv-stat-v" id="sv3">—</div><div class="inv-stat-s">개</div></div>
     </div>
-    <div class="toolbar-scroll"><div class="toolbar"><button class="btn-primary ml-auto" onclick="openModal('subModal')">+ 구독 추가</button></div></div>
+    <div class="toolbar-scroll"><div class="toolbar"><button class="btn-primary ml-auto" onclick="openModal('subModal')">+ 정기지출 추가</button></div></div>
     <div class="sub-cards" id="subCards"><div class="loading-msg">로딩 중...</div></div>
   </div>
   <div id="sub-memo" style="display:none">
@@ -517,7 +517,7 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div class="d-sec">
     <div class="d-lbl">DB 컬럼 구조</div>
-    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/예금/적금/펀드/기타) · Amount · ReturnRate · UpdatedAt(Date)<br><br><b>Subscription:</b> Service · Category · Fee · Cycle(월/연) · RenewDate(Date) · Active(Checkbox)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · CreatedAt(Created time)</div>
+    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/예금/적금/펀드/기타) · Amount · ReturnRate · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category(엔터테인먼트/업무/생산성/AI/개발/헬스/통신비/보험/대출이자/교육/관리비공과금/기타) · Fee · Currency(KRW/USD/EUR/JPY/GBP) · FeeKRW(Number) · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · CreatedAt(Created time)</div>
   </div>
 </div>
 
@@ -555,10 +555,23 @@ input,select,textarea{font-family:inherit;}
 
 <div class="m-wrap" id="subModal"><div class="modal">
   <div class="modal-handle"></div>
-  <div class="m-title">구독 추가</div>
-  <div class="m-fr"><label class="m-fl">서비스명</label><input class="m-fi" id="sService" placeholder="예: Netflix, ChatGPT Plus"></div>
+  <div class="m-title">정기 지출 추가</div>
+  <div class="m-fr"><label class="m-fl">항목명</label><input class="m-fi" id="sService" placeholder="예: Netflix, 통신비, 삼성화재 보험"></div>
   <div class="m-row2" style="margin-bottom:0.75rem">
-    <div><label class="m-fl">카테고리</label><select class="m-sel" id="sCat"><option value="엔터테인먼트">엔터테인먼트</option><option value="업무/생산성">업무/생산성</option><option value="AI/개발">AI/개발</option><option value="헬스">헬스</option><option value="기타">기타</option></select></div>
+    <div><label class="m-fl">카테고리</label>
+      <select class="m-sel" id="sCat">
+        <option value="엔터테인먼트">엔터테인먼트</option>
+        <option value="업무/생산성">업무/생산성</option>
+        <option value="AI/개발">AI/개발</option>
+        <option value="헬스">헬스</option>
+        <option value="통신비">통신비</option>
+        <option value="보험">보험</option>
+        <option value="대출/이자">대출/이자</option>
+        <option value="교육">교육</option>
+        <option value="관리비/공과금">관리비/공과금</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
     <div><label class="m-fl">결제주기</label><select class="m-sel" id="sCycle"><option value="월">월간</option><option value="연">연간</option></select></div>
   </div>
   <div class="m-row2" style="margin-bottom:0.75rem">
@@ -885,10 +898,10 @@ function rSubs(){
   document.getElementById('sv1').textContent=fkrw(mf);
   document.getElementById('sv2').textContent=fkrw(mf*12);
   document.getElementById('sv3').textContent=act.length;
-  const icons={'엔터테인먼트':'▶','AI/개발':'◆','업무/생산성':'◉','헬스':'◎','기타':'○'};
+  const icons={'엔터테인먼트':'▶','AI/개발':'◆','업무/생산성':'◉','헬스':'◎','통신비':'📡','보험':'🛡','대출/이자':'🏦','교육':'📚','관리비/공과금':'🏠','기타':'○'};
   const csym={'KRW':'₩','USD':'$','EUR':'€','JPY':'¥','GBP':'£'};
   const g=document.getElementById('subCards');
-  if(!act.length){g.innerHTML='<div class="loading-msg">구독 정보를 추가해보세요</div>';return;}
+  if(!act.length){g.innerHTML='<div class="loading-msg">정기 지출을 추가해보세요</div>';return;}
   g.innerHTML=act.map(s=>{
     const d=dUntil(s.renewDate),soon=d<=7;
     const sym=csym[s.currency||'KRW']||'₩';
