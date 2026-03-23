@@ -812,7 +812,22 @@ function rSched(id,g){
     el.innerHTML=`<a class="sched-link" href="#" onclick="openCalendar(event,'${g}')"><span class="sched-time" style="color:var(--text-m)">+</span><span class="sched-title" style="color:var(--text-m)">새 일정 추가</span></a>`;
     return;
   }
-  el.innerHTML=items.map(s=>`<a class="sched-link" href="#" onclick="openCalendar(event,'${g}')"><span class="sched-time">${s.time}</span><span class="sched-title">${esc(s.title)}</span><span class="sched-arrow">›</span></a>`).join('');
+  el.innerHTML=items.map(s=>{
+    const isToday=s.time==='오늘';
+    const isTomorrow=s.time==='내일';
+    const timeStyle=isToday
+      ?'color:var(--danger);font-weight:700;'
+      :isTomorrow
+        ?'color:var(--work-c);font-weight:700;'
+        :'';
+    const titleStyle=isToday
+      ?'color:var(--text-h);font-weight:700;'
+      :isTomorrow
+        ?'color:var(--text-b);font-weight:600;'
+        :'';
+    const dot=isToday?'<span style="width:5px;height:5px;border-radius:50%;background:var(--danger);flex-shrink:0;display:inline-block;margin-right:2px"></span>':'';
+    return`<a class="sched-link" href="#" onclick="openCalendar(event,'${g}')"><span class="sched-time" style="${timeStyle}">${s.time}</span>${dot}<span class="sched-title" style="${titleStyle}">${esc(s.title)}</span><span class="sched-arrow">›</span></a>`;
+  }).join('');
 }
 
 function openCalendar(e, group){
