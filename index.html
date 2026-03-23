@@ -965,7 +965,7 @@ function rInvest(){
 async function saveInv(){
   const asset=document.getElementById('iAsset').value.trim();
   if(!asset){showToast('자산명을 입력해주세요','error');return;}
-  const qty=Math.max(parseFloat(document.getElementById('iQty').value)||1,0.000001);
+  const qty=Math.min(Math.max(parseFloat(document.getElementById('iQty').value)||1,0.000001),1000000000);
   const costPrice=safeInt(document.getElementById('iCost').value,0,10000000000000);
   const currentPrice=safeInt(document.getElementById('iCurrent').value,0,10000000000000);
   const editId=document.getElementById('iEditId').value;
@@ -1003,7 +1003,7 @@ function editInv(id){
 }
 
 function updateInvPreview(){
-  const qty=Math.max(parseFloat(document.getElementById('iQty')?.value)||1,0.000001);
+  const qty=Math.min(Math.max(parseFloat(document.getElementById('iQty')?.value)||1,0.000001),1000000000);
   const cost=safeInt(document.getElementById('iCost').value,0,10000000000000);
   const cur=safeInt(document.getElementById('iCurrent').value,0,10000000000000);
   const el=document.getElementById('iCalcPreview');
@@ -1012,12 +1012,18 @@ function updateInvPreview(){
   const totalCur=cur*qty;
   const rate=calcReturn(cost,cur);
   const profit=totalCur-totalCost;
-  el.innerHTML=`총취득 <b>${fkrw(totalCost)}원</b> → 현재 <b>${fkrw(totalCur)}원</b> &nbsp; <span class="calc-rate ${rate>=0?'pos':'neg'}">${rate>=0?'+':''}${rate}%</span> <span class="calc-profit">(${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)</span>`;
+  // textContent로 안전하게 분리 구성
+  el.innerHTML='';
+  const span=document.createElement('span');
+  span.textContent=`총취득 ${fkrw(totalCost)}원 → 현재 ${fkrw(totalCur)}원   ${rate>=0?'+':''}${rate}%  (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)`;
+  span.className=`calc-rate ${rate>=0?'pos':'neg'}`;
+  el.appendChild(span);
 }
 async function saveSub(){
   const service=document.getElementById('sService').value.trim();if(!service){showToast('서비스명을 입력해주세요','error');return;}
   const fee=safeInt(document.getElementById('sFee').value,0,100000000);
-  const currency=document.getElementById('sCurrency').value||'KRW';
+  const VALID_CURRENCIES=['KRW','USD','EUR','JPY','GBP'];
+  const currency=VALID_CURRENCIES.includes(document.getElementById('sCurrency').value)?document.getElementById('sCurrency').value:'KRW';
   const feeKrw=safeInt(document.getElementById('sFeeKrw').value,0,100000000000);
   const memo=document.getElementById('sMemo').value.trim().slice(0,200);
   const sub={id:'l'+Date.now(),service:service.slice(0,100),category:document.getElementById('sCat').value,fee,currency,feeKrw,cycle:document.getElementById('sCycle').value,renewDate:document.getElementById('sRenew').value,memo,active:true};
