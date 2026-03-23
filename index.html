@@ -403,6 +403,7 @@ input,select,textarea{font-family:inherit;}
           <option value="finance">재테크</option>
         </select>
         <label class="quick-memo-pin"><input type="checkbox" id="qmPin"> 📌 고정</label>
+        <label class="quick-memo-pin"><input type="checkbox" id="qmDash" checked> 🏠 대시보드</label>
       </div>
     </div>
     <div class="quick-memo-input-row">
@@ -500,6 +501,7 @@ input,select,textarea{font-family:inherit;}
         <div class="nm-opts">
           <select class="nm-sel" id="nmArea"><option value="">영역 선택</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
           <label class="nm-pin"><input type="checkbox" id="nmPin"> 고정</label>
+          <label class="nm-pin"><input type="checkbox" id="nmDash" checked> 🏠 대시보드</label>
           <button class="nm-save" onclick="saveMemo()">저장</button>
         </div>
       </div>
@@ -836,7 +838,7 @@ async function loadAll(){
     D.goals=g.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'growth').toLowerCase(),period:gp(p,'Period','select')||'월간',progress:gp(p,'Progress','number')||0,status:gp(p,'Status','select')||'진행중',due:gp(p,'Due','date'),desc:gp(p,'Description','text')}));
     D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',currency:gp(p,'Currency','select')||'KRW',qty:gp(p,'Qty','number')||1,costPrice:gp(p,'CostPrice','number')||0,currentPrice:gp(p,'CurrentPrice','number')||0,costRate:gp(p,'CostRate','number')||0,curRate:gp(p,'CurRate','number')||0,memo:gp(p,'Memo','text')||'',updatedAt:gp(p,'UpdatedAt','date')}));
     D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,currency:gp(p,'Currency','select')||'KRW',feeKrw:gp(p,'FeeKRW','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),memo:gp(p,'Memo','text')||'',alert:gp(p,'Alert','check')!==false,active:gp(p,'Active','check')!==false}));
-    D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
+    D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,showInDash:gp(p,'ShowInDash','check')!==false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
     setSS('ok');
     render();
     loadCalendars();
@@ -1284,9 +1286,10 @@ function editSub(id){
 }
 async function saveMemo(){
   const content=document.getElementById('nmText').value.trim().slice(0,1000);if(!content)return;
-  const m={id:'l'+Date.now(),content,area:document.getElementById('nmArea').value,pinned:document.getElementById('nmPin').checked,createdAt:new Date().toISOString()};
-  if(cfg.token&&cfg.memo){try{await mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned}});}catch(e){}}
-  D.memo.unshift(m);rMemo();rHome();document.getElementById('nmText').value='';document.getElementById('nmPin').checked=false;showToast('✅ 메모 저장 완료!','success');
+  const showInDash=document.getElementById('nmDash').checked;
+  const m={id:'l'+Date.now(),content,area:document.getElementById('nmArea').value,pinned:document.getElementById('nmPin').checked,showInDash,createdAt:new Date().toISOString()};
+  if(cfg.token&&cfg.memo){try{await mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}});}catch(e){}}
+  D.memo.unshift(m);rMemo();rHome();document.getElementById('nmText').value='';document.getElementById('nmPin').checked=false;document.getElementById('nmDash').checked=true;showToast('✅ 메모 저장 완료!','success');
 }
 
 async function saveQuickMemo(){
@@ -1296,9 +1299,10 @@ async function saveQuickMemo(){
   btn.disabled=true;btn.textContent='저장 중...';
   const area=document.getElementById('qmArea').value;
   const pinned=document.getElementById('qmPin').checked;
-  const m={id:'l'+Date.now(),content,area,pinned,createdAt:new Date().toISOString()};
+  const showInDash=document.getElementById('qmDash').checked;
+  const m={id:'l'+Date.now(),content,area,pinned,showInDash,createdAt:new Date().toISOString()};
   if(cfg.token&&cfg.memo){
-    try{await mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned}});}
+    try{await mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}});}
     catch(e){showToast('Notion 저장 실패','error');}
   }
   D.memo.unshift(m);
@@ -1306,6 +1310,7 @@ async function saveQuickMemo(){
   rQuickMemoRecent();
   document.getElementById('qmText').value='';
   document.getElementById('qmPin').checked=false;
+  document.getElementById('qmDash').checked=true;
   btn.disabled=false;btn.textContent='저장';
   showToast('✅ 메모가 저장되었습니다!','success');
 }
@@ -1313,7 +1318,7 @@ async function saveQuickMemo(){
 function rQuickMemoRecent(){
   const el=document.getElementById('qmRecent');
   if(!el)return;
-  const recent=D.memo.slice(0,3);
+  const recent=D.memo.filter(m=>m.showInDash!==false).slice(0,3);
   if(!recent.length){el.innerHTML='';return;}
   el.innerHTML=recent.map(m=>{
     const a=AMAP[m.area];
