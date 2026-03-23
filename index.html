@@ -1137,14 +1137,28 @@ function syncDebtAmt(){
 }
 
 function updateInvPreview(){
+  const cat=document.getElementById('iCat')?.value||'';
+  const isDebt=isDebtCat(cat);
   const curSel=document.getElementById('iCurrency')?.value||'KRW';
   const isFx=curSel&&curSel!=='KRW';
   const qty=Math.min(Math.max(parseFloat(document.getElementById('iQty')?.value)||1,0.000001),1000000000);
+  const el=document.getElementById('iCalcPreview');
+
+  if(isDebt){
+    const bal=safeFloat(document.getElementById('iDebtAmt')?.value)||safeFloat(document.getElementById('iCurrent')?.value)||0;
+    if(!bal){el.textContent='현재 잔액을 입력해주세요.';return;}
+    el.innerHTML='';
+    const s=document.createElement('span');
+    s.style.cssText='color:var(--danger);font-weight:700;';
+    s.textContent=`부채 잔액: -${fkrw(bal*qty)}원`;
+    el.appendChild(s);
+    return;
+  }
+
   const cost=safeFloat(document.getElementById('iCost').value);
   const curP=safeFloat(document.getElementById('iCurrent').value);
   const costRate=safeFloat(document.getElementById('iCostRate')?.value)||0;
   const curRate=safeFloat(document.getElementById('iCurRate')?.value)||0;
-  const el=document.getElementById('iCalcPreview');
   if(!cost&&!curP){el.textContent='취득단가·현재단가 입력 시 수익률이 자동 계산됩니다.';return;}
   const costKrw=isFx?(costRate?cost*costRate:0):cost;
   const curKrw=isFx?(curRate?curP*curRate:0):curP;
@@ -1156,7 +1170,7 @@ function updateInvPreview(){
   const span=document.createElement('span');
   span.className=`calc-rate ${rate>=0?'pos':'neg'}`;
   if(isFx&&(!costRate||!curRate)){
-    span.textContent=`환율을 입력하면 원화 수익률이 계산됩니다.`;
+    span.textContent='환율을 입력하면 원화 수익률이 계산됩니다.';
   } else {
     span.textContent=`₩${fkrw(totalCostKrw)} → ₩${fkrw(totalCurKrw)}   ${rate>=0?'+':''}${rate}%  (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)`;
   }
