@@ -621,7 +621,8 @@ input,select,textarea{font-family:inherit;}
 
 <div class="m-wrap" id="subModal"><div class="modal">
   <div class="modal-handle"></div>
-  <div class="m-title">정기 지출 추가</div>
+  <div class="m-title" id="subModalTitle">정기 지출 추가</div>
+  <input type="hidden" id="sEditId" value="">
   <div class="m-fr"><label class="m-fl">항목명</label><input class="m-fi" id="sService" placeholder="예: Netflix, 통신비, 삼성화재 보험"></div>
   <div class="m-row2" style="margin-bottom:0.75rem">
     <div><label class="m-fl">카테고리</label>
@@ -1187,13 +1188,41 @@ async function saveSub(){
   const feeKrw=safeInt(document.getElementById('sFeeKrw').value,0,100000000000);
   const memo=document.getElementById('sMemo').value.trim().slice(0,200);
   const alert=document.getElementById('sAlert').checked;
-  const sub={id:'l'+Date.now(),service:service.slice(0,100),category:document.getElementById('sCat').value,fee,currency,feeKrw,cycle:document.getElementById('sCycle').value,renewDate:document.getElementById('sRenew').value,memo,alert,active:true};
-  if(cfg.token&&cfg.subs){try{await mkPage(cfg.subs,{Service:{title:[{text:{content:sub.service}}]},Category:{select:{name:sub.category}},Fee:{number:sub.fee},Cycle:{select:{name:sub.cycle}},RenewDate:sub.renewDate?{date:{start:sub.renewDate}}:{date:null},Active:{checkbox:true},Alert:{checkbox:sub.alert},Currency:{select:{name:sub.currency}},FeeKRW:{number:sub.feeKrw||0},Memo:{rich_text:[{text:{content:sub.memo}}]}});}catch(e){}}
-  D.subs.push(sub);render();closeModal('subModal');
+  const editId=document.getElementById('sEditId').value;
+  const sub={id:editId||'l'+Date.now(),service:service.slice(0,100),category:document.getElementById('sCat').value,fee,currency,feeKrw,cycle:document.getElementById('sCycle').value,renewDate:document.getElementById('sRenew').value,memo,alert,active:true};
+  if(cfg.token&&cfg.subs){
+    try{
+      const props={Service:{title:[{text:{content:sub.service}}]},Category:{select:{name:sub.category}},Fee:{number:sub.fee},Cycle:{select:{name:sub.cycle}},RenewDate:sub.renewDate?{date:{start:sub.renewDate}}:{date:null},Active:{checkbox:true},Alert:{checkbox:sub.alert},Currency:{select:{name:sub.currency}},FeeKRW:{number:sub.feeKrw||0},Memo:{rich_text:[{text:{content:sub.memo}}]}};
+      if(editId) await nFetch(`pages/${editId}`,'PATCH',{properties:props});
+      else await mkPage(cfg.subs,props);
+    }catch(e){}
+  }
+  if(editId){const idx=D.subs.findIndex(s=>s.id===editId);if(idx>-1)D.subs[idx]=sub;}
+  else D.subs.push(sub);
+  render();closeModal('subModal');
   ['sService','sFee','sFeeKrw','sMemo'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('sCurrency').value='KRW';
   document.getElementById('sAlert').checked=true;
-  showToast('✅ 구독 저장 완료!','success');
+  document.getElementById('sEditId').value='';
+  document.getElementById('subModalTitle').textContent='정기 지출 추가';
+  showToast(`✅ 정기 지출 ${editId?'수정':'저장'} 완료!`,'success');
+}
+
+function editSub(id){
+  const s=D.subs.find(s=>s.id===id);
+  if(!s)return;
+  document.getElementById('subModalTitle').textContent='정기 지출 수정';
+  document.getElementById('sEditId').value=s.id;
+  document.getElementById('sService').value=s.service;
+  document.getElementById('sCat').value=s.category;
+  document.getElementById('sCycle').value=s.cycle||'월';
+  document.getElementById('sFee').value=s.fee||'';
+  document.getElementById('sCurrency').value=s.currency||'KRW';
+  document.getElementById('sFeeKrw').value=s.feeKrw||'';
+  document.getElementById('sRenew').value=s.renewDate||'';
+  document.getElementById('sMemo').value=s.memo||'';
+  document.getElementById('sAlert').checked=s.alert!==false;
+  openModal('subModal');
 }
 async function saveMemo(){
   const content=document.getElementById('nmText').value.trim().slice(0,1000);if(!content)return;
@@ -1253,7 +1282,7 @@ function rSubs(){
     const sym=csym[s.currency||'KRW']||'₩';
     const feeDisplay=(!s.currency||s.currency==='KRW')?`${fkrw(s.fee)}원`:`${sym}${s.fee.toLocaleString()}`;
     const krwNote=(s.currency&&s.currency!=='KRW'&&s.feeKrw)?` <span style="font-size:0.4rem;color:var(--text-m)">(≈${fkrw(s.feeKrw)}원)</span>`:'';
-    return`<div class="sub-card"><div class="sub-ico">${icons[s.category]||'○'}</div><div style="flex:1;min-width:0"><div class="sub-cn">${esc(s.service)}</div><div class="sub-cf">${feeDisplay}${krwNote} / ${s.cycle}간</div><div class="sub-cc">${esc(s.category)}${s.memo?` · ${esc(s.memo)}`:''}</div></div><div class="sub-cr"><div class="sub-rd">${fd(s.renewDate)}</div><span class="sub-rb" style="background:${soon?'#fef2f2':'var(--subtle)'};color:${soon?'var(--danger)':'var(--text-m)'}">${d<=0?'오늘':d+'일 후'}</span></div></div>`;
+    return`<div class="sub-card"><div class="sub-ico">${icons[s.category]||'○'}</div><div style="flex:1;min-width:0"><div class="sub-cn">${esc(s.service)}</div><div class="sub-cf">${feeDisplay}${krwNote} / ${s.cycle}간</div><div class="sub-cc">${esc(s.category)}${s.memo?` · ${esc(s.memo)}`:''}</div></div><div class="sub-cr"><div class="sub-rd">${fd(s.renewDate)}</div><span class="sub-rb" style="background:${soon?'#fef2f2':'var(--subtle)'};color:${soon?'var(--danger)':'var(--text-m)'}">${d<=0?'오늘':d+'일 후'}</span><button class="inv-edit-btn" style="margin-top:0.3rem" onclick="editSub('${s.id}')">수정</button></div></div>`;
   }).join('');
 }
 
