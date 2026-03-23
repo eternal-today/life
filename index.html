@@ -235,11 +235,14 @@ input,select,textarea{font-family:inherit;}
 
 /* 데스크탑 1024px — 단일 분기 */
 @media(min-width:1024px){
-  html{font-size:18px;}
-  .header-inner,.tab-bar-inner{max-width:960px;margin-left:auto;margin-right:auto;padding-left:0;padding-right:0;}
-  .home-wrap,.detail-wrap{max-width:960px;margin-left:auto;margin-right:auto;border-left:1px solid var(--border);border-right:1px solid var(--border);padding-left:1.25rem;padding-right:1.25rem;padding-top:1rem;padding-bottom:2rem;}
-  .area-grid{flex-direction:row;align-items:stretch;}
+  html{font-size:22px;}
+  .header-inner,.tab-bar-inner{max-width:1280px;margin-left:auto;margin-right:auto;padding-left:1.5rem;padding-right:1.5rem;}
+  .home-wrap,.detail-wrap{max-width:1280px;margin-left:auto;margin-right:auto;border-left:1px solid var(--border);border-right:1px solid var(--border);padding-left:1.5rem;padding-right:1.5rem;padding-top:1.25rem;padding-bottom:2rem;}
+  .area-grid{flex-direction:row;align-items:stretch;gap:1rem;}
   .area-card{flex:1;}
+  .area-header{padding:0.75rem 1.25rem;}
+  .area-body{padding:1rem 1.25rem;gap:0.75rem;}
+  .area-footer{padding:0.625rem 1.25rem;}
   .goals-grid{grid-template-columns:repeat(2,1fr);}
   .inv-stats{grid-template-columns:repeat(4,1fr);}
   .sub-cards{display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;}
@@ -496,9 +499,9 @@ input,select,textarea{font-family:inherit;}
 
 <script>
 const AMAP={family:{l:'가정/가족',c:'var(--family-c)',bg:'var(--family-bg)',g:'family'},work:{l:'회사/업무',c:'var(--work-c)',bg:'var(--work-bg)',g:'work'},growth:{l:'개인 성장',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},health:{l:'건강/운동',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},side:{l:'사이드',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},finance:{l:'재테크',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'}};
-const DS={family:[{time:'토',title:'가족 외식'},{time:'일',title:'우림이 수영 레슨'}],work:[{time:'오늘',title:'팀 주간 싱크'},{time:'목',title:'대광직불 미팅'}]};
+const DS={family:[],work:[],personal:[]};
 let cfg={token:'',goals:'',invest:'',subs:'',memo:'',proxy:''};
-let D={goals:[],invest:[],subs:[],memo:[]};
+let D={goals:[],invest:[],subs:[],memo:[],sched:{family:[],work:[],personal:[]}};
 let gF={family:'all',work:'all',personal:'all'};
 
 window.addEventListener('DOMContentLoaded',()=>{loadCfg();initDate();loadAll();});
@@ -521,12 +524,49 @@ function gp(p,k,t){const v=p.properties?.[k];if(!v)return null;if(t==='title')re
 
 async function loadAll(){
   if(!cfg.token){demoData();return;}
-  try{setSS('loading');const[g,i,s,m]=await Promise.all([qDB(cfg.goals),qDB(cfg.invest),qDB(cfg.subs),qDB(cfg.memo)]);
-  D.goals=g.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'growth').toLowerCase(),period:gp(p,'Period','select')||'월간',progress:gp(p,'Progress','number')||0,status:gp(p,'Status','select')||'진행중',due:gp(p,'Due','date'),desc:gp(p,'Description','text')}));
-  D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',amount:gp(p,'Amount','number')||0,returnRate:gp(p,'ReturnRate','number')||0,updatedAt:gp(p,'UpdatedAt','date')}));
-  D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),active:gp(p,'Active','check')!==false}));
-  D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
-  setSS('ok');render();}catch(e){setSS('err');showToast('로드 실패. 데모 모드 전환.','error');demoData();}
+  try{
+    setSS('loading');
+    const[g,i,s,m]=await Promise.all([qDB(cfg.goals),qDB(cfg.invest),qDB(cfg.subs),qDB(cfg.memo)]);
+    D.goals=g.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'growth').toLowerCase(),period:gp(p,'Period','select')||'월간',progress:gp(p,'Progress','number')||0,status:gp(p,'Status','select')||'진행중',due:gp(p,'Due','date'),desc:gp(p,'Description','text')}));
+    D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',amount:gp(p,'Amount','number')||0,returnRate:gp(p,'ReturnRate','number')||0,updatedAt:gp(p,'UpdatedAt','date')}));
+    D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),active:gp(p,'Active','check')!==false}));
+    D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
+    setSS('ok');
+    render();
+    // 캘린더는 별도로 로드 (실패해도 나머지에 영향 없음)
+    loadCalendars();
+  }catch(e){setSS('err');showToast('로드 실패. 데모 모드 전환.','error');demoData();}
+}
+
+async function loadCalendars(){
+  if(!cfg.proxy) return;
+  try{
+    const groups=['family','work','personal'];
+    await Promise.all(groups.map(async g=>{
+      try{
+        const r=await fetch(`${cfg.proxy}/calendar?group=${g}`);
+        const data=await r.json();
+        D.sched[g]=parseCalEvents(data.items||[]);
+        rSched('home-'+g+'-sched',g);
+      }catch(e){}
+    }));
+  }catch(e){}
+}
+
+function parseCalEvents(items){
+  const days=['일','월','화','수','목','금','토'];
+  const today=new Date();today.setHours(0,0,0,0);
+  return items.slice(0,2).map(ev=>{
+    const start=ev.start?.dateTime||ev.start?.date||'';
+    const dt=new Date(start);
+    const diff=Math.round((dt-today)/86400000);
+    let time='';
+    if(diff===0) time='오늘';
+    else if(diff===1) time='내일';
+    else if(diff>1&&diff<7) time=days[dt.getDay()]+'요';
+    else time=`${dt.getMonth()+1}/${dt.getDate()}`;
+    return{time, title:ev.summary||'(제목 없음)'};
+  });
 }
 function setSS(s){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');if(s==='ok'){d.className='sync-dot ok';t.textContent='동기화 완료';}else if(s==='loading'){d.className='sync-dot';t.textContent='로딩 중...';}else{d.className='sync-dot';t.textContent='데모 모드';}}
 
@@ -547,14 +587,20 @@ function rHome(){
   document.getElementById('badge-family').textContent=`${fam.length}개 · ${avg(fam)}%`;
   document.getElementById('badge-work').textContent=`${wrk.length}개 · ${avg(wrk)}%`;
   document.getElementById('badge-personal').textContent=`${per.length}개 · ${avg(per)}%`;
-  rSched('home-family-sched','family');rSched('home-work-sched','work');
+  rSched('home-family-sched','family');
+  rSched('home-work-sched','work');
   rMini('home-family-goals',fam.slice(0,2),'var(--family-c)');
   rMini('home-work-goals',wrk.slice(0,2),'var(--work-c)');
   rMini('home-personal-goals',per.slice(0,2),'var(--personal-c)');
   const soon=D.subs.filter(s=>s.active).sort((a,b)=>new Date(a.renewDate)-new Date(b.renewDate)).slice(0,2);
   document.getElementById('home-personal-subs').innerHTML=soon.length?soon.map(s=>{const d=dUntil(s.renewDate);return`<div class="sub-mini-item"><span class="sub-dday${d<=7?' soon':''}">${d<=0?'오늘':d+'일'}</span><span class="sub-mini-name">${esc(s.service)}</span></div>`;}).join(''):'<div class="ph-txt">갱신 예정 없음</div>';
 }
-function rSched(id,g){const it=(DS[g]||[]).slice(0,1);document.getElementById(id).innerHTML=it.length?it.map(s=>`<div class="sched-item"><span class="sched-time">${s.time}</span><span class="sched-title">${esc(s.title)}</span></div>`).join(''):'<div class="ph-txt">일정이 없습니다</div>';}
+function rSched(id,g){
+  const items=D.sched[g]||[];
+  document.getElementById(id).innerHTML=items.length
+    ?items.map(s=>`<div class="sched-item"><span class="sched-time">${s.time}</span><span class="sched-title">${esc(s.title)}</span></div>`).join('')
+    :'<div class="ph-txt">이번 주 일정 없음</div>';
+}
 function rMini(id,goals,color){const el=document.getElementById(id);if(!goals.length){el.innerHTML='<div class="ph-txt">목표가 없습니다</div>';return;}el.innerHTML=goals.map(g=>`<div class="goal-mini"><div class="gm-bar-wrap"><div class="gm-bar" style="width:${g.progress}%;background:${color}"></div></div><div class="gm-title">${esc(g.title)}</div><div class="gm-pct">${g.progress}%</div></div>`).join('');}
 
 function rGoalPage(group){
