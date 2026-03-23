@@ -71,7 +71,9 @@ input,select,textarea{font-family:inherit;}
 .area-name{font-size:0.75rem;font-weight:700;color:var(--text-h);}
 .area-badge{font-size:0.44rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:20px;}
 .area-arrow{font-size:0.7rem;color:var(--text-m);}
-.area-body{flex:1;padding:0.75rem 1rem;display:flex;flex-direction:column;gap:0.5rem;}
+.area-body{flex:1;padding:0.75rem 1rem;display:flex;flex-direction:column;}
+.area-section{flex:1;padding:0.5rem 0;display:flex;flex-direction:column;border-bottom:1px solid var(--border);}
+.area-section:last-child{border-bottom:none;}
 .sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin-bottom:0.25rem;display:flex;align-items:center;gap:0.4rem;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
 .goal-mini{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--subtle);}
@@ -85,7 +87,9 @@ input,select,textarea{font-family:inherit;}
 .sched-time{font-size:0.42rem;color:var(--text-m);flex-shrink:0;width:1.6rem;font-weight:600;}
 .sched-title{font-size:0.52rem;color:var(--text-b);line-height:1.3;font-weight:500;}
 .memo-mini{font-size:0.5rem;color:var(--text-s);line-height:1.5;background:var(--subtle);border-radius:var(--r-sm);padding:0.4rem 0.625rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.sub-mini-item{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--subtle);}
+.sub-alert-bar{display:flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;background:#fef2f2;border-top:1px solid #fecaca;flex-wrap:wrap;}
+.sub-alert-bar .sub-alert-lbl{font-size:0.42rem;font-weight:700;color:var(--danger);white-space:nowrap;}
+.sub-alert-bar .sub-alert-item{font-size:0.42rem;color:#7f1d1d;background:#fee2e2;padding:0.1rem 0.45rem;border-radius:20px;white-space:nowrap;}
 .sub-mini-item:last-child{border-bottom:none;}
 .sub-dday{font-size:0.42rem;font-weight:700;color:var(--text-m);width:1.8rem;flex-shrink:0;}
 .sub-dday.soon{color:var(--danger);}
@@ -289,8 +293,8 @@ input,select,textarea{font-family:inherit;}
         <span class="area-arrow">›</span>
       </div>
       <div class="area-body">
-        <div><div class="sec-lbl">이번 주 일정</div><div id="home-family-sched"></div></div>
-        <div><div class="sec-lbl">진행 중 목표</div><div id="home-family-goals"></div></div>
+        <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-family-sched"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-family-goals"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('family',document.querySelectorAll('.tab-btn')[1])">전체 보기</button>
@@ -303,8 +307,8 @@ input,select,textarea{font-family:inherit;}
         <span class="area-arrow">›</span>
       </div>
       <div class="area-body">
-        <div><div class="sec-lbl">오늘 · 이번 주</div><div id="home-work-sched"></div></div>
-        <div><div class="sec-lbl">진행 중 목표</div><div id="home-work-goals"></div></div>
+        <div class="area-section"><div class="sec-lbl">오늘 · 이번 주</div><div id="home-work-sched"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-work-goals"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('work',document.querySelectorAll('.tab-btn')[2])">전체 보기</button>
@@ -317,9 +321,10 @@ input,select,textarea{font-family:inherit;}
         <span class="area-arrow">›</span>
       </div>
       <div class="area-body">
-        <div><div class="sec-lbl">진행 중 목표</div><div id="home-personal-goals"></div></div>
-        <div><div class="sec-lbl">갱신 임박 구독</div><div id="home-personal-subs"></div></div>
+        <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-personal-sched"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-personal-goals"></div></div>
       </div>
+      <div id="home-personal-sub-alert"></div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('personal',document.querySelectorAll('.tab-btn')[3])">전체 보기</button>
         <button class="btn-add-sm" style="background:var(--personal-c)" onclick="openGoalModal('personal')">+ 목표</button>
@@ -609,11 +614,18 @@ function rHome(){
   document.getElementById('badge-personal').textContent=`${per.length}개 · ${avg(per)}%`;
   rSched('home-family-sched','family');
   rSched('home-work-sched','work');
+  rSched('home-personal-sched','personal');
   rMini('home-family-goals',fam.slice(0,2),'var(--family-c)');
   rMini('home-work-goals',wrk.slice(0,2),'var(--work-c)');
   rMini('home-personal-goals',per.slice(0,2),'var(--personal-c)');
-  const soon=D.subs.filter(s=>s.active).sort((a,b)=>new Date(a.renewDate)-new Date(b.renewDate)).slice(0,2);
-  document.getElementById('home-personal-subs').innerHTML=soon.length?soon.map(s=>{const d=dUntil(s.renewDate);return`<div class="sub-mini-item"><span class="sub-dday${d<=7?' soon':''}">${d<=0?'오늘':d+'일'}</span><span class="sub-mini-name">${esc(s.service)}</span></div>`;}).join(''):'<div class="ph-txt">갱신 예정 없음</div>';
+  // 30일 이내 갱신 구독만 알림 표시
+  const soon=D.subs.filter(s=>s.active&&dUntil(s.renewDate)<=30).sort((a,b)=>new Date(a.renewDate)-new Date(b.renewDate));
+  const alertEl=document.getElementById('home-personal-sub-alert');
+  if(soon.length){
+    alertEl.innerHTML=`<div class="sub-alert-bar"><span class="sub-alert-lbl">⚠ 갱신 임박</span>${soon.map(s=>{const d=dUntil(s.renewDate);return`<span class="sub-alert-item">${esc(s.service)} ${d<=0?'오늘':d+'일 후'}</span>`;}).join('')}</div>`;
+  } else {
+    alertEl.innerHTML='';
+  }
 }
 function rSched(id,g){
   const items=D.sched[g]||[];
