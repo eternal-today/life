@@ -571,7 +571,7 @@ input,select,textarea{font-family:inherit;}
   <div class="m-fr"><label class="m-fl">자산명</label><input class="m-fi" id="iAsset" placeholder="예: 삼성전자, AAPL, 서울 아파트"></div>
   <div class="m-row2" style="margin-bottom:0.75rem">
     <div><label class="m-fl">분류</label>
-      <select class="m-sel" id="iCat">
+      <select class="m-sel" id="iCat" onchange="updateInvCurrency()">
         <option value="주식">주식</option>
         <option value="ETF">ETF</option>
         <option value="예금">예금</option>
@@ -602,9 +602,13 @@ input,select,textarea{font-family:inherit;}
     <div><label class="m-fl">수량</label><input class="m-fi" id="iQty" type="number" placeholder="10" min="0" step="any" oninput="updateInvPreview()"></div>
     <div><label class="m-fl">기준일</label><input class="m-fi" id="iDate" type="date"></div>
   </div>
-  <div class="m-row2" style="margin-bottom:0.75rem">
+  <div class="m-row2" style="margin-bottom:0.75rem" id="iCostRow">
     <div><label class="m-fl" id="iCostLbl">취득단가 (원)</label><input class="m-fi" id="iCost" type="number" placeholder="70000" oninput="updateInvPreview()"></div>
     <div><label class="m-fl" id="iCurLbl">현재단가 (원)</label><input class="m-fi" id="iCurrent" type="number" placeholder="85000" oninput="updateInvPreview()"></div>
+  </div>
+  <div class="m-fr" id="iDebtRow" style="display:none">
+    <label class="m-fl">현재 잔액 (원)</label>
+    <input class="m-fi" id="iDebtAmt" type="number" placeholder="10000000" oninput="syncDebtAmt()">
   </div>
   <div class="m-row2" id="iKrwRow" style="margin-bottom:0.75rem;display:none">
     <div><label class="m-fl">취득단가 환율 (원/단위)</label><input class="m-fi" id="iCostRate" type="number" placeholder="1350" oninput="updateInvPreview()"></div>
@@ -1076,7 +1080,7 @@ async function saveInv(){
   if(editId){const idx=D.invest.findIndex(i=>i.id===editId);if(idx>-1)D.invest[idx]=inv;}
   else D.invest.push(inv);
   render();closeModal('invModal');
-  ['iAsset','iQty','iCost','iCurrent','iCostRate','iCurRate','iMemo'].forEach(id=>document.getElementById(id).value='');
+  ['iAsset','iQty','iCost','iCurrent','iCostRate','iCurRate','iMemo','iDebtAmt'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('iEditId').value='';
   document.getElementById('iCurrency').value='KRW';
   document.getElementById('invModalTitle').textContent='자산 추가';
@@ -1097,6 +1101,7 @@ function editInv(id){
   document.getElementById('iQty').value=inv.qty||1;
   document.getElementById('iCost').value=inv.costPrice||'';
   document.getElementById('iCurrent').value=inv.currentPrice||'';
+  document.getElementById('iDebtAmt').value=isDebtCat(inv.category)?inv.currentPrice||'':'';
   document.getElementById('iCostRate').value=inv.costRate||'';
   document.getElementById('iCurRate').value=inv.curRate||'';
   document.getElementById('iMemo').value=inv.memo||'';
@@ -1106,12 +1111,28 @@ function editInv(id){
   openModal('invModal');
 }
 
+function isDebtCat(cat){return DEBT_CATS.includes(cat);}
+
 function updateInvCurrency(){
   const cur=document.getElementById('iCurrency').value;
+  const cat=document.getElementById('iCat').value;
   const isFx=cur&&cur!=='KRW';
-  document.getElementById('iCostLbl').textContent=isFx?`취득단가 (${cur})`:'취득단가 (원)';
-  document.getElementById('iCurLbl').textContent=isFx?`현재단가 (${cur})`:'현재단가 (원)';
-  document.getElementById('iKrwRow').style.display=isFx?'':'none';
+  const isDebt=isDebtCat(cat);
+  // 대출 카테고리면 단순 잔액 입력 모드
+  document.getElementById('iCostRow').style.display=isDebt?'none':'';
+  document.getElementById('iDebtRow').style.display=isDebt?'':'none';
+  document.getElementById('iKrwRow').style.display=(!isDebt&&isFx)?'':'none';
+  if(!isDebt){
+    document.getElementById('iCostLbl').textContent=isFx?`취득단가 (${cur})`:'취득단가 (원)';
+    document.getElementById('iCurLbl').textContent=isFx?`현재단가 (${cur})`:'현재단가 (원)';
+  }
+  updateInvPreview();
+}
+
+function syncDebtAmt(){
+  // 잔액 입력을 현재단가에 동기화
+  const v=document.getElementById('iDebtAmt').value;
+  document.getElementById('iCurrent').value=v;
   updateInvPreview();
 }
 
