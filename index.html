@@ -293,7 +293,7 @@ input,select,textarea{font-family:inherit;}
   .area-body{padding:1rem 1.25rem;gap:0.75rem;}
   .area-footer{padding:0.625rem 1.25rem;}
   .goals-grid{grid-template-columns:repeat(2,1fr);}
-  .inv-stats{grid-template-columns:repeat(4,1fr);}
+  .inv-stats{grid-template-columns:repeat(6,1fr);}
   .sub-cards{display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;}
   .memo-layout{flex-direction:row;align-items:start;}
   .memo-list{flex:1;}
@@ -468,9 +468,11 @@ input,select,textarea{font-family:inherit;}
   <div id="sub-invest" style="display:none">
     <div class="inv-stats">
       <div class="inv-stat"><div class="inv-stat-l">총 자산</div><div class="inv-stat-v" id="iv1">—</div><div class="inv-stat-s">원</div></div>
-      <div class="inv-stat"><div class="inv-stat-l">주식</div><div class="inv-stat-v" id="iv2">—</div><div class="inv-stat-s">원</div></div>
+      <div class="inv-stat"><div class="inv-stat-l">총 부채</div><div class="inv-stat-v neg" id="iv5">—</div><div class="inv-stat-s">원</div></div>
+      <div class="inv-stat" style="border:1px solid var(--primary);"><div class="inv-stat-l" style="font-weight:700">순 자산</div><div class="inv-stat-v" id="iv6">—</div><div class="inv-stat-s">원</div></div>
+      <div class="inv-stat"><div class="inv-stat-l">주식/ETF</div><div class="inv-stat-v" id="iv2">—</div><div class="inv-stat-s">원</div></div>
       <div class="inv-stat"><div class="inv-stat-l">예금/적금</div><div class="inv-stat-v" id="iv3">—</div><div class="inv-stat-s">원</div></div>
-      <div class="inv-stat"><div class="inv-stat-l">기타</div><div class="inv-stat-v" id="iv4">—</div><div class="inv-stat-s">원</div></div>
+      <div class="inv-stat"><div class="inv-stat-l">기타 자산</div><div class="inv-stat-v" id="iv4">—</div><div class="inv-stat-s">원</div></div>
     </div>
     <div class="toolbar-scroll"><div class="toolbar"><button class="btn-primary ml-auto" onclick="openModal('invModal')">+ 자산 추가</button></div></div>
     <div class="inv-tbl" id="invTable"><div class="loading-msg">로딩 중...</div></div>
@@ -516,31 +518,32 @@ input,select,textarea{font-family:inherit;}
   <div class="d-sec">
     <div class="d-lbl">Notion API</div>
     <div class="d-note">1. <a href="https://www.notion.so/my-integrations" target="_blank">Notion Integrations</a>에서 생성<br>2. Token 입력 후 각 DB에 Connection 추가<br>3. DB URL의 <code>?v=</code> 앞 32자리 ID 입력</div>
-    <div class="d-fr"><label class="d-fl">Integration Token</label><input class="d-fi" type="password" id="cToken" placeholder="secret_..." oninput="saveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">Integration Token</label><input class="d-fi" type="password" id="cToken" placeholder="secret_..." oninput="debouncedSaveCfg()"></div>
     <button class="d-btn" onclick="testNotion()">연결 테스트</button>
+    <button class="d-btn" style="background:var(--subtle);border:1px solid var(--border);color:var(--text-b);margin-top:0.375rem" onclick="diagCheck()">🔍 상태 진단</button>
   </div>
   <div class="d-sec">
     <div class="d-lbl">DB ID</div>
-    <div class="d-fr"><label class="d-fl">Goals</label><input class="d-fi" id="cGoals" oninput="saveCfg()"></div>
-    <div class="d-fr"><label class="d-fl">Investment</label><input class="d-fi" id="cInvest" oninput="saveCfg()"></div>
-    <div class="d-fr"><label class="d-fl">Subscription</label><input class="d-fi" id="cSubs" oninput="saveCfg()"></div>
-    <div class="d-fr"><label class="d-fl">Memo</label><input class="d-fi" id="cMemo" oninput="saveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">Goals</label><input class="d-fi" id="cGoals" oninput="debouncedSaveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">Investment</label><input class="d-fi" id="cInvest" oninput="debouncedSaveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">Subscription</label><input class="d-fi" id="cSubs" oninput="debouncedSaveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">Memo</label><input class="d-fi" id="cMemo" oninput="debouncedSaveCfg()"></div>
   </div>
   <div class="d-sec">
     <div class="d-lbl">CORS 프록시</div>
     <div class="d-note">GitHub Pages 배포 시 필요합니다. Cloudflare Workers 무료 권장.</div>
-    <div class="d-fr"><label class="d-fl">프록시 URL</label><input class="d-fi" id="cProxy" placeholder="https://your-worker.workers.dev" oninput="saveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">프록시 URL</label><input class="d-fi" id="cProxy" placeholder="https://your-worker.workers.dev" oninput="debouncedSaveCfg()"></div>
   </div>
   <div class="d-sec">
     <div class="d-lbl">Google Calendar ID</div>
     <div class="d-note">캘린더 설정 → <code>캘린더 통합</code> 섹션에서 확인. 일정 클릭 시 해당 캘린더로 새 일정이 생성됩니다.</div>
-    <div class="d-fr"><label class="d-fl">가정 캘린더 ID</label><input class="d-fi" id="cCalFamily" placeholder="xxx@gmail.com 또는 캘린더ID" oninput="saveCfg()"></div>
-    <div class="d-fr"><label class="d-fl">회사 캘린더 ID</label><input class="d-fi" id="cCalWork" placeholder="xxx@gmail.com 또는 캘린더ID" oninput="saveCfg()"></div>
-    <div class="d-fr"><label class="d-fl">개인 캘린더 ID</label><input class="d-fi" id="cCalPersonal" placeholder="xxx@gmail.com 또는 캘린더ID" oninput="saveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">가정 캘린더 ID</label><input class="d-fi" id="cCalFamily" placeholder="xxx@gmail.com 또는 캘린더ID" oninput="debouncedSaveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">회사 캘린더 ID</label><input class="d-fi" id="cCalWork" placeholder="xxx@gmail.com 또는 캘린더ID" oninput="debouncedSaveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">개인 캘린더 ID</label><input class="d-fi" id="cCalPersonal" placeholder="xxx@gmail.com 또는 캘린더ID" oninput="debouncedSaveCfg()"></div>
   </div>
   <div class="d-sec">
     <div class="d-lbl">DB 컬럼 구조</div>
-    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타) · CostPrice(Number) · CurrentPrice(Number) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category(엔터테인먼트/업무/생산성/AI/개발/헬스/통신비/보험/대출이자/교육/관리비공과금/기타) · Fee · Currency(KRW/USD/EUR/JPY/GBP) · FeeKRW(Number) · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · CreatedAt(Created time)</div>
+    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타/주택담보대출/신용대출/마이너스통장/기타대출) · Currency(KRW/USD/EUR/JPY/GBP) · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo(Text) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category(엔터테인먼트/업무/생산성/AI/개발/헬스/통신비/보험/대출이자/교육/관리비공과금/기타) · Fee · Currency(KRW/USD/EUR/JPY/GBP) · FeeKRW(Number) · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · CreatedAt(Created time)</div>
   </div>
 </div>
 
@@ -577,6 +580,12 @@ input,select,textarea{font-family:inherit;}
         <option value="부동산">부동산</option>
         <option value="암호화폐">암호화폐</option>
         <option value="기타">기타</option>
+        <optgroup label="── 부채 ──">
+          <option value="주택담보대출">주택담보대출</option>
+          <option value="신용대출">신용대출</option>
+          <option value="마이너스통장">마이너스통장</option>
+          <option value="기타대출">기타대출</option>
+        </optgroup>
       </select>
     </div>
     <div><label class="m-fl">통화</label>
@@ -702,7 +711,7 @@ async function deriveKey(seed){
   const raw=new TextEncoder().encode(seed);
   const base=await crypto.subtle.importKey('raw',raw,{name:'PBKDF2'},false,['deriveKey']);
   return crypto.subtle.deriveKey(
-    {name:'PBKDF2',salt:new TextEncoder().encode('ET-Salt-2026'),iterations:100000,hash:'SHA-256'},
+    {name:'PBKDF2',salt:new TextEncoder().encode('ET-Salt-2026'),iterations:10000,hash:'SHA-256'},
     base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']
   );
 }
@@ -804,6 +813,10 @@ function gp(p,k,t){const v=p.properties?.[k];if(!v)return null;if(t==='title')re
 
 async function loadAll(){
   if(!cfg.token){demoData();return;}
+  if(!cfg.proxy||!isValidUrl(cfg.proxy)){
+    showToast('⚠ CORS 프록시 URL이 설정되지 않았습니다. 설정(⚙)을 확인해주세요.','error');
+    demoData();return;
+  }
   try{
     setSS('loading');
     const[g,i,s,m]=await Promise.all([qDB(cfg.goals),qDB(cfg.invest),qDB(cfg.subs),qDB(cfg.memo)]);
@@ -813,9 +826,16 @@ async function loadAll(){
     D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
     setSS('ok');
     render();
-    // 캘린더는 별도로 로드 (실패해도 나머지에 영향 없음)
     loadCalendars();
-  }catch(e){setSS('err');showToast('로드 실패. 데모 모드 전환.','error');demoData();}
+  }catch(e){
+    const msg=e?.message||String(e);
+    if(msg==='401') showToast('❌ Token 인증 실패 (401). 설정에서 Token을 다시 확인해주세요.','error');
+    else if(msg==='403') showToast('❌ 접근 권한 없음 (403). DB에 Integration 연결이 됐는지 확인해주세요.','error');
+    else if(msg==='404') showToast('❌ DB를 찾을 수 없음 (404). DB ID를 다시 확인해주세요.','error');
+    else showToast(`❌ 로드 실패 (${msg}). 설정(⚙)을 확인해주세요.`,'error');
+    setSS('err');
+    demoData();
+  }
 }
 
 async function loadCalendars(){
@@ -946,20 +966,29 @@ function calcReturn(cost,cur){
   if(!cost||cost===0)return 0;
   return Math.round((cur-cost)/cost*1000)/10;
 }
+const DEBT_CATS=['주택담보대출','신용대출','마이너스통장','기타대출'];
+function isDebt(i){return DEBT_CATS.includes(i.category);}
 function toKrw(inv,type){
-  // type: 'cost' or 'cur'
   const price=type==='cost'?inv.costPrice:inv.currentPrice;
   const rate=type==='cost'?inv.costRate:inv.curRate;
   if(!inv.currency||inv.currency==='KRW') return price;
-  return rate?price*rate:0; // 환율 없으면 0 (미입력)
+  return rate?price*rate:0;
 }
 const CSYM={'KRW':'₩','USD':'$','EUR':'€','JPY':'¥','GBP':'£'};
 function rInvest(){
-  const totCurrent=D.invest.reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
-  const totCost=D.invest.reduce((a,i)=>a+toKrw(i,'cost')*(i.qty||1),0);
+  const assets=D.invest.filter(i=>!isDebt(i));
+  const debts=D.invest.filter(i=>isDebt(i));
+  const totCurrent=assets.reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
+  const totCost=assets.reduce((a,i)=>a+toKrw(i,'cost')*(i.qty||1),0);
+  const totDebt=debts.reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
+  const netWorth=totCurrent-totDebt;
   const totRate=totCost?Math.round((totCurrent-totCost)/totCost*1000)/10:0;
-  const bc=c=>D.invest.filter(i=>i.category===c).reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
+  const bc=c=>assets.filter(i=>i.category===c).reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
   document.getElementById('iv1').textContent=fkrw(totCurrent);
+  document.getElementById('iv5').textContent=fkrw(totDebt);
+  const nw=document.getElementById('iv6');
+  nw.textContent=fkrw(Math.abs(netWorth));
+  nw.className='inv-stat-v '+(netWorth>=0?'':'neg');
   document.getElementById('iv2').textContent=fkrw(bc('주식')+bc('ETF'));
   document.getElementById('iv3').textContent=fkrw(bc('예금')+bc('적금'));
   document.getElementById('iv4').textContent=fkrw(totCurrent-bc('주식')-bc('ETF')-bc('예금')-bc('적금'));
@@ -967,31 +996,57 @@ function rInvest(){
   if(!D.invest.length){t.innerHTML='<div class="loading-msg">자산 정보를 추가해보세요</div>';return;}
   const rateHtml=totCost?`<span class="${totRate>=0?'pos':'neg'}">${totRate>=0?'+':''}${totRate}%</span>`:'—';
   const sym=i=>CSYM[i.currency||'KRW']||'₩';
-  t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>통화</th><th>수량</th><th>취득단가</th><th>총취득(₩)</th><th>현재단가</th><th>현재총액(₩)</th><th>수익률</th><th>기준일</th><th></th></tr></thead><tbody>${D.invest.map(i=>{
-    const qty=i.qty||1;
-    const costKrw=toKrw(i,'cost');
-    const curKrw=toKrw(i,'cur');
-    const totalCostKrw=costKrw*qty;
-    const totalCurKrw=curKrw*qty;
-    const rate=calcReturn(costKrw,curKrw);
-    const profit=totalCurKrw-totalCostKrw;
-    const isFx=i.currency&&i.currency!=='KRW';
-    const costDisp=isFx?`${sym(i)}${i.costPrice.toLocaleString()}`:fkrw(i.costPrice)+'원';
-    const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
-    return`<tr>
-      <td style="font-weight:600">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td>
-      <td><span class="tag" style="background:var(--subtle);color:var(--text-s)">${esc(i.category)}</span></td>
-      <td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td>
-      <td style="text-align:right">${qty.toLocaleString()}</td>
-      <td style="text-align:right">${i.costPrice?costDisp:'—'}</td>
-      <td style="text-align:right">${totalCostKrw?fkrw(totalCostKrw)+'원':'—'}</td>
-      <td style="text-align:right">${i.currentPrice?curDisp:'—'}</td>
-      <td style="text-align:right;font-weight:600">${totalCurKrw?fkrw(totalCurKrw)+'원':'—'}</td>
-      <td class="${rate>=0?'pos':'neg'}" style="text-align:right">${costKrw?`${rate>=0?'+':''}${rate}%<br><span style="font-size:0.42rem;font-weight:400">${profit>=0?'+':''}${fkrw(Math.abs(profit))}</span>`:'—'}</td>
-      <td style="color:var(--text-m)">${fd(i.updatedAt)}</td>
-      <td><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button></td>
-    </tr>`;
-  }).join('')}</tbody><tfoot><tr><td colspan="7" style="padding:0.625rem 0.875rem;font-size:0.44rem;color:var(--text-m)">총 평가액 / 수익률</td><td style="padding:0.625rem 0.875rem;font-weight:700">${fkrw(totCurrent)}원</td><td class="${totRate>=0?'pos':'neg'}" style="padding:0.625rem 0.875rem">${rateHtml}</td><td colspan="2"></td></tr></tfoot></table>`;
+  const rows=[
+    ...assets.map(i=>renderInvRow(i,sym)),
+    ...(debts.length?[`<tr><td colspan="11" style="padding:0.5rem 0.875rem;font-size:0.44rem;font-weight:700;color:var(--danger);background:#fef2f2;border-radius:4px">── 부채 ──</td></tr>`]:[]),
+    ...debts.map(i=>renderDebtRow(i,sym)),
+  ];
+  t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>통화</th><th>수량</th><th>취득단가</th><th>총취득(₩)</th><th>현재단가</th><th>현재총액(₩)</th><th>수익률</th><th>기준일</th><th></th></tr></thead><tbody>${rows.join('')}</tbody><tfoot><tr><td colspan="7" style="padding:0.625rem 0.875rem;font-size:0.44rem;color:var(--text-m)">총 자산 / 수익률</td><td style="padding:0.625rem 0.875rem;font-weight:700">${fkrw(totCurrent)}원</td><td class="${totRate>=0?'pos':'neg'}" style="padding:0.625rem 0.875rem">${rateHtml}</td><td colspan="2"></td></tr><tr><td colspan="7" style="padding:0.5rem 0.875rem;font-size:0.44rem;color:var(--danger)">총 부채</td><td style="padding:0.5rem 0.875rem;font-weight:700;color:var(--danger)">-${fkrw(totDebt)}원</td><td colspan="3"></td></tr><tr><td colspan="7" style="padding:0.5rem 0.875rem;font-size:0.44rem;font-weight:700">순 자산</td><td style="padding:0.5rem 0.875rem;font-weight:700;font-size:0.6rem" class="${netWorth>=0?'':'neg'}">${netWorth>=0?'':'-'}${fkrw(Math.abs(netWorth))}원</td><td colspan="3"></td></tr></tfoot></table>`;
+}
+
+function renderInvRow(i,sym){
+  const qty=i.qty||1;
+  const costKrw=toKrw(i,'cost');
+  const curKrw=toKrw(i,'cur');
+  const totalCostKrw=costKrw*qty;
+  const totalCurKrw=curKrw*qty;
+  const rate=calcReturn(costKrw,curKrw);
+  const profit=totalCurKrw-totalCostKrw;
+  const isFx=i.currency&&i.currency!=='KRW';
+  const costDisp=isFx?`${sym(i)}${i.costPrice.toLocaleString()}`:fkrw(i.costPrice)+'원';
+  const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
+  return`<tr>
+    <td style="font-weight:600">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td>
+    <td><span class="tag" style="background:var(--subtle);color:var(--text-s)">${esc(i.category)}</span></td>
+    <td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td>
+    <td style="text-align:right">${qty.toLocaleString()}</td>
+    <td style="text-align:right">${i.costPrice?costDisp:'—'}</td>
+    <td style="text-align:right">${totalCostKrw?fkrw(totalCostKrw)+'원':'—'}</td>
+    <td style="text-align:right">${i.currentPrice?curDisp:'—'}</td>
+    <td style="text-align:right;font-weight:600">${totalCurKrw?fkrw(totalCurKrw)+'원':'—'}</td>
+    <td class="${rate>=0?'pos':'neg'}" style="text-align:right">${costKrw?`${rate>=0?'+':''}${rate}%<br><span style="font-size:0.42rem;font-weight:400">${profit>=0?'+':''}${fkrw(Math.abs(profit))}</span>`:'—'}</td>
+    <td style="color:var(--text-m)">${fd(i.updatedAt)}</td>
+    <td><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button></td>
+  </tr>`;
+}
+
+function renderDebtRow(i,sym){
+  const qty=i.qty||1;
+  const curKrw=toKrw(i,'cur');
+  const totalKrw=curKrw*qty;
+  const isFx=i.currency&&i.currency!=='KRW';
+  const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
+  return`<tr style="background:#fef9f9">
+    <td style="font-weight:600;color:var(--danger)">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td>
+    <td><span class="tag" style="background:#fee2e2;color:var(--danger)">${esc(i.category)}</span></td>
+    <td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td>
+    <td style="text-align:right">${qty.toLocaleString()}</td>
+    <td colspan="2" style="text-align:center;color:var(--text-m);font-size:0.44rem">—</td>
+    <td style="text-align:right;color:var(--danger)">${i.currentPrice?curDisp:'—'}</td>
+    <td style="text-align:right;font-weight:600;color:var(--danger)">${totalKrw?'-'+fkrw(totalKrw)+'원':'—'}</td>
+    <td colspan="2" style="color:var(--text-m);font-size:0.44rem;text-align:center">—</td>
+    <td><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button></td>
+  </tr>`;
 }
 
 async function saveInv(){
@@ -1012,7 +1067,11 @@ async function saveInv(){
       const props={Asset:{title:[{text:{content:inv.asset}}]},Category:{select:{name:inv.category}},Currency:{select:{name:inv.currency}},Qty:{number:inv.qty},CostPrice:{number:inv.costPrice},CurrentPrice:{number:inv.currentPrice},CostRate:{number:inv.costRate||0},CurRate:{number:inv.curRate||0},Memo:{rich_text:[{text:{content:inv.memo}}]},UpdatedAt:inv.updatedAt?{date:{start:inv.updatedAt}}:{date:null}};
       if(editId) await nFetch(`pages/${editId}`,'PATCH',{properties:props});
       else await mkPage(cfg.invest,props);
-    }catch(e){showToast('Notion 저장 실패','error');}
+    }catch(e){
+      showToast('❌ Notion 저장 실패 — DB 컬럼을 확인해주세요 (Currency, Qty, CostRate, CurRate, Memo)','error');
+      console.error('saveInv error:',e);
+      return;
+    }
   }
   if(editId){const idx=D.invest.findIndex(i=>i.id===editId);if(idx>-1)D.invest[idx]=inv;}
   else D.invest.push(inv);
@@ -1190,6 +1249,25 @@ document.getElementById('iCurrent').addEventListener('input',updateInvPreview);
 function openGoalModal(group){document.getElementById('gArea').value={family:'family',work:'work',personal:'growth'}[group]||'growth';openModal('goalModal');}
 async function testNotion(){await saveCfg();if(!cfg.token){showToast('Token을 입력해주세요','error');return;}try{await nFetch('users/me');showToast('✅ 연결 성공!','success');loadAll();}catch(e){showToast('❌ 연결 실패 — CORS 프록시를 확인해주세요','error');}}
 
+async function diagCheck(){
+  const lines=[];
+  lines.push(`Token: ${cfg.token?'✅ 입력됨':'❌ 없음'}`);
+  lines.push(`Proxy: ${cfg.proxy?'✅ '+cfg.proxy.slice(0,30)+'...':'❌ 없음'}`);
+  lines.push(`Goals DB: ${cfg.goals?'✅':'❌ 없음'}`);
+  lines.push(`Invest DB: ${cfg.invest?'✅':'❌ 없음'}`);
+  lines.push(`Subs DB: ${cfg.subs?'✅':'❌ 없음'}`);
+  lines.push(`Memo DB: ${cfg.memo?'✅':'❌ 없음'}`);
+  if(cfg.token&&cfg.proxy){
+    try{
+      await nFetch('users/me');
+      lines.push('API 연결: ✅ 성공');
+    }catch(e){
+      lines.push(`API 연결: ❌ 실패 (${e.message})`);
+    }
+  }
+  alert(lines.join('\n'));
+}
+
 async function saveGoal(){
   const title=document.getElementById('gTitle').value.trim();if(!title){showToast('제목을 입력해주세요','error');return;}
   const btn=document.getElementById('bSaveGoal');btn.disabled=true;btn.textContent='저장 중...';
@@ -1204,6 +1282,9 @@ async function saveGoal(){
   showToast('✅ 목표 저장 완료!','success');
 }
 
+let _saveCfgTimer=null;
+function debouncedSaveCfg(){clearTimeout(_saveCfgTimer);_saveCfgTimer=setTimeout(()=>saveCfg(),400);}
+
 async function saveCfgAndCopyUrl(){
   await saveCfg();
   const url=location.href;
@@ -1214,8 +1295,8 @@ async function saveCfgAndCopyUrl(){
 function copySettings(){
   saveCfgAndCopyUrl();
 }
-function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000);}
-function fkrw(n){if(n>=100000000)return(n/100000000).toFixed(1)+'억';if(n>=10000)return Math.round(n/10000)+'만';return n.toLocaleString();}
+function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',type==='error'?6000:3000);}
+function fkrw(n){if(n>=100000000)return(n/100000000).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g,',')+'억';if(n>=10000)return Math.round(n/10000).toLocaleString()+'만';return n.toLocaleString();}
 function fd(d){if(!d)return'—';return d.slice(0,10).replace(/-/g,'.');}
 function fdt(d){if(!d)return'';const dt=new Date(d);return`${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;}
 function dUntil(d){if(!d)return 999;return Math.ceil((new Date(d)-new Date())/86400000);}
