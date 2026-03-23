@@ -684,14 +684,28 @@ function rSched(id,g){
   const items=D.sched[g]||[];
   const el=document.getElementById(id);
   if(!el)return;
+  const newEventUrl='https://calendar.google.com/calendar/r/eventedit';
   if(!items.length){
-    el.innerHTML='<div class="ph-txt">이번 주 일정 없음</div>';
+    el.innerHTML=`<a class="sched-link" href="${newEventUrl}" target="_blank" onclick="openCalendar(event)"><span class="sched-time" style="color:var(--text-m)">+</span><span class="sched-title" style="color:var(--text-m)">새 일정 추가</span></a>`;
     return;
   }
-  el.innerHTML=items.map(s=>{
-    const gcalLink=s.htmlLink?`href="${s.htmlLink}" target="_blank"`:'href="https://calendar.google.com" target="_blank"';
-    return`<a class="sched-item sched-link" ${gcalLink}><span class="sched-time">${s.time}</span><span class="sched-title">${esc(s.title)}</span><span class="sched-arrow">›</span></a>`;
-  }).join('');
+  el.innerHTML=items.map(s=>`<a class="sched-link" href="${newEventUrl}" target="_blank" onclick="openCalendar(event)"><span class="sched-time">${s.time}</span><span class="sched-title">${esc(s.title)}</span><span class="sched-arrow">›</span></a>`).join('');
+}
+
+function openCalendar(e){
+  e.preventDefault();
+  const url='https://calendar.google.com/calendar/r/eventedit';
+  const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(isMobile){
+    // 구글 캘린더 앱 딥링크 시도 → 미설치 시 웹으로 폴백
+    const start=Date.now();
+    window.location.href='googlecalendar://';
+    setTimeout(()=>{
+      if(Date.now()-start<1500) window.open(url,'_blank');
+    },1000);
+  } else {
+    window.open(url,'_blank');
+  }
 }
 function rMini(id,goals,color){const el=document.getElementById(id);if(!goals.length){el.innerHTML='<div class="ph-txt">목표가 없습니다</div>';return;}el.innerHTML=goals.map(g=>`<div class="goal-mini"><div class="gm-bar-wrap"><div class="gm-bar" style="width:${g.progress}%;background:${color}"></div></div><div class="gm-title">${esc(g.title)}</div><div class="gm-pct">${g.progress}%</div></div>`).join('');}
 
