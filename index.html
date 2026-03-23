@@ -565,7 +565,7 @@ input,select,textarea{font-family:inherit;}
   <div class="modal-handle"></div>
   <div class="m-title" id="invModalTitle">자산 추가</div>
   <input type="hidden" id="iEditId" value="">
-  <div class="m-fr"><label class="m-fl">자산명</label><input class="m-fi" id="iAsset" placeholder="예: 삼성전자, KB정기예금, 서울 아파트"></div>
+  <div class="m-fr"><label class="m-fl">자산명</label><input class="m-fi" id="iAsset" placeholder="예: 삼성전자, AAPL, 서울 아파트"></div>
   <div class="m-row2" style="margin-bottom:0.75rem">
     <div><label class="m-fl">분류</label>
       <select class="m-sel" id="iCat">
@@ -579,14 +579,30 @@ input,select,textarea{font-family:inherit;}
         <option value="기타">기타</option>
       </select>
     </div>
-    <div><label class="m-fl">수량</label><input class="m-fi" id="iQty" type="number" placeholder="10" min="0" step="any"></div>
+    <div><label class="m-fl">통화</label>
+      <select class="m-sel" id="iCurrency" onchange="updateInvCurrency()">
+        <option value="KRW">₩ 원화 (KRW)</option>
+        <option value="USD">$ 달러 (USD)</option>
+        <option value="EUR">€ 유로 (EUR)</option>
+        <option value="JPY">¥ 엔화 (JPY)</option>
+        <option value="GBP">£ 파운드 (GBP)</option>
+      </select>
+    </div>
   </div>
   <div class="m-row2" style="margin-bottom:0.75rem">
-    <div><label class="m-fl">취득단가 (원)</label><input class="m-fi" id="iCost" type="number" placeholder="70000" oninput="updateInvPreview()"></div>
-    <div><label class="m-fl">현재단가 (원)</label><input class="m-fi" id="iCurrent" type="number" placeholder="85000" oninput="updateInvPreview()"></div>
+    <div><label class="m-fl">수량</label><input class="m-fi" id="iQty" type="number" placeholder="10" min="0" step="any" oninput="updateInvPreview()"></div>
+    <div><label class="m-fl">기준일</label><input class="m-fi" id="iDate" type="date"></div>
   </div>
-  <div class="m-fr"><label class="m-fl">기준일</label><input class="m-fi" id="iDate" type="date"></div>
+  <div class="m-row2" style="margin-bottom:0.75rem">
+    <div><label class="m-fl" id="iCostLbl">취득단가 (원)</label><input class="m-fi" id="iCost" type="number" placeholder="70000" oninput="updateInvPreview()"></div>
+    <div><label class="m-fl" id="iCurLbl">현재단가 (원)</label><input class="m-fi" id="iCurrent" type="number" placeholder="85000" oninput="updateInvPreview()"></div>
+  </div>
+  <div class="m-row2" id="iKrwRow" style="margin-bottom:0.75rem;display:none">
+    <div><label class="m-fl">취득단가 환율 (원/단위)</label><input class="m-fi" id="iCostRate" type="number" placeholder="1350" oninput="updateInvPreview()"></div>
+    <div><label class="m-fl">현재단가 환율 (원/단위)</label><input class="m-fi" id="iCurRate" type="number" placeholder="1380" oninput="updateInvPreview()"></div>
+  </div>
   <div class="inv-calc-preview" id="iCalcPreview"></div>
+  <div class="m-fr"><label class="m-fl">메모 (선택)</label><input class="m-fi" id="iMemo" placeholder="예: 대출 3억, 최초 투자 아이디어, 목표 수익률 등"></div>
   <div class="m-acts"><button class="m-cancel" onclick="closeModal('invModal')">취소</button><button class="m-save" id="bSaveInv" onclick="saveInv()">저장</button></div>
 </div></div>
 
@@ -792,7 +808,7 @@ async function loadAll(){
     setSS('loading');
     const[g,i,s,m]=await Promise.all([qDB(cfg.goals),qDB(cfg.invest),qDB(cfg.subs),qDB(cfg.memo)]);
     D.goals=g.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'growth').toLowerCase(),period:gp(p,'Period','select')||'월간',progress:gp(p,'Progress','number')||0,status:gp(p,'Status','select')||'진행중',due:gp(p,'Due','date'),desc:gp(p,'Description','text')}));
-    D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',qty:gp(p,'Qty','number')||1,costPrice:gp(p,'CostPrice','number')||0,currentPrice:gp(p,'CurrentPrice','number')||0,updatedAt:gp(p,'UpdatedAt','date')}));
+    D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',currency:gp(p,'Currency','select')||'KRW',qty:gp(p,'Qty','number')||1,costPrice:gp(p,'CostPrice','number')||0,currentPrice:gp(p,'CurrentPrice','number')||0,costRate:gp(p,'CostRate','number')||0,curRate:gp(p,'CurRate','number')||0,memo:gp(p,'Memo','text')||'',updatedAt:gp(p,'UpdatedAt','date')}));
     D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,currency:gp(p,'Currency','select')||'KRW',feeKrw:gp(p,'FeeKRW','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),memo:gp(p,'Memo','text')||'',active:gp(p,'Active','check')!==false}));
     D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
     setSS('ok');
@@ -930,11 +946,19 @@ function calcReturn(cost,cur){
   if(!cost||cost===0)return 0;
   return Math.round((cur-cost)/cost*1000)/10;
 }
+function toKrw(inv,type){
+  // type: 'cost' or 'cur'
+  const price=type==='cost'?inv.costPrice:inv.currentPrice;
+  const rate=type==='cost'?inv.costRate:inv.curRate;
+  if(!inv.currency||inv.currency==='KRW') return price;
+  return rate?price*rate:0; // 환율 없으면 0 (미입력)
+}
+const CSYM={'KRW':'₩','USD':'$','EUR':'€','JPY':'¥','GBP':'£'};
 function rInvest(){
-  const totCurrent=D.invest.reduce((a,i)=>a+(i.currentPrice||0)*(i.qty||1),0);
-  const totCost=D.invest.reduce((a,i)=>a+(i.costPrice||0)*(i.qty||1),0);
+  const totCurrent=D.invest.reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
+  const totCost=D.invest.reduce((a,i)=>a+toKrw(i,'cost')*(i.qty||1),0);
   const totRate=totCost?Math.round((totCurrent-totCost)/totCost*1000)/10:0;
-  const bc=c=>D.invest.filter(i=>i.category===c).reduce((a,i)=>a+(i.currentPrice||0)*(i.qty||1),0);
+  const bc=c=>D.invest.filter(i=>i.category===c).reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
   document.getElementById('iv1').textContent=fkrw(totCurrent);
   document.getElementById('iv2').textContent=fkrw(bc('주식')+bc('ETF'));
   document.getElementById('iv3').textContent=fkrw(bc('예금')+bc('적금'));
@@ -942,38 +966,50 @@ function rInvest(){
   const t=document.getElementById('invTable');
   if(!D.invest.length){t.innerHTML='<div class="loading-msg">자산 정보를 추가해보세요</div>';return;}
   const rateHtml=totCost?`<span class="${totRate>=0?'pos':'neg'}">${totRate>=0?'+':''}${totRate}%</span>`:'—';
-  t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>수량</th><th>취득단가</th><th>총취득액</th><th>현재단가</th><th>현재총액</th><th>수익률</th><th>기준일</th><th></th></tr></thead><tbody>${D.invest.map(i=>{
+  const sym=i=>CSYM[i.currency||'KRW']||'₩';
+  t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>통화</th><th>수량</th><th>취득단가</th><th>총취득(₩)</th><th>현재단가</th><th>현재총액(₩)</th><th>수익률</th><th>기준일</th><th></th></tr></thead><tbody>${D.invest.map(i=>{
     const qty=i.qty||1;
-    const totalCost=(i.costPrice||0)*qty;
-    const totalCur=(i.currentPrice||0)*qty;
-    const rate=calcReturn(i.costPrice,i.currentPrice);
-    const profit=totalCur-totalCost;
+    const costKrw=toKrw(i,'cost');
+    const curKrw=toKrw(i,'cur');
+    const totalCostKrw=costKrw*qty;
+    const totalCurKrw=curKrw*qty;
+    const rate=calcReturn(costKrw,curKrw);
+    const profit=totalCurKrw-totalCostKrw;
+    const isFx=i.currency&&i.currency!=='KRW';
+    const costDisp=isFx?`${sym(i)}${i.costPrice.toLocaleString()}`:fkrw(i.costPrice)+'원';
+    const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
     return`<tr>
-      <td style="font-weight:600">${esc(i.asset)}</td>
+      <td style="font-weight:600">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td>
       <td><span class="tag" style="background:var(--subtle);color:var(--text-s)">${esc(i.category)}</span></td>
+      <td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td>
       <td style="text-align:right">${qty.toLocaleString()}</td>
-      <td style="text-align:right">${i.costPrice?fkrw(i.costPrice)+'원':'—'}</td>
-      <td style="text-align:right">${totalCost?fkrw(totalCost)+'원':'—'}</td>
-      <td style="text-align:right">${i.currentPrice?fkrw(i.currentPrice)+'원':'—'}</td>
-      <td style="text-align:right;font-weight:600">${totalCur?fkrw(totalCur)+'원':'—'}</td>
-      <td class="${rate>=0?'pos':'neg'}" style="text-align:right">${i.costPrice?`${rate>=0?'+':''}${rate}%<br><span style="font-size:0.42rem;font-weight:400">${profit>=0?'+':''}${fkrw(Math.abs(profit))}</span>`:'—'}</td>
+      <td style="text-align:right">${i.costPrice?costDisp:'—'}</td>
+      <td style="text-align:right">${totalCostKrw?fkrw(totalCostKrw)+'원':'—'}</td>
+      <td style="text-align:right">${i.currentPrice?curDisp:'—'}</td>
+      <td style="text-align:right;font-weight:600">${totalCurKrw?fkrw(totalCurKrw)+'원':'—'}</td>
+      <td class="${rate>=0?'pos':'neg'}" style="text-align:right">${costKrw?`${rate>=0?'+':''}${rate}%<br><span style="font-size:0.42rem;font-weight:400">${profit>=0?'+':''}${fkrw(Math.abs(profit))}</span>`:'—'}</td>
       <td style="color:var(--text-m)">${fd(i.updatedAt)}</td>
       <td><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button></td>
     </tr>`;
-  }).join('')}</tbody><tfoot><tr><td colspan="6" style="padding:0.625rem 0.875rem;font-size:0.44rem;color:var(--text-m)">총 평가액 / 수익률</td><td style="padding:0.625rem 0.875rem;font-weight:700">${fkrw(totCurrent)}원</td><td class="${totRate>=0?'pos':'neg'}" style="padding:0.625rem 0.875rem">${rateHtml}</td><td colspan="2"></td></tr></tfoot></table>`;
+  }).join('')}</tbody><tfoot><tr><td colspan="7" style="padding:0.625rem 0.875rem;font-size:0.44rem;color:var(--text-m)">총 평가액 / 수익률</td><td style="padding:0.625rem 0.875rem;font-weight:700">${fkrw(totCurrent)}원</td><td class="${totRate>=0?'pos':'neg'}" style="padding:0.625rem 0.875rem">${rateHtml}</td><td colspan="2"></td></tr></tfoot></table>`;
 }
 
 async function saveInv(){
   const asset=document.getElementById('iAsset').value.trim();
   if(!asset){showToast('자산명을 입력해주세요','error');return;}
+  const VALID_INV_CURRENCIES=['KRW','USD','EUR','JPY','GBP'];
+  const currency=VALID_INV_CURRENCIES.includes(document.getElementById('iCurrency').value)?document.getElementById('iCurrency').value:'KRW';
   const qty=Math.min(Math.max(parseFloat(document.getElementById('iQty').value)||1,0.000001),1000000000);
-  const costPrice=safeInt(document.getElementById('iCost').value,0,10000000000000);
-  const currentPrice=safeInt(document.getElementById('iCurrent').value,0,10000000000000);
+  const costPrice=safeFloat(document.getElementById('iCost').value);
+  const currentPrice=safeFloat(document.getElementById('iCurrent').value);
+  const costRate=safeFloat(document.getElementById('iCostRate').value);
+  const curRate=safeFloat(document.getElementById('iCurRate').value);
+  const memo=document.getElementById('iMemo').value.trim().slice(0,500);
   const editId=document.getElementById('iEditId').value;
-  const inv={id:editId||'l'+Date.now(),asset:asset.slice(0,100),category:document.getElementById('iCat').value,qty,costPrice,currentPrice,updatedAt:document.getElementById('iDate').value};
+  const inv={id:editId||'l'+Date.now(),asset:asset.slice(0,100),category:document.getElementById('iCat').value,currency,qty,costPrice,currentPrice,costRate,curRate,memo,updatedAt:document.getElementById('iDate').value};
   if(cfg.token&&cfg.invest){
     try{
-      const props={Asset:{title:[{text:{content:inv.asset}}]},Category:{select:{name:inv.category}},Qty:{number:inv.qty},CostPrice:{number:inv.costPrice},CurrentPrice:{number:inv.currentPrice},UpdatedAt:inv.updatedAt?{date:{start:inv.updatedAt}}:{date:null}};
+      const props={Asset:{title:[{text:{content:inv.asset}}]},Category:{select:{name:inv.category}},Currency:{select:{name:inv.currency}},Qty:{number:inv.qty},CostPrice:{number:inv.costPrice},CurrentPrice:{number:inv.currentPrice},CostRate:{number:inv.costRate||0},CurRate:{number:inv.curRate||0},Memo:{rich_text:[{text:{content:inv.memo}}]},UpdatedAt:inv.updatedAt?{date:{start:inv.updatedAt}}:{date:null}};
       if(editId) await nFetch(`pages/${editId}`,'PATCH',{properties:props});
       else await mkPage(cfg.invest,props);
     }catch(e){showToast('Notion 저장 실패','error');}
@@ -981,10 +1017,13 @@ async function saveInv(){
   if(editId){const idx=D.invest.findIndex(i=>i.id===editId);if(idx>-1)D.invest[idx]=inv;}
   else D.invest.push(inv);
   render();closeModal('invModal');
-  ['iAsset','iQty','iCost','iCurrent'].forEach(id=>document.getElementById(id).value='');
+  ['iAsset','iQty','iCost','iCurrent','iCostRate','iCurRate','iMemo'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('iEditId').value='';
+  document.getElementById('iCurrency').value='KRW';
   document.getElementById('invModalTitle').textContent='자산 추가';
   document.getElementById('iCalcPreview').textContent='';
+  document.getElementById('iKrwRow').style.display='none';
+  updateInvCurrency();
   showToast(`✅ 자산 ${editId?'수정':'저장'} 완료!`,'success');
 }
 
@@ -995,29 +1034,52 @@ function editInv(id){
   document.getElementById('iEditId').value=inv.id;
   document.getElementById('iAsset').value=inv.asset;
   document.getElementById('iCat').value=inv.category;
+  document.getElementById('iCurrency').value=inv.currency||'KRW';
   document.getElementById('iQty').value=inv.qty||1;
   document.getElementById('iCost').value=inv.costPrice||'';
   document.getElementById('iCurrent').value=inv.currentPrice||'';
+  document.getElementById('iCostRate').value=inv.costRate||'';
+  document.getElementById('iCurRate').value=inv.curRate||'';
+  document.getElementById('iMemo').value=inv.memo||'';
   document.getElementById('iDate').value=inv.updatedAt||'';
+  updateInvCurrency();
   updateInvPreview();
   openModal('invModal');
 }
 
+function updateInvCurrency(){
+  const cur=document.getElementById('iCurrency').value;
+  const isFx=cur&&cur!=='KRW';
+  document.getElementById('iCostLbl').textContent=isFx?`취득단가 (${cur})`:'취득단가 (원)';
+  document.getElementById('iCurLbl').textContent=isFx?`현재단가 (${cur})`:'현재단가 (원)';
+  document.getElementById('iKrwRow').style.display=isFx?'':'none';
+  updateInvPreview();
+}
+
 function updateInvPreview(){
+  const curSel=document.getElementById('iCurrency')?.value||'KRW';
+  const isFx=curSel&&curSel!=='KRW';
   const qty=Math.min(Math.max(parseFloat(document.getElementById('iQty')?.value)||1,0.000001),1000000000);
-  const cost=safeInt(document.getElementById('iCost').value,0,10000000000000);
-  const cur=safeInt(document.getElementById('iCurrent').value,0,10000000000000);
+  const cost=safeFloat(document.getElementById('iCost').value);
+  const curP=safeFloat(document.getElementById('iCurrent').value);
+  const costRate=safeFloat(document.getElementById('iCostRate')?.value)||0;
+  const curRate=safeFloat(document.getElementById('iCurRate')?.value)||0;
   const el=document.getElementById('iCalcPreview');
-  if(!cost&&!cur){el.textContent='취득단가·현재단가 입력 시 수익률이 자동 계산됩니다.';return;}
-  const totalCost=cost*qty;
-  const totalCur=cur*qty;
-  const rate=calcReturn(cost,cur);
-  const profit=totalCur-totalCost;
-  // textContent로 안전하게 분리 구성
+  if(!cost&&!curP){el.textContent='취득단가·현재단가 입력 시 수익률이 자동 계산됩니다.';return;}
+  const costKrw=isFx?(costRate?cost*costRate:0):cost;
+  const curKrw=isFx?(curRate?curP*curRate:0):curP;
+  const totalCostKrw=costKrw*qty;
+  const totalCurKrw=curKrw*qty;
+  const rate=calcReturn(costKrw,curKrw);
+  const profit=totalCurKrw-totalCostKrw;
   el.innerHTML='';
   const span=document.createElement('span');
-  span.textContent=`총취득 ${fkrw(totalCost)}원 → 현재 ${fkrw(totalCur)}원   ${rate>=0?'+':''}${rate}%  (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)`;
   span.className=`calc-rate ${rate>=0?'pos':'neg'}`;
+  if(isFx&&(!costRate||!curRate)){
+    span.textContent=`환율을 입력하면 원화 수익률이 계산됩니다.`;
+  } else {
+    span.textContent=`₩${fkrw(totalCostKrw)} → ₩${fkrw(totalCurKrw)}   ${rate>=0?'+':''}${rate}%  (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)`;
+  }
   el.appendChild(span);
 }
 async function saveSub(){
