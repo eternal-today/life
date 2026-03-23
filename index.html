@@ -235,7 +235,7 @@ input,select,textarea{font-family:inherit;}
 
 /* 데스크탑 1024px — 단일 분기 */
 @media(min-width:1024px){
-  html{font-size:22px;}
+  html{font-size:25px;}
   .header-inner,.tab-bar-inner{max-width:1280px;margin-left:auto;margin-right:auto;padding-left:1.5rem;padding-right:1.5rem;}
   .home-wrap,.detail-wrap{max-width:1280px;margin-left:auto;margin-right:auto;border-left:1px solid var(--border);border-right:1px solid var(--border);padding-left:1.5rem;padding-right:1.5rem;padding-top:1.25rem;padding-bottom:2rem;}
   .area-grid{flex-direction:row;align-items:stretch;gap:1rem;}
@@ -425,6 +425,11 @@ input,select,textarea{font-family:inherit;}
   <button class="d-close" onclick="closeDrawer()">✕</button>
   <div class="d-title">설정</div>
   <div class="d-sec">
+    <div class="d-lbl">📱 모바일 사용 안내</div>
+    <div class="d-note">설정은 이 브라우저에만 저장됩니다. 모바일에서도 아래 Token과 DB ID를 동일하게 입력해 주세요.</div>
+    <button class="d-btn" style="background:var(--subtle);border:1px solid var(--border2);color:var(--text-b);margin-bottom:0.5rem" onclick="copySettings()">설정값 클립보드에 복사</button>
+  </div>
+  <div class="d-sec">
     <div class="d-lbl">Notion API</div>
     <div class="d-note">1. <a href="https://www.notion.so/my-integrations" target="_blank">Notion Integrations</a>에서 생성<br>2. Token 입력 후 각 DB에 Connection 추가<br>3. DB URL의 <code>?v=</code> 앞 32자리 ID 입력</div>
     <div class="d-fr"><label class="d-fl">Integration Token</label><input class="d-fi" type="password" id="cToken" placeholder="secret_..." oninput="saveCfg()"></div>
@@ -507,6 +512,14 @@ let gF={family:'all',work:'all',personal:'all'};
 window.addEventListener('DOMContentLoaded',()=>{loadCfg();initDate();loadAll();});
 
 function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// 프록시 URL 유효성 검사 — http(s)://로 시작하는지 확인
+function isValidUrl(url){try{const u=new URL(url);return u.protocol==='https:'||u.protocol==='http:';}catch(e){return false;}}
+
+// 숫자 입력값 범위 제한
+function safeInt(val,min=0,max=Number.MAX_SAFE_INTEGER){const n=parseInt(val)||0;return Math.min(Math.max(n,min),max);}
+function safeFloat(val){const n=parseFloat(val);return isNaN(n)?0:n;}
+function safeProgress(val){return Math.min(Math.max(parseInt(val)||0,0),100);}
 function initDate(){const n=new Date(),days=['일','월','화','수','목','금','토'],q=Math.ceil((n.getMonth()+1)/3);document.getElementById('todayDate').textContent=`${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일 ${days[n.getDay()]}요일`;document.getElementById('todayMeta').textContent=`${n.getFullYear()} Q${q}`;}
 
 const LS={cToken:'el_t',cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p'};
@@ -515,7 +528,8 @@ function loadCfg(){try{Object.entries(CM).forEach(([id,k])=>{cfg[k]=localStorage
 function saveCfg(){try{Object.entries(CM).forEach(([id,k])=>{const el=document.getElementById(id);if(el){cfg[k]=el.value;localStorage.setItem(LS[id],cfg[k]);}});}catch(e){}}
 
 async function nFetch(path,method='GET',body=null,retry=0){
-  try{const base=cfg.proxy||'https://api.notion.com';const r=await fetch(`${base}/v1/${path}`,{method,headers:{'Authorization':`Bearer ${cfg.token}`,'Notion-Version':'2022-06-28','Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});if(!r.ok)throw new Error(r.status);return r.json();}
+  const base=(cfg.proxy&&isValidUrl(cfg.proxy))?cfg.proxy:'https://api.notion.com';
+  try{const r=await fetch(`${base}/v1/${path}`,{method,headers:{'Authorization':`Bearer ${cfg.token}`,'Notion-Version':'2022-06-28','Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});if(!r.ok)throw new Error(r.status);return r.json();}
   catch(e){if(retry<3){await new Promise(r=>setTimeout(r,500*Math.pow(2,retry)));return nFetch(path,method,body,retry+1);}throw e;}
 }
 async function qDB(id){if(!cfg.token||!id)return[];return(await nFetch(`databases/${id}/query`,'POST',{page_size:100})).results||[];}
@@ -555,26 +569,26 @@ async function loadCalendars(){
 
 function parseCalEvents(items){
   const days=['일','월','화','수','목','금','토'];
-  const today=new Date();today.setHours(0,0,0,0);
+  const now=new Date();
+  const todayStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const tomorrowDate=new Date(now);tomorrowDate.setDate(tomorrowDate.getDate()+1);
+  const tomorrowStr=`${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth()+1).padStart(2,'0')}-${String(tomorrowDate.getDate()).padStart(2,'0')}`;
   return items.slice(0,2).map(ev=>{
-    const start=ev.start?.dateTime||ev.start?.date||'';
-    const dt=new Date(start);
-    const diff=Math.round((dt-today)/86400000);
+    const raw=ev.start?.dateTime||ev.start?.date||'';
+    const dateStr=raw.slice(0,10); // YYYY-MM-DD만 추출
+    const dt=new Date(dateStr+'T00:00:00'); // 로컬 시간 기준
     let time='';
-    if(diff===0) time='오늘';
-    else if(diff===1) time='내일';
-    else if(diff>1&&diff<7) time=days[dt.getDay()]+'요';
-    else time=`${dt.getMonth()+1}/${dt.getDate()}`;
+    if(dateStr===todayStr) time='오늘';
+    else if(dateStr===tomorrowStr) time='내일';
+    else time=days[dt.getDay()];
     return{time, title:ev.summary||'(제목 없음)'};
   });
 }
 function setSS(s){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');if(s==='ok'){d.className='sync-dot ok';t.textContent='동기화 완료';}else if(s==='loading'){d.className='sync-dot';t.textContent='로딩 중...';}else{d.className='sync-dot';t.textContent='데모 모드';}}
 
 function demoData(){
-  D.goals=[{id:'g1',title:'가족 여행 2회',area:'family',period:'연간',progress:25,status:'진행중',due:'2026-12-31',desc:'여름 제주, 가을 일본'},{id:'g2',title:'월 가족 데이트',area:'family',period:'월간',progress:60,status:'진행중',due:'2026-03-31',desc:'월 1회 가족 외식 또는 나들이'},{id:'g3',title:'우림이 교육 계획',area:'family',period:'분기',progress:10,status:'진행중',due:'2026-03-31',desc:''},{id:'g4',title:'팀 KPI 120% 달성',area:'work',period:'분기',progress:68,status:'진행중',due:'2026-03-31',desc:'Q1 핵심 지표 초과 달성'},{id:'g5',title:'Career 로드맵 정리',area:'work',period:'연간',progress:20,status:'진행중',due:'2026-12-31',desc:'3년 커리어 플랜 문서화'},{id:'g6',title:'주간 업무 리뷰',area:'work',period:'월간',progress:80,status:'진행중',due:'2026-03-31',desc:'매주 금요일 30분'},{id:'g7',title:'독서 월 2권',area:'growth',period:'월간',progress:50,status:'진행중',due:'2026-03-31',desc:'비즈니스/자기계발'},{id:'g8',title:'Eternal Life 완성',area:'side',period:'연간',progress:50,status:'진행중',due:'2026-06-30',desc:'GitHub Pages 배포'},{id:'g9',title:'주 3회 운동 루틴',area:'health',period:'월간',progress:75,status:'진행중',due:'2026-03-31',desc:'헬스 or 러닝'}];
-  D.invest=[{id:'i1',asset:'삼성전자',category:'주식',amount:5000000,returnRate:-2.3,updatedAt:'2026-03-20'},{id:'i2',asset:'S&P500 ETF',category:'주식',amount:8000000,returnRate:12.5,updatedAt:'2026-03-20'},{id:'i3',asset:'KB 정기예금',category:'예금',amount:10000000,returnRate:3.8,updatedAt:'2026-01-01'},{id:'i4',asset:'청약저축',category:'적금',amount:2400000,returnRate:2.5,updatedAt:'2026-03-01'}];
-  D.subs=[{id:'s1',service:'ChatGPT Plus',category:'AI/개발',fee:27000,cycle:'월',renewDate:'2026-04-05',active:true},{id:'s2',service:'Netflix',category:'엔터테인먼트',fee:17000,cycle:'월',renewDate:'2026-03-28',active:true},{id:'s3',service:'GitHub Copilot',category:'AI/개발',fee:13000,cycle:'월',renewDate:'2026-04-12',active:true},{id:'s4',service:'Notion Plus',category:'업무/생산성',fee:10000,cycle:'월',renewDate:'2026-04-20',active:true}];
-  D.memo=[{id:'m1',content:'Eternal Life 구조 확정 — 가정/회사/개인 3영역',area:'side',pinned:true,createdAt:'2026-03-20T10:00:00Z'},{id:'m2',content:'Notion CORS → Cloudflare Worker 설정 완료',area:'side',pinned:false,createdAt:'2026-03-19T14:00:00Z'},{id:'m3',content:'Q1 회고 일정: 3월 31일 저녁',area:'',pinned:false,createdAt:'2026-03-18T09:00:00Z'}];
+  D.goals=[];D.invest=[];D.subs=[];D.memo=[];
+  setSS('err');
   render();
 }
 
@@ -645,7 +659,10 @@ async function saveGoal(){
   const title=document.getElementById('gTitle').value.trim();if(!title){showToast('제목을 입력해주세요','error');return;}
   const btn=document.getElementById('bSaveGoal');btn.disabled=true;btn.textContent='저장 중...';
   const area=document.getElementById('gArea').value;
-  const g={id:'l'+Date.now(),title,area,period:document.getElementById('gPeriod').value,progress:parseInt(document.getElementById('gProgress').value)||0,status:'진행중',due:document.getElementById('gDue').value,desc:document.getElementById('gDesc').value};
+  const progress=safeProgress(document.getElementById('gProgress').value);
+  const due=document.getElementById('gDue').value;
+  const desc=document.getElementById('gDesc').value.slice(0,2000); // 최대 2000자
+  const g={id:'l'+Date.now(),title:title.slice(0,200),area,period:document.getElementById('gPeriod').value,progress,status:'진행중',due,desc};
   if(cfg.token&&cfg.goals){try{await mkPage(cfg.goals,{Title:{title:[{text:{content:g.title}}]},Area:{select:{name:area}},Period:{select:{name:g.period}},Progress:{number:g.progress},Status:{select:{name:'진행중'}},Due:g.due?{date:{start:g.due}}:{date:null},Description:{rich_text:[{text:{content:g.desc}}]}});}catch(e){showToast('Notion 저장 실패','error');}}
   D.goals.push(g);render();closeModal('goalModal');btn.disabled=false;btn.textContent='저장';
   ['gTitle','gDesc'].forEach(id=>document.getElementById(id).value='');document.getElementById('gProgress').value='0';
@@ -653,24 +670,31 @@ async function saveGoal(){
 }
 async function saveInv(){
   const asset=document.getElementById('iAsset').value.trim();if(!asset){showToast('자산명을 입력해주세요','error');return;}
-  const inv={id:'l'+Date.now(),asset,category:document.getElementById('iCat').value,amount:parseInt(document.getElementById('iAmount').value)||0,returnRate:parseFloat(document.getElementById('iReturn').value)||0,updatedAt:document.getElementById('iDate').value};
+  const amount=safeInt(document.getElementById('iAmount').value,0,10000000000000);
+  const returnRate=Math.min(Math.max(safeFloat(document.getElementById('iReturn').value),-100),10000);
+  const inv={id:'l'+Date.now(),asset:asset.slice(0,100),category:document.getElementById('iCat').value,amount,returnRate,updatedAt:document.getElementById('iDate').value};
   if(cfg.token&&cfg.invest){try{await mkPage(cfg.invest,{Asset:{title:[{text:{content:inv.asset}}]},Category:{select:{name:inv.category}},Amount:{number:inv.amount},ReturnRate:{number:inv.returnRate},UpdatedAt:inv.updatedAt?{date:{start:inv.updatedAt}}:{date:null}});}catch(e){}}
   D.invest.push(inv);render();closeModal('invModal');['iAsset','iAmount','iReturn'].forEach(id=>document.getElementById(id).value='');showToast('✅ 자산 저장 완료!','success');
 }
 async function saveSub(){
   const service=document.getElementById('sService').value.trim();if(!service){showToast('서비스명을 입력해주세요','error');return;}
-  const sub={id:'l'+Date.now(),service,category:document.getElementById('sCat').value,fee:parseInt(document.getElementById('sFee').value)||0,cycle:document.getElementById('sCycle').value,renewDate:document.getElementById('sRenew').value,active:true};
+  const fee=safeInt(document.getElementById('sFee').value,0,100000000);
+  const sub={id:'l'+Date.now(),service:service.slice(0,100),category:document.getElementById('sCat').value,fee,cycle:document.getElementById('sCycle').value,renewDate:document.getElementById('sRenew').value,active:true};
   if(cfg.token&&cfg.subs){try{await mkPage(cfg.subs,{Service:{title:[{text:{content:sub.service}}]},Category:{select:{name:sub.category}},Fee:{number:sub.fee},Cycle:{select:{name:sub.cycle}},RenewDate:sub.renewDate?{date:{start:sub.renewDate}}:{date:null},Active:{checkbox:true}});}catch(e){}}
   D.subs.push(sub);render();closeModal('subModal');['sService','sFee'].forEach(id=>document.getElementById(id).value='');showToast('✅ 구독 저장 완료!','success');
 }
 async function saveMemo(){
-  const content=document.getElementById('nmText').value.trim();if(!content)return;
+  const content=document.getElementById('nmText').value.trim().slice(0,1000);if(!content)return;
   const m={id:'l'+Date.now(),content,area:document.getElementById('nmArea').value,pinned:document.getElementById('nmPin').checked,createdAt:new Date().toISOString()};
   if(cfg.token&&cfg.memo){try{await mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned}});}catch(e){}}
   D.memo.unshift(m);rMemo();rHome();document.getElementById('nmText').value='';document.getElementById('nmPin').checked=false;showToast('✅ 메모 저장 완료!','success');
 }
 
-function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000);}
+function copySettings(){
+  const text=`Token: ${cfg.token}\nGoals: ${cfg.goals}\nInvest: ${cfg.invest}\nSubs: ${cfg.subs}\nMemo: ${cfg.memo}\nProxy: ${cfg.proxy}`;
+  navigator.clipboard.writeText(text).then(()=>showToast('설정값이 복사됐습니다. 메모장에 붙여넣어 보관하세요.','success')).catch(()=>showToast('복사 실패 — 직접 입력해 주세요','error'));
+}
+const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000);}
 function fkrw(n){if(n>=100000000)return(n/100000000).toFixed(1)+'억';if(n>=10000)return Math.round(n/10000)+'만';return n.toLocaleString();}
 function fd(d){if(!d)return'—';return d.slice(0,10).replace(/-/g,'.');}
 function fdt(d){if(!d)return'';const dt=new Date(d);return`${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;}
