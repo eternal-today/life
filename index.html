@@ -483,9 +483,9 @@ input,select,textarea{font-family:inherit;}
   <button class="d-close" onclick="closeDrawer()">✕</button>
   <div class="d-title">설정</div>
   <div class="d-sec">
-    <div class="d-lbl">📱 모바일 사용 안내</div>
-    <div class="d-note">설정은 이 브라우저에만 저장됩니다. 모바일에서도 아래 Token과 DB ID를 동일하게 입력해 주세요.</div>
-    <button class="d-btn" style="background:var(--subtle);border:1px solid var(--border2);color:var(--text-b);margin-bottom:0.5rem" onclick="copySettings()">설정값 클립보드에 복사</button>
+    <div class="d-lbl">📌 저장 방법</div>
+    <div class="d-note">설정값이 이 페이지 URL에 암호화되어 저장됩니다.<br>아래 버튼으로 저장 후 <b>URL을 북마크</b>하면 어떤 기기/브라우저에서든 동일하게 작동합니다.</div>
+    <button class="d-btn" onclick="saveCfgAndCopyUrl()">💾 저장 후 URL 복사</button>
   </div>
   <div class="d-sec">
     <div class="d-lbl">Notion API</div>
@@ -574,7 +574,7 @@ let cfg={token:'',goals:'',invest:'',subs:'',memo:'',proxy:'',calFamily:'',calWo
 let D={goals:[],invest:[],subs:[],memo:[],sched:{family:[],work:[],personal:[]}};
 let gF={family:'all',work:'all',personal:'all'};
 
-window.addEventListener('DOMContentLoaded',()=>{loadCfg();initDate();loadAll();});
+window.addEventListener('DOMContentLoaded',async()=>{await loadCfg();initDate();loadAll();});
 
 function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -593,10 +593,87 @@ function initDate(){
   if(metaEl) metaEl.textContent=`${n.getFullYear()} Q${q}`;
 }
 
-const LS={cToken:'el_t',cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};
-const CM={cToken:'token',cGoals:'goals',cInvest:'invest',cSubs:'subs',cMemo:'memo',cProxy:'proxy',cCalFamily:'calFamily',cCalWork:'calWork',cCalPersonal:'calPersonal'};
-function loadCfg(){try{Object.entries(CM).forEach(([id,k])=>{cfg[k]=localStorage.getItem(LS[id])||'';const el=document.getElementById(id);if(el)el.value=cfg[k];});}catch(e){}}
-function saveCfg(){try{Object.entries(CM).forEach(([id,k])=>{const el=document.getElementById(id);if(el){cfg[k]=el.value;localStorage.setItem(LS[id],cfg[k]);}});}catch(e){}}
+const CFG_KEYS=['token','goals','invest','subs','memo','proxy','calFamily','calWork','calPersonal'];
+const CFG_IDS =['cToken','cGoals','cInvest','cSubs','cMemo','cProxy','cCalFamily','cCalWork','cCalPersonal'];
+
+// 암호화 키 — Notion Token 앞 16자를 시드로 사용
+// Token이 없으면 고정 fallback (localStorage 하위 호환용)
+async function getCryptoKey(seed){
+  const material=new TextEncoder().encode((seed||'EternalTodayFallback').padEnd(32).slice(0,32));
+  const base=await crypto.subtle.importKey('raw',material,{name:'PBKDF2'},false,['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt:new TextEncoder().encode('EternalSalt2026'),iterations:100000,hash:'SHA-256'},
+    base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']
+  );
+}
+async function encryptCfg(obj){
+  try{
+    const seed=obj.token?obj.token.slice(0,16):'';
+    const key=await getCryptoKey(seed);
+    const iv=crypto.getRandomValues(new Uint8Array(12));
+    const data=new TextEncoder().encode(JSON.stringify(obj));
+    const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data);
+    const buf=new Uint8Array(iv.length+enc.byteLength);
+    buf.set(iv);buf.set(new Uint8Array(enc),iv.length);
+    return btoa(String.fromCharCode(...buf));
+  }catch(e){return '';}
+}
+async function decryptCfg(str,seed){
+  try{
+    const buf=Uint8Array.from(atob(str),c=>c.charCodeAt(0));
+    const iv=buf.slice(0,12);const data=buf.slice(12);
+    const key=await getCryptoKey(seed||'');
+    const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,data);
+    return JSON.parse(new TextDecoder().decode(dec));
+  }catch(e){return null;}
+}
+
+async function loadCfg(){
+  const hash=location.hash.slice(1);
+  if(hash){
+    // Token 앞 16자를 시드로 복호화 시도 (여러 시드 순서대로)
+    // 첫 시도: localStorage에 남아있는 token으로 시드 추측
+    let seed='';
+    try{seed=localStorage.getItem('el_t_seed')||'';}catch(e){}
+    let obj=await decryptCfg(hash,seed);
+    // 실패 시 빈 시드로 재시도 (fallback)
+    if(!obj) obj=await decryptCfg(hash,'');
+    if(obj){
+      CFG_KEYS.forEach((k,i)=>{cfg[k]=obj[k]||'';const el=document.getElementById(CFG_IDS[i]);if(el)el.value=cfg[k];});
+      return;
+    }
+  }
+  // 하위 호환: localStorage (Token 제외)
+  try{
+    const LS={cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};
+    Object.entries(LS).forEach(([id,k])=>{
+      const v=localStorage.getItem(k)||'';
+      const key=CFG_KEYS[CFG_IDS.indexOf(id)];
+      if(key){cfg[key]=v;const el=document.getElementById(id);if(el)el.value=v;}
+    });
+  }catch(e){}
+}
+
+async function saveCfg(){
+  CFG_KEYS.forEach((k,i)=>{const el=document.getElementById(CFG_IDS[i]);if(el)cfg[k]=el.value;});
+  const enc=await encryptCfg(cfg);
+  if(enc){
+    history.replaceState(null,'','#'+enc);
+    // Token 시드 힌트만 저장 (Token 전체는 저장 안 함)
+    try{if(cfg.token)localStorage.setItem('el_t_seed',cfg.token.slice(0,16));}catch(e){}
+    showToast('✅ 설정이 URL에 저장됐습니다. 이 URL을 북마크하세요!','success');
+  }
+  // localStorage에 Token 제외한 값만 저장 (하위 호환)
+  try{
+    const LS={cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};
+    Object.entries(LS).forEach(([id,lk])=>{
+      const k=CFG_KEYS[CFG_IDS.indexOf(id)];
+      if(k)localStorage.setItem(lk,cfg[k]||'');
+    });
+    // Token은 localStorage에서 제거
+    localStorage.removeItem('el_t');
+  }catch(e){}
+}
 
 async function nFetch(path,method='GET',body=null,retry=0){
   const base=(cfg.proxy&&isValidUrl(cfg.proxy))?cfg.proxy:'https://api.notion.com';
@@ -624,12 +701,13 @@ async function loadAll(){
 }
 
 async function loadCalendars(){
-  if(!cfg.proxy) return;
+  if(!cfg.proxy||!isValidUrl(cfg.proxy)) return;
   try{
     const groups=['family','work','personal'];
     await Promise.all(groups.map(async g=>{
       try{
-        const r=await fetch(`${cfg.proxy}/calendar?group=${g}`);
+        const r=await fetch(`${cfg.proxy}/calendar?group=${encodeURIComponent(g)}`);
+        if(!r.ok) return;
         const data=await r.json();
         D.sched[g]=parseCalEvents(data.items||[]);
         rSched('home-'+g+'-sched',g);
@@ -703,13 +781,13 @@ function openCalendar(e, group){
   const calIdMap={family:cfg.calFamily, work:cfg.calWork, personal:cfg.calPersonal};
   const calId=calIdMap[group]||'';
   const base='https://calendar.google.com/calendar/r/eventedit';
-  const webUrl=calId?`${base}?cid=${encodeURIComponent(calId)}`:base;
+  const webUrl=calId?`${base}?src=${encodeURIComponent(calId)}`:base;
   const ua=navigator.userAgent;
   const isAndroid=/Android/i.test(ua);
-  const isIOS=/iPhone|iPad|iPod/i.test(ua);
   if(isAndroid){
     const fallback=encodeURIComponent(webUrl);
-    window.location.href=`intent://calendar.google.com/calendar/r/eventedit${calId?'?cid='+encodeURIComponent(calId):''}#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=${fallback};end`;
+    const path=calId?`/calendar/r/eventedit?src=${encodeURIComponent(calId)}`:'/calendar/r/eventedit';
+    window.location.href=`intent://calendar.google.com${path}#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=${fallback};end`;
   } else {
     window.open(webUrl,'_blank');
   }
@@ -753,7 +831,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.m-wrap').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 document.getElementById('qmText').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();saveQuickMemo();}});
 function openGoalModal(group){document.getElementById('gArea').value={family:'family',work:'work',personal:'growth'}[group]||'growth';openModal('goalModal');}
-async function testNotion(){saveCfg();if(!cfg.token){showToast('Token을 입력해주세요','error');return;}try{await nFetch('users/me');showToast('✅ 연결 성공!','success');loadAll();}catch(e){showToast('❌ 연결 실패 — CORS 프록시를 확인해주세요','error');}}
+async function testNotion(){await saveCfg();if(!cfg.token){showToast('Token을 입력해주세요','error');return;}try{await nFetch('users/me');showToast('✅ 연결 성공!','success');loadAll();}catch(e){showToast('❌ 연결 실패 — CORS 프록시를 확인해주세요','error');}}
 
 async function saveGoal(){
   const title=document.getElementById('gTitle').value.trim();if(!title){showToast('제목을 입력해주세요','error');return;}
@@ -823,9 +901,15 @@ function rQuickMemoRecent(){
   }).join('');
 }
 
+async function saveCfgAndCopyUrl(){
+  await saveCfg();
+  const url=location.href;
+  navigator.clipboard.writeText(url)
+    .then(()=>showToast('✅ URL이 복사됐습니다! 북마크에 추가하세요.','success'))
+    .catch(()=>showToast('URL: '+url,'success'));
+}
 function copySettings(){
-  const text=`Token: ${cfg.token}\nGoals: ${cfg.goals}\nInvest: ${cfg.invest}\nSubs: ${cfg.subs}\nMemo: ${cfg.memo}\nProxy: ${cfg.proxy}\nCal-Family: ${cfg.calFamily}\nCal-Work: ${cfg.calWork}\nCal-Personal: ${cfg.calPersonal}`;
-  navigator.clipboard.writeText(text).then(()=>showToast('설정값이 복사됐습니다.','success')).catch(()=>showToast('복사 실패 — 직접 입력해 주세요','error'));
+  saveCfgAndCopyUrl();
 }
 function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000);}
 function fkrw(n){if(n>=100000000)return(n/100000000).toFixed(1)+'억';if(n>=10000)return Math.round(n/10000)+'만';return n.toLocaleString();}
