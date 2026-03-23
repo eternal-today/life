@@ -183,7 +183,7 @@ input,select,textarea{font-family:inherit;}
 /* 드로어 */
 .d-overlay{position:fixed;inset:0;background:rgba(9,9,11,0.3);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;}
 .d-overlay.open{opacity:1;pointer-events:all;}
-.drawer{position:fixed;top:0;right:0;width:min(22rem,100vw);height:100vh;background:var(--surface);border-left:1px solid var(--border);padding:1.25rem;transform:translateX(100%);transition:transform .25s cubic-bezier(0.4,0,0.2,1);z-index:201;overflow-y:auto;}
+.drawer{position:fixed;top:0;right:0;width:min(22rem,100vw);height:100vh;background:var(--surface);border-left:1px solid var(--border);padding:1.25rem;transform:translateX(110%);transition:transform .25s cubic-bezier(0.4,0,0.2,1);z-index:201;overflow-y:auto;box-shadow:var(--sh-md);}
 .drawer.open{transform:translateX(0);}
 .d-title{font-size:0.85rem;font-weight:700;color:var(--text-h);margin-bottom:1.25rem;}
 .d-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:0.75rem;color:var(--text-m);cursor:pointer;padding:0.3rem 0.5rem;border-radius:var(--r-sm);}
@@ -520,7 +520,13 @@ function isValidUrl(url){try{const u=new URL(url);return u.protocol==='https:'||
 function safeInt(val,min=0,max=Number.MAX_SAFE_INTEGER){const n=parseInt(val)||0;return Math.min(Math.max(n,min),max);}
 function safeFloat(val){const n=parseFloat(val);return isNaN(n)?0:n;}
 function safeProgress(val){return Math.min(Math.max(parseInt(val)||0,0),100);}
-function initDate(){const n=new Date(),days=['일','월','화','수','목','금','토'],q=Math.ceil((n.getMonth()+1)/3);document.getElementById('todayDate').textContent=`${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일 ${days[n.getDay()]}요일`;document.getElementById('todayMeta').textContent=`${n.getFullYear()} Q${q}`;}
+function initDate(){
+  const n=new Date(),days=['일','월','화','수','목','금','토'],q=Math.ceil((n.getMonth()+1)/3);
+  const dateEl=document.getElementById('todayDate');
+  const metaEl=document.getElementById('todayMeta');
+  if(dateEl) dateEl.textContent=`${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일 ${days[n.getDay()]}요일`;
+  if(metaEl) metaEl.textContent=`${n.getFullYear()} Q${q}`;
+}
 
 const LS={cToken:'el_t',cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p'};
 const CM={cToken:'token',cGoals:'goals',cInvest:'invest',cSubs:'subs',cMemo:'memo',cProxy:'proxy'};
@@ -589,7 +595,6 @@ function setSS(s){const d=document.getElementById('syncDot'),t=document.getEleme
 function demoData(){
   D.goals=[];D.invest=[];D.subs=[];D.memo=[];
   setSS('err');
-  initDate();
   render();
 }
 
