@@ -506,6 +506,13 @@ input,select,textarea{font-family:inherit;}
     <div class="d-fr"><label class="d-fl">프록시 URL</label><input class="d-fi" id="cProxy" placeholder="https://your-worker.workers.dev" oninput="saveCfg()"></div>
   </div>
   <div class="d-sec">
+    <div class="d-lbl">Google Calendar ID</div>
+    <div class="d-note">캘린더 설정 → <code>캘린더 통합</code> 섹션에서 확인. 일정 클릭 시 해당 캘린더로 새 일정이 생성됩니다.</div>
+    <div class="d-fr"><label class="d-fl">가정 캘린더 ID</label><input class="d-fi" id="cCalFamily" placeholder="xxx@gmail.com 또는 캘린더ID" oninput="saveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">회사 캘린더 ID</label><input class="d-fi" id="cCalWork" placeholder="xxx@gmail.com 또는 캘린더ID" oninput="saveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">개인 캘린더 ID</label><input class="d-fi" id="cCalPersonal" placeholder="xxx@gmail.com 또는 캘린더ID" oninput="saveCfg()"></div>
+  </div>
+  <div class="d-sec">
     <div class="d-lbl">DB 컬럼 구조</div>
     <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/예금/적금/펀드/기타) · Amount · ReturnRate · UpdatedAt(Date)<br><br><b>Subscription:</b> Service · Category · Fee · Cycle(월/연) · RenewDate(Date) · Active(Checkbox)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · CreatedAt(Created time)</div>
   </div>
@@ -563,7 +570,7 @@ input,select,textarea{font-family:inherit;}
 <script>
 const AMAP={family:{l:'가정/가족',c:'var(--family-c)',bg:'var(--family-bg)',g:'family'},work:{l:'회사/업무',c:'var(--work-c)',bg:'var(--work-bg)',g:'work'},growth:{l:'개인 성장',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},health:{l:'건강/운동',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},side:{l:'사이드',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},finance:{l:'재테크',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'}};
 const DS={family:[],work:[],personal:[]};
-let cfg={token:'',goals:'',invest:'',subs:'',memo:'',proxy:''};
+let cfg={token:'',goals:'',invest:'',subs:'',memo:'',proxy:'',calFamily:'',calWork:'',calPersonal:''};
 let D={goals:[],invest:[],subs:[],memo:[],sched:{family:[],work:[],personal:[]}};
 let gF={family:'all',work:'all',personal:'all'};
 
@@ -586,8 +593,8 @@ function initDate(){
   if(metaEl) metaEl.textContent=`${n.getFullYear()} Q${q}`;
 }
 
-const LS={cToken:'el_t',cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p'};
-const CM={cToken:'token',cGoals:'goals',cInvest:'invest',cSubs:'subs',cMemo:'memo',cProxy:'proxy'};
+const LS={cToken:'el_t',cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};
+const CM={cToken:'token',cGoals:'goals',cInvest:'invest',cSubs:'subs',cMemo:'memo',cProxy:'proxy',cCalFamily:'calFamily',cCalWork:'calWork',cCalPersonal:'calPersonal'};
 function loadCfg(){try{Object.entries(CM).forEach(([id,k])=>{cfg[k]=localStorage.getItem(LS[id])||'';const el=document.getElementById(id);if(el)el.value=cfg[k];});}catch(e){}}
 function saveCfg(){try{Object.entries(CM).forEach(([id,k])=>{const el=document.getElementById(id);if(el){cfg[k]=el.value;localStorage.setItem(LS[id],cfg[k]);}});}catch(e){}}
 
@@ -684,27 +691,27 @@ function rSched(id,g){
   const items=D.sched[g]||[];
   const el=document.getElementById(id);
   if(!el)return;
-  const newEventUrl='https://calendar.google.com/calendar/r/eventedit';
   if(!items.length){
-    el.innerHTML=`<a class="sched-link" href="${newEventUrl}" target="_blank" onclick="openCalendar(event)"><span class="sched-time" style="color:var(--text-m)">+</span><span class="sched-title" style="color:var(--text-m)">새 일정 추가</span></a>`;
+    el.innerHTML=`<a class="sched-link" href="#" onclick="openCalendar(event,'${g}')"><span class="sched-time" style="color:var(--text-m)">+</span><span class="sched-title" style="color:var(--text-m)">새 일정 추가</span></a>`;
     return;
   }
-  el.innerHTML=items.map(s=>`<a class="sched-link" href="${newEventUrl}" target="_blank" onclick="openCalendar(event)"><span class="sched-time">${s.time}</span><span class="sched-title">${esc(s.title)}</span><span class="sched-arrow">›</span></a>`).join('');
+  el.innerHTML=items.map(s=>`<a class="sched-link" href="#" onclick="openCalendar(event,'${g}')"><span class="sched-time">${s.time}</span><span class="sched-title">${esc(s.title)}</span><span class="sched-arrow">›</span></a>`).join('');
 }
 
-function openCalendar(e){
+function openCalendar(e, group){
   e.preventDefault();
-  const url='https://calendar.google.com/calendar/r/eventedit';
-  const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if(isMobile){
-    // 구글 캘린더 앱 딥링크 시도 → 미설치 시 웹으로 폴백
-    const start=Date.now();
-    window.location.href='googlecalendar://';
-    setTimeout(()=>{
-      if(Date.now()-start<1500) window.open(url,'_blank');
-    },1000);
+  const calIdMap={family:cfg.calFamily, work:cfg.calWork, personal:cfg.calPersonal};
+  const calId=calIdMap[group]||'';
+  const base='https://calendar.google.com/calendar/r/eventedit';
+  const webUrl=calId?`${base}?cid=${encodeURIComponent(calId)}`:base;
+  const ua=navigator.userAgent;
+  const isAndroid=/Android/i.test(ua);
+  const isIOS=/iPhone|iPad|iPod/i.test(ua);
+  if(isAndroid){
+    const fallback=encodeURIComponent(webUrl);
+    window.location.href=`intent://calendar.google.com/calendar/r/eventedit${calId?'?cid='+encodeURIComponent(calId):''}#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=${fallback};end`;
   } else {
-    window.open(url,'_blank');
+    window.open(webUrl,'_blank');
   }
 }
 function rMini(id,goals,color){const el=document.getElementById(id);if(!goals.length){el.innerHTML='<div class="ph-txt">목표가 없습니다</div>';return;}el.innerHTML=goals.map(g=>`<div class="goal-mini"><div class="gm-bar-wrap"><div class="gm-bar" style="width:${g.progress}%;background:${color}"></div></div><div class="gm-title">${esc(g.title)}</div><div class="gm-pct">${g.progress}%</div></div>`).join('');}
@@ -817,8 +824,8 @@ function rQuickMemoRecent(){
 }
 
 function copySettings(){
-  const text=`Token: ${cfg.token}\nGoals: ${cfg.goals}\nInvest: ${cfg.invest}\nSubs: ${cfg.subs}\nMemo: ${cfg.memo}\nProxy: ${cfg.proxy}`;
-  navigator.clipboard.writeText(text).then(()=>showToast('설정값이 복사됐습니다. 메모장에 붙여넣어 보관하세요.','success')).catch(()=>showToast('복사 실패 — 직접 입력해 주세요','error'));
+  const text=`Token: ${cfg.token}\nGoals: ${cfg.goals}\nInvest: ${cfg.invest}\nSubs: ${cfg.subs}\nMemo: ${cfg.memo}\nProxy: ${cfg.proxy}\nCal-Family: ${cfg.calFamily}\nCal-Work: ${cfg.calWork}\nCal-Personal: ${cfg.calPersonal}`;
+  navigator.clipboard.writeText(text).then(()=>showToast('설정값이 복사됐습니다.','success')).catch(()=>showToast('복사 실패 — 직접 입력해 주세요','error'));
 }
 function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000);}
 function fkrw(n){if(n>=100000000)return(n/100000000).toFixed(1)+'억';if(n>=10000)return Math.round(n/10000)+'만';return n.toLocaleString();}
