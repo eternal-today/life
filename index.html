@@ -485,8 +485,8 @@ input,select,textarea{font-family:inherit;}
   <div class="d-sec">
     <div class="d-lbl">📌 저장 안내</div>
     <div class="d-note">
-      <b>Notion Token</b>은 이 탭에서만 유지됩니다. 탭을 닫으면 재입력이 필요합니다.<br><br>
-      나머지 설정값은 <b>💾 저장 후 URL 복사</b>를 눌러 북마크에 추가하면 어떤 기기/브라우저에서든 자동으로 불러옵니다.
+      <b>Notion Token</b>은 이 기기에 암호화되어 저장됩니다. 다른 기기에서는 재입력이 필요합니다.<br><br>
+      나머지 설정값은 <b>💾 저장 후 URL 복사</b>를 눌러 북마크에 추가하면 어떤 기기에서든 자동으로 불러옵니다.
     </div>
     <button class="d-btn" onclick="saveCfgAndCopyUrl()">💾 저장 후 URL 복사</button>
   </div>
@@ -601,58 +601,86 @@ const CFG_IDS =['cToken','cGoals','cInvest','cSubs','cMemo','cProxy','cCalFamily
 const HASH_KEYS=['goals','invest','subs','memo','proxy','calFamily','calWork','calPersonal'];
 const HASH_IDS =['cGoals','cInvest','cSubs','cMemo','cProxy','cCalFamily','cCalWork','cCalPersonal'];
 
-/* ── AES-GCM 암호화 (Token 제외한 설정값용) ── */
-async function getCryptoKey(){
-  const raw=new TextEncoder().encode('EternalToday-Hash-2026');
+/* ── 기기 고유 시드 생성 (안정적 — 브라우저 업데이트 영향 없음) ── */
+function getDeviceSeed(){
+  try{
+    // 기기별 고유 랜덤 ID — 최초 생성 후 localStorage에 영구 보관
+    let id=localStorage.getItem('et_did');
+    if(!id){
+      const arr=crypto.getRandomValues(new Uint8Array(24));
+      id=btoa(String.fromCharCode(...arr));
+      localStorage.setItem('et_did',id);
+    }
+    return id;
+  }catch(e){
+    // localStorage 불가 시 UA 기반 fallback
+    return `${navigator.userAgent}-${screen.width}x${screen.height}`.slice(0,64);
+  }
+}
+
+/* ── 암호화 키 파생 (공통) ── */
+async function deriveKey(seed){
+  const raw=new TextEncoder().encode(seed);
   const base=await crypto.subtle.importKey('raw',raw,{name:'PBKDF2'},false,['deriveKey']);
   return crypto.subtle.deriveKey(
-    {name:'PBKDF2',salt:new TextEncoder().encode('ET-Salt'),iterations:100000,hash:'SHA-256'},
+    {name:'PBKDF2',salt:new TextEncoder().encode('ET-Salt-2026'),iterations:100000,hash:'SHA-256'},
     base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']
   );
 }
-async function encryptObj(obj){
+
+/* ── 암호화 / 복호화 ── */
+async function encrypt(text, seed){
   try{
-    const key=await getCryptoKey();
+    const key=await deriveKey(seed);
     const iv=crypto.getRandomValues(new Uint8Array(12));
-    const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(obj)));
+    const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(text));
     const buf=new Uint8Array(12+enc.byteLength);
     buf.set(iv);buf.set(new Uint8Array(enc),12);
     return btoa(String.fromCharCode(...buf));
   }catch(e){return '';}
 }
-async function decryptObj(str){
+async function decrypt(str, seed){
   try{
     const buf=Uint8Array.from(atob(str),c=>c.charCodeAt(0));
-    const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(0,12)},await getCryptoKey(),buf.slice(12));
-    return JSON.parse(new TextDecoder().decode(dec));
-  }catch(e){return null;}
+    const key=await deriveKey(seed);
+    const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(0,12)},key,buf.slice(12));
+    return new TextDecoder().decode(dec);
+  }catch(e){return '';}
 }
 
 /* ── 설정 로드 ── */
 async function loadCfg(){
-  // 1. Token → sessionStorage (탭 닫으면 삭제)
+  // 1. Token → localStorage (기기 고유키로 암호화)
   try{
-    const t=sessionStorage.getItem('et_token')||'';
-    cfg.token=t;
-    const el=document.getElementById('cToken');
-    if(el)el.value=t;
+    const enc=localStorage.getItem('et_tok');
+    if(enc){
+      const t=await decrypt(enc, getDeviceSeed());
+      if(t){
+        cfg.token=t;
+        const el=document.getElementById('cToken');
+        if(el)el.value=t;
+      }
+    }
   }catch(e){}
 
   // 2. 나머지 → URL 해시 복호화
   const hash=location.hash.slice(1);
   if(hash){
-    const obj=await decryptObj(hash);
-    if(obj){
-      HASH_KEYS.forEach((k,i)=>{
-        cfg[k]=obj[k]||'';
-        const el=document.getElementById(HASH_IDS[i]);
-        if(el)el.value=cfg[k];
-      });
-      return;
+    const plain=await decrypt(hash,'EternalToday-Hash-2026');
+    if(plain){
+      try{
+        const obj=JSON.parse(plain);
+        HASH_KEYS.forEach((k,i)=>{
+          cfg[k]=obj[k]||'';
+          const el=document.getElementById(HASH_IDS[i]);
+          if(el)el.value=cfg[k];
+        });
+        return;
+      }catch(e){}
     }
   }
 
-  // 3. 하위 호환 — localStorage (기존 사용자)
+  // 3. 하위 호환 — localStorage
   try{
     const LS={cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};
     Object.entries(LS).forEach(([id,lk])=>{
@@ -666,16 +694,23 @@ async function loadCfg(){
 async function saveCfg(){
   CFG_KEYS.forEach((k,i)=>{const el=document.getElementById(CFG_IDS[i]);if(el)cfg[k]=el.value.trim();});
 
-  // Token → sessionStorage만 (URL/localStorage 저장 안 함)
+  // Token → 기기 고유키로 암호화 후 localStorage
   try{
-    sessionStorage.setItem('et_token',cfg.token);
-    localStorage.removeItem('el_t'); // 기존 잔재 제거
+    if(cfg.token){
+      const enc=await encrypt(cfg.token, getDeviceSeed());
+      if(enc) localStorage.setItem('et_tok',enc);
+    } else {
+      localStorage.removeItem('et_tok');
+    }
+    // 구버전 잔재 제거
+    localStorage.removeItem('el_t');
+    sessionStorage.removeItem('et_token');
   }catch(e){}
 
   // 나머지 → URL 해시 암호화
   const hashObj={};
   HASH_KEYS.forEach(k=>{hashObj[k]=cfg[k]||'';});
-  const enc=await encryptObj(hashObj);
+  const enc=await encrypt(JSON.stringify(hashObj),'EternalToday-Hash-2026');
   if(enc) history.replaceState(null,'','#'+enc);
 }
 
