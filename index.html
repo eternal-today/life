@@ -235,7 +235,7 @@ input,select,textarea{font-family:inherit;}
 
 /* 데스크탑 1024px — 단일 분기 */
 @media(min-width:1024px){
-  html{font-size:25px;}
+  html{font-size:28px;}
   .header-inner,.tab-bar-inner{max-width:1280px;margin-left:auto;margin-right:auto;padding-left:1.5rem;padding-right:1.5rem;}
   .home-wrap,.detail-wrap{max-width:1280px;margin-left:auto;margin-right:auto;border-left:1px solid var(--border);border-right:1px solid var(--border);padding-left:1.5rem;padding-right:1.5rem;padding-top:1.25rem;padding-bottom:2rem;}
   .area-grid{flex-direction:row;align-items:stretch;gap:1rem;}
@@ -589,6 +589,7 @@ function setSS(s){const d=document.getElementById('syncDot'),t=document.getEleme
 function demoData(){
   D.goals=[];D.invest=[];D.subs=[];D.memo=[];
   setSS('err');
+  initDate();
   render();
 }
 
