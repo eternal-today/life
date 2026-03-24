@@ -1126,18 +1126,18 @@ function rTodo(id,group){
 
   if(!items.length){el.innerHTML='<div class="ph-txt">할 일 없음</div>';return;}
 
-  // extra 배지는 마지막 항목 끝에 인라인으로 삽입 — 별도 행 없음
-  const extraBadge=extra>0
-    ?`<span onclick="goToTodo('${group}')" style="display:inline-flex;align-items:center;justify-content:center;width:0.85rem;height:0.85rem;border-radius:50%;background:${areaColor};color:white;font-size:0.3rem;font-weight:700;margin-left:0.25rem;flex-shrink:0;cursor:pointer;" title="+${extra}개 더">+${extra}</span>`
-    :'';
-
-  el.innerHTML=items.map((t,i)=>{
+  el.innerHTML=items.map(t=>{
     const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;
     const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';
     const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
-    const isLast=i===items.length-1;
-    return`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button>${isLast?extraBadge:''}</div>`;
+    return`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button></div>`;
   }).join('');
+
+  // extra 있으면 sec-more 텍스트를 동적으로 업데이트
+  if(extra>0){
+    const secMore=el.closest('.area-section')?.querySelector('.sec-more');
+    if(secMore){secMore.textContent=`more +${extra}`;secMore.style.color=areaColor;secMore.style.fontWeight='700';}
+  }
 }
 
 function editMemoItem(id){
