@@ -1471,13 +1471,21 @@ async function saveTodo(){
   const due=document.getElementById('tDue').value;
   const editId=document.getElementById('tEditId').value;
   const t={id:editId||'l'+Date.now(),title:title.slice(0,200),area,priority,due,done:false};
-  if(cfg.token&&cfg.todo){
-    try{
-      const props={Title:{title:[{text:{content:t.title}}]},Area:{select:{name:t.area}},Priority:{select:{name:t.priority}},Done:{checkbox:false},...(t.due?{Due:{date:{start:t.due}}}:{})};
-      if(editId) await nFetch(`pages/${editId}`,'PATCH',{properties:props});
-      else await mkPage(cfg.todo,props);
-    }catch(e){showToast('Notion 저장 실패','error');}
+
+  if(!cfg.token){showToast('❌ Notion Token이 없습니다. 설정을 확인해주세요.','error');btn.disabled=false;btn.textContent='저장';return;}
+  if(!cfg.todo){showToast('❌ Todo DB ID가 없습니다. 설정을 확인해주세요.','error');btn.disabled=false;btn.textContent='저장';return;}
+
+  try{
+    const props={Title:{title:[{text:{content:t.title}}]},Area:{select:{name:t.area}},Priority:{select:{name:t.priority}},Done:{checkbox:false},...(t.due?{Due:{date:{start:t.due}}}:{})};
+    if(editId) await nFetch(`pages/${editId}`,'PATCH',{properties:props});
+    else await mkPage(cfg.todo,props);
+  }catch(e){
+    console.error('saveTodo error:',e);
+    showToast(`❌ Notion 저장 실패 (${e.message}) — Todo DB에 Connection이 추가됐는지 확인해주세요.`,'error');
+    btn.disabled=false;btn.textContent='저장';
+    return;
   }
+
   if(editId){const idx=D.todo.findIndex(x=>x.id===editId);if(idx>-1)D.todo[idx]=t;}
   else D.todo.unshift(t);
   render();closeModal('todoModal');
@@ -1486,17 +1494,14 @@ async function saveTodo(){
 }
 
 async function completeTodo(id){
-  const t=D.todo.find(x=>x.id===id);
-  if(!t)return;
-  t.done=true;
-  if(cfg.token&&cfg.todo){
-    try{await nFetch(`pages/${id}`,'PATCH',{properties:{Done:{checkbox:true}}});}catch(e){}
-  }
-  // 완료 시 0.4초 후 목록에서 제거 (체크 애니메이션 후)
-  setTimeout(()=>{D.todo=D.todo.filter(x=>x.id!==id);render();},400);
-  // 즉시 체크 표시
+  // 즉시 UI 반응 — 체크 표시 후 0.4초 뒤 목록에서 제거
   const check=document.querySelector(`[onclick="completeTodo('${id}')"]`);
   if(check)check.classList.add('done');
+  setTimeout(()=>{D.todo=D.todo.filter(x=>x.id!==id);render();},400);
+  // Notion 저장은 백그라운드 (UI 블로킹 없음)
+  if(cfg.token&&cfg.todo){
+    nFetch(`pages/${id}`,'PATCH',{properties:{Done:{checkbox:true}}}).catch(e=>console.warn('completeTodo sync failed:',e));
+  }
 }
 
 function rMemo(){
