@@ -102,11 +102,11 @@ input,select,textarea{font-family:inherit;}
 .gm-pct{font-size:0.42rem;color:var(--text-m);flex-shrink:0;font-weight:600;}
 .sched-item{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
 .sched-item:last-child{border-bottom:none;}
-/* sched-link: 위아래 패딩 0.25rem — sec-lbl margin-bottom과 동일 → 완전 균일 여백 */
-.sched-link{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0.375rem;border-bottom:1px solid var(--subtle);border-radius:var(--r-sm);text-decoration:none;color:inherit;transition:background var(--ease);cursor:pointer;margin-bottom:0;}
+/* sched-link: padding-top = sec-lbl margin-bottom = 0.25rem, bottom은 0으로 구분선에 딱 붙임 */
+.sched-link{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0.375rem 0;border-bottom:1px solid var(--subtle);border-radius:var(--r-sm);text-decoration:none;color:inherit;transition:background var(--ease);cursor:pointer;margin-bottom:0;}
 
 /* ★ 수정 3: sched-link:last-child 여백 제거 */
-.sched-link:last-child{border-bottom:none;margin-bottom:0;}
+.sched-link:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
 .sched-link:hover{background:var(--subtle);}
 .sched-link:active{background:var(--border);}
 .sched-time{font-size:0.42rem;color:var(--text-m);flex-shrink:0;width:1.6rem;font-weight:600;}
