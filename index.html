@@ -83,8 +83,8 @@ input,select,textarea{font-family:inherit;}
 .area-badge{font-size:0.44rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:20px;}
 .area-arrow{font-size:0.7rem;color:var(--text-m);}
 .area-body{flex:1;padding:0.375rem 1rem;display:flex;flex-direction:column;}
-.area-section{flex:1;padding:0.625rem 0 0.75rem;display:flex;flex-direction:column;border-bottom:1px solid var(--border);min-height:3.5rem;}
-.area-section:last-child{border-bottom:none;padding-bottom:0.375rem;}
+.area-section{flex:1;padding:0.5rem 0 0.25rem;display:flex;flex-direction:column;border-bottom:1px solid var(--border);min-height:3.5rem;}
+.area-section:last-child{border-bottom:none;padding-bottom:0.25rem;}
 .sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin-bottom:0.25rem;display:flex;align-items:center;gap:0.4rem;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
 .goal-mini{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--subtle);}
@@ -1043,7 +1043,7 @@ function rSched(id,g){
   const el=document.getElementById(id);
   if(!el)return;
   if(!items.length){
-    el.innerHTML='<div class="ph-txt">이번 주 일정 없음</div>';
+    el.innerHTML='<div style="padding-bottom:0.375rem"><div class="ph-txt">이번 주 일정 없음</div></div>';
     return;
   }
   el.innerHTML='<div style="padding-bottom:0.375rem">'+items.map(s=>{
@@ -1487,11 +1487,11 @@ function rTodo(id, group){
   const el=document.getElementById(id);
   if(!el)return;
   if(!items.length){
-    el.innerHTML='<div class="ph-txt">할 일 없음</div>';
+    el.innerHTML='<div style="padding-bottom:0.375rem"><div class="ph-txt">할 일 없음</div></div>';
     return;
   }
   const today=new Date().toISOString().slice(0,10);
-  el.innerHTML=items.map(t=>{
+  el.innerHTML='<div style="padding-bottom:0.375rem">'+items.map(t=>{
     const overdue=t.due&&t.due<today;
     const isToday=t.due&&t.due===today;
     const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';
@@ -1503,7 +1503,7 @@ function rTodo(id, group){
       ${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}
       <button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button>
     </div>`;
-  }).join('');
+  }).join('')+'</div>';
 }
 
 function editMemoItem(id){
