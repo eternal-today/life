@@ -83,8 +83,9 @@ input,select,textarea{font-family:inherit;}
 .area-badge{font-size:0.44rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:20px;}
 .area-arrow{font-size:0.7rem;color:var(--text-m);}
 .area-body{flex:1;padding:0.375rem 1rem;display:flex;flex-direction:column;}
-.area-section{flex:1;padding:0.5rem 0 0.25rem;display:flex;flex-direction:column;border-bottom:1px solid var(--border);min-height:3.5rem;}
-.area-section:last-child{border-bottom:none;padding-bottom:0.25rem;}
+.area-section{padding:0.5rem 0;display:flex;flex-direction:column;border-bottom:1px solid var(--border);}
+.area-section:last-child{border-bottom:none;}
+.area-section-content{min-height:2.5rem;padding-bottom:0.5rem;}
 .sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin-bottom:0.25rem;display:flex;align-items:center;gap:0.4rem;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
 .goal-mini{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--subtle);}
@@ -363,9 +364,9 @@ input,select,textarea{font-family:inherit;}
         <span class="area-arrow">›</span>
       </div>
       <div class="area-body">
-        <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-family-sched"></div></div>
-        <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-family-todo"></div></div>
-        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-family-goals"></div></div>
+        <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-family-sched" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-family-todo" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-family-goals" class="area-section-content"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('family',document.querySelectorAll('.tab-btn')[1])">전체 보기</button>
@@ -380,9 +381,9 @@ input,select,textarea{font-family:inherit;}
         <span class="area-arrow">›</span>
       </div>
       <div class="area-body">
-        <div class="area-section"><div class="sec-lbl">오늘 · 이번 주</div><div id="home-work-sched"></div></div>
-        <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-work-todo"></div></div>
-        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-work-goals"></div></div>
+        <div class="area-section"><div class="sec-lbl">오늘 · 이번 주</div><div id="home-work-sched" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-work-todo" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-work-goals" class="area-section-content"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('work',document.querySelectorAll('.tab-btn')[2])">전체 보기</button>
@@ -397,9 +398,9 @@ input,select,textarea{font-family:inherit;}
         <span class="area-arrow">›</span>
       </div>
       <div class="area-body">
-        <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-personal-sched"></div></div>
-        <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-personal-todo"></div></div>
-        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-personal-goals"></div></div>
+        <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-personal-sched" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-personal-todo" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-personal-goals" class="area-section-content"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('personal',document.querySelectorAll('.tab-btn')[3])">전체 보기</button>
@@ -1043,10 +1044,10 @@ function rSched(id,g){
   const el=document.getElementById(id);
   if(!el)return;
   if(!items.length){
-    el.innerHTML='<div style="padding-bottom:0.375rem"><div class="ph-txt">이번 주 일정 없음</div></div>';
+    el.innerHTML='<div class="ph-txt">이번 주 일정 없음</div>';
     return;
   }
-  el.innerHTML='<div style="padding-bottom:0.375rem">'+items.map(s=>{
+  el.innerHTML=items.map(s=>{
     const isToday=s.time==='오늘';
     const isTomorrow=s.time==='내일';
     const timeStyle=isToday
@@ -1061,7 +1062,7 @@ function rSched(id,g){
         :'';
     const dot=isToday?'<span style="width:5px;height:5px;border-radius:50%;background:var(--danger);flex-shrink:0;display:inline-block;margin-right:2px"></span>':'';
     return`<a class="sched-link" href="#" onclick="openCalendar(event,'${g}')"><span class="sched-time" style="${timeStyle}">${s.time}</span>${dot}<span class="sched-title" style="${titleStyle}">${esc(s.title)}</span><span class="sched-arrow">›</span></a>`;
-  }).join('')+'</div>';
+  }).join('');
 }
 
 function openCalendar(e, group){
@@ -1487,11 +1488,11 @@ function rTodo(id, group){
   const el=document.getElementById(id);
   if(!el)return;
   if(!items.length){
-    el.innerHTML='<div style="padding-bottom:0.375rem"><div class="ph-txt">할 일 없음</div></div>';
+    el.innerHTML='<div class="ph-txt">할 일 없음</div>';
     return;
   }
   const today=new Date().toISOString().slice(0,10);
-  el.innerHTML='<div style="padding-bottom:0.375rem">'+items.map(t=>{
+  el.innerHTML=items.map(t=>{
     const overdue=t.due&&t.due<today;
     const isToday=t.due&&t.due===today;
     const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';
@@ -1503,7 +1504,7 @@ function rTodo(id, group){
       ${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}
       <button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button>
     </div>`;
-  }).join('')+'</div>';
+  }).join('');
 }
 
 function editMemoItem(id){
