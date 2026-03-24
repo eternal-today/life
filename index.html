@@ -984,7 +984,7 @@ function rInvest(){
   const bc=c=>assets.filter(i=>i.category===c).reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
   document.getElementById('iv1').textContent=fkrw(totCurrent);
   document.getElementById('iv5').textContent=fkrw(totDebt);
-  const nw=document.getElementById('iv6');nw.textContent=fkrw(Math.abs(netWorth));nw.className='inv-stat-v '+(netWorth>=0?'':'neg');
+  const nw=document.getElementById('iv6');nw.textContent=(netWorth<0?'-':'')+fkrw(Math.abs(netWorth));nw.className='inv-stat-v '+(netWorth>=0?'':'neg');
   document.getElementById('iv2').textContent=fkrw(bc('주식')+bc('ETF'));
   document.getElementById('iv3').textContent=fkrw(bc('예금')+bc('적금'));
   document.getElementById('iv4').textContent=fkrw(totCurrent-bc('주식')-bc('ETF')-bc('예금')-bc('적금'));
