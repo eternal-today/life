@@ -1085,6 +1085,7 @@ function rTodo(id,group){
   const el=document.getElementById(id);if(!el)return;
   if(!items.length){el.innerHTML='<div class="ph-txt">할 일 없음</div>';return;}
   const today=new Date().toISOString().slice(0,10);
+  const tabIdx={family:1,work:2,personal:3}[group]||1;
   const areaColor={family:'var(--family-c)',work:'var(--work-c)',personal:'var(--personal-c)'}[group]||'var(--text-s)';
   el.innerHTML=items.map(t=>{
     const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
