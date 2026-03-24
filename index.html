@@ -331,7 +331,7 @@ input,select,textarea{font-family:inherit;}
 <body>
 <header class="app-header">
   <div class="header-inner">
-    <div class="header-logo" onclick="showPage('home',document.querySelectorAll('.tab-btn')[0])" style="cursor:pointer;">Eternal <em>Today</em></div>
+    <div class="header-logo" onclick="syncNow()" style="cursor:pointer;">Eternal <em>Today</em></div>
     <div class="header-right">
       <div class="sync-wrap"><div class="sync-dot" id="syncDot"></div><span class="sync-txt" id="syncTxt">데모</span></div>
       <button class="btn-icon" onclick="openDrawer()">⚙</button>
@@ -754,7 +754,20 @@ let cfg={token:'',goals:'',invest:'',subs:'',memo:'',todo:'',proxy:'',calFamily:
 let D={goals:[],invest:[],subs:[],memo:[],todo:[],sched:{family:[],work:[],personal:[]}};
 let gF={family:'all',work:'all',personal:'all'};
 
-window.addEventListener('DOMContentLoaded',async()=>{await loadCfg();initDate();loadAll();});
+window.addEventListener('DOMContentLoaded',async()=>{
+  await loadCfg();
+  initDate();
+  loadAll();
+  // 5분마다 자동 갱신
+  setInterval(()=>{ if(document.visibilityState!=='hidden') syncNow(false); }, 5*60*1000);
+});
+
+async function syncNow(showFeedback=true){
+  showPage('home', document.querySelectorAll('.tab-btn')[0]);
+  if(showFeedback) setSS('loading');
+  await loadAll();
+  if(showFeedback) showToast('🔄 동기화 완료!', 'success');
+}
 
 function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
