@@ -87,12 +87,12 @@ input,select,textarea{font-family:inherit;}
 .area-body{padding:0.25rem 1rem;display:flex;flex-direction:column;flex:1;}
 
 /* ★ 수정 2: area-section 고정 min-height — 내용 유무 무관 레이아웃 통일 */
-.area-section{padding:0.375rem 0 0;display:flex;flex-direction:column;border-bottom:1px solid var(--border);min-height:4.5rem;}
-.area-section:last-child{border-bottom:none;padding-bottom:0.375rem;min-height:3.75rem;}
+.area-section{padding:0;display:flex;flex-direction:column;border-bottom:1px solid var(--border);min-height:4.5rem;}
+.area-section:last-child{border-bottom:none;min-height:3.75rem;}
 .area-section-content{flex:1;display:flex;flex-direction:column;justify-content:flex-start;}
 
-/* sec-lbl 아래 여백 = sched-link 세로 패딩과 동일하게 맞춤 */
-.sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin-bottom:0.25rem;display:flex;align-items:center;gap:0.4rem;}
+/* sec-lbl: margin-top으로 섹션 상단 여백, margin-bottom으로 첫 항목과의 간격 통합 제어 */
+.sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin:0.3rem 0 0.25rem;display:flex;align-items:center;gap:0.4rem;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
 .goal-mini{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
 .goal-mini:last-child{border-bottom:none;margin-bottom:0;}
@@ -102,10 +102,10 @@ input,select,textarea{font-family:inherit;}
 .gm-pct{font-size:0.42rem;color:var(--text-m);flex-shrink:0;font-weight:600;}
 .sched-item{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
 .sched-item:last-child{border-bottom:none;}
-/* sched-link: padding-top = sec-lbl margin-bottom = 0.25rem, bottom은 0으로 구분선에 딱 붙임 */
-.sched-link{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0.375rem 0;border-bottom:1px solid var(--subtle);border-radius:var(--r-sm);text-decoration:none;color:inherit;transition:background var(--ease);cursor:pointer;margin-bottom:0;}
+/* sched-link: padding 위아래 모두 0.25rem으로 균일, last-child만 bottom 0 */
+.sched-link{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0.375rem;border-bottom:1px solid var(--subtle);border-radius:var(--r-sm);text-decoration:none;color:inherit;transition:background var(--ease);cursor:pointer;margin-bottom:0;}
 
-/* ★ 수정 3: sched-link:last-child 여백 제거 */
+/* ★ 수정 3: sched-link:last-child — padding-bottom 0으로 구분선에 딱 붙임 */
 .sched-link:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
 .sched-link:hover{background:var(--subtle);}
 .sched-link:active{background:var(--border);}
@@ -184,8 +184,8 @@ input,select,textarea{font-family:inherit;}
 .btn-ord{background:none;border:1px solid var(--border);border-radius:var(--r-sm);padding:0.2rem 0.4rem;font-family:inherit;font-size:0.44rem;color:var(--text-m);cursor:pointer;transition:all var(--ease);flex-shrink:0;line-height:1;}
 .btn-ord:hover{background:var(--subtle);}
 .item-actions{display:flex;gap:0.25rem;margin-top:0.3rem;flex-wrap:wrap;}
-.todo-item{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--subtle);}
-.todo-item:last-child{border-bottom:none;margin-bottom:0;}
+.todo-item{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
+.todo-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
 .todo-check{width:0.85rem;height:0.85rem;border:1.5px solid var(--border);border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--ease);background:var(--surface);}
 .todo-check:hover{border-color:var(--primary);}
 .todo-check.done{background:var(--primary);border-color:var(--primary);}
