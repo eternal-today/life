@@ -82,14 +82,19 @@ input,select,textarea{font-family:inherit;}
 .area-name{font-size:0.75rem;font-weight:700;color:var(--text-h);}
 .area-badge{font-size:0.44rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:20px;}
 .area-arrow{font-size:0.7rem;color:var(--text-m);}
-.area-body{padding:0.375rem 1rem;display:flex;flex-direction:column;}
-.area-section{padding:0.5rem 0 0;display:flex;flex-direction:column;border-bottom:1px solid var(--border);}
+
+/* ★ 수정 1: area-body flex:1로 카드 내 세 섹션이 균등 공간 점유 */
+.area-body{padding:0.375rem 1rem;display:flex;flex-direction:column;flex:1;}
+
+/* ★ 수정 2: area-section flex:1로 세 섹션이 균등 높이 점유 */
+.area-section{padding:0.5rem 0 0.5rem;display:flex;flex-direction:column;flex:1;border-bottom:1px solid var(--border);}
 .area-section:last-child{border-bottom:none;}
-.area-section-content{}
+.area-section-content{flex:1;}
+
 .sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin-bottom:0.25rem;display:flex;align-items:center;gap:0.4rem;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
 .goal-mini{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--subtle);}
-.goal-mini:last-child{border-bottom:none;margin-bottom:0.5rem;}
+.goal-mini:last-child{border-bottom:none;margin-bottom:0;}
 .gm-bar-wrap{width:1.6rem;height:2px;background:var(--border);border-radius:2px;flex-shrink:0;}
 .gm-bar{height:100%;border-radius:2px;}
 .gm-title{flex:1;font-size:0.52rem;color:var(--text-b);line-height:1.25;font-weight:500;}
@@ -97,7 +102,9 @@ input,select,textarea{font-family:inherit;}
 .sched-item{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--subtle);}
 .sched-item:last-child{border-bottom:none;}
 .sched-link{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0.375rem;border-bottom:1px solid var(--subtle);border-radius:var(--r-sm);text-decoration:none;color:inherit;transition:background var(--ease);cursor:pointer;margin-bottom:0;}
-.sched-link:last-child{border-bottom:none;margin-bottom:0.5rem;}
+
+/* ★ 수정 3: sched-link:last-child 여백 제거 */
+.sched-link:last-child{border-bottom:none;margin-bottom:0;}
 .sched-link:hover{background:var(--subtle);}
 .sched-link:active{background:var(--border);}
 .sched-time{font-size:0.42rem;color:var(--text-m);flex-shrink:0;width:1.6rem;font-weight:600;}
@@ -176,7 +183,7 @@ input,select,textarea{font-family:inherit;}
 .btn-ord:hover{background:var(--subtle);}
 .item-actions{display:flex;gap:0.25rem;margin-top:0.3rem;flex-wrap:wrap;}
 .todo-item{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;border-bottom:1px solid var(--subtle);}
-.todo-item:last-child{border-bottom:none;margin-bottom:0.5rem;}
+.todo-item:last-child{border-bottom:none;margin-bottom:0;}
 .todo-check{width:0.85rem;height:0.85rem;border:1.5px solid var(--border);border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--ease);background:var(--surface);}
 .todo-check:hover{border-color:var(--primary);}
 .todo-check.done{background:var(--primary);border-color:var(--primary);}
@@ -282,7 +289,7 @@ input,select,textarea{font-family:inherit;}
 .empty-msg{padding:3rem 1rem;text-align:center;color:var(--text-m);}
 .empty-msg p{font-size:0.6rem;color:var(--text-s);margin-bottom:0.25rem;}
 .tag{display:inline-block;font-size:0.44rem;padding:0.15rem 0.5rem;border-radius:20px;font-weight:700;}
-.ph-txt{font-size:0.5rem;color:var(--text-m);padding:0.125rem 0 0.375rem;}
+.ph-txt{font-size:0.5rem;color:var(--text-m);padding:0.25rem 0 0.125rem;}
 
 /* 빠른 메모 */
 .quick-memo-wrap{margin-top:0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem 1.25rem;box-shadow:var(--sh-sm);}
@@ -303,6 +310,8 @@ input,select,textarea{font-family:inherit;}
 .qm-item-text{flex:1;font-size:0.54rem;color:var(--text-b);line-height:1.55;white-space:pre-wrap;word-break:break-word;}
 .qm-item-time{font-size:0.42rem;color:var(--text-m);flex-shrink:0;margin-top:0.1rem;}
 
+@keyframes fadeUp{from{opacity:0;transform:translateY(0.5rem);}to{opacity:1;transform:translateY(0);}}
+
 /* 데스크탑 1024px — 단일 분기 */
 @media(min-width:1024px){
   html{font-size:28px;}
@@ -312,7 +321,7 @@ input,select,textarea{font-family:inherit;}
   .ds-quote{display:block;}
   .tab-date-wrap{display:flex;}
   .tab-bar{top:2.75rem;}
-  .area-grid{flex-direction:row;align-items:flex-start;gap:1rem;}
+  .area-grid{flex-direction:row;align-items:stretch;gap:1rem;}
   .area-card{flex:1;}
   .area-header{padding:0.75rem 1.25rem;}
   .area-body{padding:1rem 1.25rem;}
@@ -358,6 +367,7 @@ input,select,textarea{font-family:inherit;}
 <!-- HOME -->
 <div class="page active" id="page-home"><div class="home-wrap">
   <div class="area-grid">
+    <!-- 가정 카드 -->
     <div class="area-card family">
       <div class="area-header" onclick="showPage('family',document.querySelectorAll('.tab-btn')[1])">
         <div class="area-header-left"><div class="area-dot" style="background:var(--family-c)"></div><div class="area-name">가정</div><span class="area-badge" style="background:var(--family-bg);color:var(--family-c)" id="badge-family">—</span></div>
@@ -375,13 +385,14 @@ input,select,textarea{font-family:inherit;}
         <button class="btn-add-sm" style="background:var(--family-c)" onclick="openGoalModal('family')">+ 목표</button>
       </div>
     </div>
+    <!-- 회사 카드 — ★ sec-lbl "이번 주 일정"으로 통일 -->
     <div class="area-card work">
       <div class="area-header" onclick="showPage('work',document.querySelectorAll('.tab-btn')[2])">
         <div class="area-header-left"><div class="area-dot" style="background:var(--work-c)"></div><div class="area-name">회사</div><span class="area-badge" style="background:var(--work-bg);color:var(--work-c)" id="badge-work">—</span></div>
         <span class="area-arrow">›</span>
       </div>
       <div class="area-body">
-        <div class="area-section"><div class="sec-lbl">오늘 · 이번 주</div><div id="home-work-sched" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-work-sched" class="area-section-content"></div></div>
         <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-work-todo" class="area-section-content"></div></div>
         <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-work-goals" class="area-section-content"></div></div>
       </div>
@@ -392,6 +403,7 @@ input,select,textarea{font-family:inherit;}
         <button class="btn-add-sm" style="background:var(--work-c)" onclick="openGoalModal('work')">+ 목표</button>
       </div>
     </div>
+    <!-- 개인 카드 -->
     <div class="area-card personal">
       <div class="area-header" onclick="showPage('personal',document.querySelectorAll('.tab-btn')[3])">
         <div class="area-header-left"><div class="area-dot" style="background:var(--personal-c)"></div><div class="area-name">개인</div><span class="area-badge" style="background:var(--personal-bg);color:var(--personal-c)" id="badge-personal">—</span></div>
@@ -411,7 +423,7 @@ input,select,textarea{font-family:inherit;}
     </div>
   </div>
 
-  <!-- 갱신 임박 알림 — 카드 밖 별도 영역 -->
+  <!-- 갱신 임박 알림 -->
   <div id="home-personal-sub-alert"></div>
 
   <!-- 빠른 메모 -->
@@ -577,7 +589,7 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div class="d-sec">
     <div class="d-lbl">DB 컬럼 구조</div>
-    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타/주택담보대출/신용대출/마이너스통장/기타대출) · Currency(KRW/USD/EUR/JPY/GBP) · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo(Text) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category(엔터테인먼트/업무/생산성/AI/개발/헬스/통신비/보험/대출이자/교육/관리비공과금/기타) · Fee · Currency(KRW/USD/EUR/JPY/GBP) · FeeKRW(Number) · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Todo:</b> Title · Area(select: family/work/personal) · Priority(select: 높음/보통/낮음) · Due(Date) · Done(Checkbox)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · ShowInDash(Checkbox) · CreatedAt(Created time)</div>
+    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타/주택담보대출/신용대출/마이너스통장/기타대출) · Currency(KRW/USD/EUR/JPY/GBP) · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo(Text) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category · Fee · Currency · FeeKRW · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Todo:</b> Title · Area(select: family/work/personal) · Priority(select: 높음/보통/낮음) · Due(Date) · Done(Checkbox)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · ShowInDash(Checkbox) · CreatedAt(Created time)</div>
   </div>
 </div>
 
@@ -606,29 +618,13 @@ input,select,textarea{font-family:inherit;}
   <div class="m-row2" style="margin-bottom:0.75rem">
     <div><label class="m-fl">분류</label>
       <select class="m-sel" id="iCat" onchange="updateInvCurrency()">
-        <option value="주식">주식</option>
-        <option value="ETF">ETF</option>
-        <option value="예금">예금</option>
-        <option value="적금">적금</option>
-        <option value="펀드">펀드</option>
-        <option value="부동산">부동산</option>
-        <option value="암호화폐">암호화폐</option>
-        <option value="기타">기타</option>
-        <optgroup label="── 부채 ──">
-          <option value="주택담보대출">주택담보대출</option>
-          <option value="신용대출">신용대출</option>
-          <option value="마이너스통장">마이너스통장</option>
-          <option value="기타대출">기타대출</option>
-        </optgroup>
+        <option value="주식">주식</option><option value="ETF">ETF</option><option value="예금">예금</option><option value="적금">적금</option><option value="펀드">펀드</option><option value="부동산">부동산</option><option value="암호화폐">암호화폐</option><option value="기타">기타</option>
+        <optgroup label="── 부채 ──"><option value="주택담보대출">주택담보대출</option><option value="신용대출">신용대출</option><option value="마이너스통장">마이너스통장</option><option value="기타대출">기타대출</option></optgroup>
       </select>
     </div>
     <div><label class="m-fl">통화</label>
       <select class="m-sel" id="iCurrency" onchange="updateInvCurrency()">
-        <option value="KRW">₩ 원화 (KRW)</option>
-        <option value="USD">$ 달러 (USD)</option>
-        <option value="EUR">€ 유로 (EUR)</option>
-        <option value="JPY">¥ 엔화 (JPY)</option>
-        <option value="GBP">£ 파운드 (GBP)</option>
+        <option value="KRW">₩ 원화 (KRW)</option><option value="USD">$ 달러 (USD)</option><option value="EUR">€ 유로 (EUR)</option><option value="JPY">¥ 엔화 (JPY)</option><option value="GBP">£ 파운드 (GBP)</option>
       </select>
     </div>
   </div>
@@ -661,16 +657,7 @@ input,select,textarea{font-family:inherit;}
   <div class="m-row2" style="margin-bottom:0.75rem">
     <div><label class="m-fl">카테고리</label>
       <select class="m-sel" id="sCat">
-        <option value="엔터테인먼트">엔터테인먼트</option>
-        <option value="업무/생산성">업무/생산성</option>
-        <option value="AI/개발">AI/개발</option>
-        <option value="헬스">헬스</option>
-        <option value="통신비">통신비</option>
-        <option value="보험">보험</option>
-        <option value="대출/이자">대출/이자</option>
-        <option value="교육">교육</option>
-        <option value="관리비/공과금">관리비/공과금</option>
-        <option value="기타">기타</option>
+        <option value="엔터테인먼트">엔터테인먼트</option><option value="업무/생산성">업무/생산성</option><option value="AI/개발">AI/개발</option><option value="헬스">헬스</option><option value="통신비">통신비</option><option value="보험">보험</option><option value="대출/이자">대출/이자</option><option value="교육">교육</option><option value="관리비/공과금">관리비/공과금</option><option value="기타">기타</option>
       </select>
     </div>
     <div><label class="m-fl">결제주기</label><select class="m-sel" id="sCycle"><option value="월">월간</option><option value="연">연간</option></select></div>
@@ -679,11 +666,7 @@ input,select,textarea{font-family:inherit;}
     <div><label class="m-fl">금액</label><input class="m-fi" id="sFee" type="number" placeholder="17000"></div>
     <div><label class="m-fl">통화</label>
       <select class="m-sel" id="sCurrency">
-        <option value="KRW">₩ 원화 (KRW)</option>
-        <option value="USD">$ 달러 (USD)</option>
-        <option value="EUR">€ 유로 (EUR)</option>
-        <option value="JPY">¥ 엔화 (JPY)</option>
-        <option value="GBP">£ 파운드 (GBP)</option>
+        <option value="KRW">₩ 원화 (KRW)</option><option value="USD">$ 달러 (USD)</option><option value="EUR">€ 유로 (EUR)</option><option value="JPY">¥ 엔화 (JPY)</option><option value="GBP">£ 파운드 (GBP)</option>
       </select>
     </div>
   </div>
@@ -705,18 +688,10 @@ input,select,textarea{font-family:inherit;}
   <div class="m-fr"><label class="m-fl">제목</label><input class="m-fi" id="tTitle" placeholder="예: 보험 서류 제출, 주간 보고서 작성"></div>
   <div class="m-row2" style="margin-bottom:0.75rem">
     <div><label class="m-fl">영역</label>
-      <select class="m-sel" id="tArea">
-        <option value="family">가정</option>
-        <option value="work">회사</option>
-        <option value="personal">개인</option>
-      </select>
+      <select class="m-sel" id="tArea"><option value="family">가정</option><option value="work">회사</option><option value="personal">개인</option></select>
     </div>
     <div><label class="m-fl">우선순위</label>
-      <select class="m-sel" id="tPriority">
-        <option value="높음">🔴 높음</option>
-        <option value="보통" selected>🟡 보통</option>
-        <option value="낮음">⚪ 낮음</option>
-      </select>
+      <select class="m-sel" id="tPriority"><option value="높음">🔴 높음</option><option value="보통" selected>🟡 보통</option><option value="낮음">⚪ 낮음</option></select>
     </div>
   </div>
   <div class="m-fr"><label class="m-fl">마감일 (선택)</label><div class="date-wrap"><input class="m-fi" id="tDue" type="date"><button class="btn-today" onclick="setToday('tDue')">Today</button></div></div>
@@ -730,13 +705,7 @@ input,select,textarea{font-family:inherit;}
   <div class="m-fr"><textarea class="m-ta" id="meText" placeholder="메모 내용..."></textarea></div>
   <div class="m-row2" style="margin-bottom:0.75rem;align-items:center">
     <div><label class="m-fl">영역</label>
-      <select class="m-sel" id="meArea">
-        <option value="">영역 없음</option>
-        <option value="growth">개인 성장</option>
-        <option value="health">건강</option>
-        <option value="side">사이드</option>
-        <option value="finance">재테크</option>
-      </select>
+      <select class="m-sel" id="meArea"><option value="">영역 없음</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
     </div>
     <div style="display:flex;gap:0.75rem;align-items:center;padding-top:1rem">
       <label class="nm-pin"><input type="checkbox" id="mePin"> 📌 고정</label>
@@ -759,7 +728,6 @@ window.addEventListener('DOMContentLoaded',async()=>{
   await loadCfg();
   initDate();
   loadAll();
-  // 5분마다 자동 갱신
   setInterval(()=>{ if(document.visibilityState!=='hidden') syncNow(false); }, 5*60*1000);
 });
 
@@ -771,14 +739,11 @@ async function syncNow(showFeedback=true){
 }
 
 function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-// 프록시 URL 유효성 검사 — http(s)://로 시작하는지 확인
 function isValidUrl(url){try{const u=new URL(url);return u.protocol==='https:'||u.protocol==='http:';}catch(e){return false;}}
-
-// 숫자 입력값 범위 제한
 function safeInt(val,min=0,max=Number.MAX_SAFE_INTEGER){const n=parseInt(val)||0;return Math.min(Math.max(n,min),max);}
 function safeFloat(val){const n=parseFloat(val);return isNaN(n)?0:n;}
 function safeProgress(val){return Math.min(Math.max(parseInt(val)||0,0),100);}
+
 function initDate(){
   const n=new Date(),days=['일','월','화','수','목','금','토'],q=Math.ceil((n.getMonth()+1)/3);
   const dateEl=document.getElementById('todayDate');
@@ -792,127 +757,49 @@ const CFG_IDS =['cToken','cGoals','cInvest','cSubs','cMemo','cTodo','cProxy','cC
 const HASH_KEYS=['goals','invest','subs','memo','todo','proxy','calFamily','calWork','calPersonal'];
 const HASH_IDS =['cGoals','cInvest','cSubs','cMemo','cTodo','cProxy','cCalFamily','cCalWork','cCalPersonal'];
 
-/* ── 기기 고유 시드 생성 (안정적 — 브라우저 업데이트 영향 없음) ── */
 function getDeviceSeed(){
-  try{
-    // 기기별 고유 랜덤 ID — 최초 생성 후 localStorage에 영구 보관
-    let id=localStorage.getItem('et_did');
-    if(!id){
-      const arr=crypto.getRandomValues(new Uint8Array(24));
-      id=btoa(String.fromCharCode(...arr));
-      localStorage.setItem('et_did',id);
-    }
-    return id;
-  }catch(e){
-    // localStorage 불가 시 UA 기반 fallback
-    return `${navigator.userAgent}-${screen.width}x${screen.height}`.slice(0,64);
-  }
+  try{let id=localStorage.getItem('et_did');if(!id){const arr=crypto.getRandomValues(new Uint8Array(24));id=btoa(String.fromCharCode(...arr));localStorage.setItem('et_did',id);}return id;}
+  catch(e){return `${navigator.userAgent}-${screen.width}x${screen.height}`.slice(0,64);}
 }
 
-/* ── 암호화 키 파생 (캐싱으로 속도 개선) ── */
 const _keyCache={};
 async function deriveKey(seed){
   if(_keyCache[seed]) return _keyCache[seed];
   const raw=new TextEncoder().encode(seed);
   const base=await crypto.subtle.importKey('raw',raw,{name:'PBKDF2'},false,['deriveKey']);
-  const key=await crypto.subtle.deriveKey(
-    {name:'PBKDF2',salt:new TextEncoder().encode('ET-Salt-2026'),iterations:10000,hash:'SHA-256'},
-    base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']
-  );
-  _keyCache[seed]=key;
-  return key;
+  const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:new TextEncoder().encode('ET-Salt-2026'),iterations:10000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+  _keyCache[seed]=key;return key;
 }
 
-/* ── 암호화 / 복호화 ── */
-async function encrypt(text, seed){
-  try{
-    const key=await deriveKey(seed);
-    const iv=crypto.getRandomValues(new Uint8Array(12));
-    const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(text));
-    const buf=new Uint8Array(12+enc.byteLength);
-    buf.set(iv);buf.set(new Uint8Array(enc),12);
-    return btoa(String.fromCharCode(...buf));
-  }catch(e){return '';}
+async function encrypt(text,seed){
+  try{const key=await deriveKey(seed);const iv=crypto.getRandomValues(new Uint8Array(12));const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(text));const buf=new Uint8Array(12+enc.byteLength);buf.set(iv);buf.set(new Uint8Array(enc),12);return btoa(String.fromCharCode(...buf));}catch(e){return '';}
 }
-async function decrypt(str, seed){
-  try{
-    const buf=Uint8Array.from(atob(str),c=>c.charCodeAt(0));
-    const key=await deriveKey(seed);
-    const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(0,12)},key,buf.slice(12));
-    return new TextDecoder().decode(dec);
-  }catch(e){return '';}
+async function decrypt(str,seed){
+  try{const buf=Uint8Array.from(atob(str),c=>c.charCodeAt(0));const key=await deriveKey(seed);const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(0,12)},key,buf.slice(12));return new TextDecoder().decode(dec);}catch(e){return '';}
 }
 
-/* ── 설정 저장 ── */
 async function saveCfg(){
   CFG_KEYS.forEach((k,i)=>{const el=document.getElementById(CFG_IDS[i]);if(el)cfg[k]=el.value.trim();});
-
-  // Token → 기기 고유키로 암호화 후 localStorage
-  try{
-    if(cfg.token){
-      const enc=await encrypt(cfg.token, getDeviceSeed());
-      if(enc) localStorage.setItem('et_tok',enc);
-    } else {
-      localStorage.removeItem('et_tok');
-    }
-    localStorage.removeItem('el_t');
-    sessionStorage.removeItem('et_token');
-  }catch(e){}
-
-  // 나머지 → URL 해시 암호화 + localStorage 동시 저장
-  const hashObj={};
-  HASH_KEYS.forEach(k=>{hashObj[k]=cfg[k]||'';});
+  try{if(cfg.token){const enc=await encrypt(cfg.token,getDeviceSeed());if(enc)localStorage.setItem('et_tok',enc);}else{localStorage.removeItem('et_tok');}localStorage.removeItem('el_t');sessionStorage.removeItem('et_token');}catch(e){}
+  const hashObj={};HASH_KEYS.forEach(k=>{hashObj[k]=cfg[k]||'';});
   const enc=await encrypt(JSON.stringify(hashObj),'EternalToday-Hash-2026');
-  if(enc){
-    history.replaceState(null,'','#'+enc);
-    try{localStorage.setItem('et_cfg',enc);}catch(e){}
-  }
+  if(enc){history.replaceState(null,'','#'+enc);try{localStorage.setItem('et_cfg',enc);}catch(e){}}
 }
 
-/* ── 설정 로드 ── */
 async function loadCfg(){
-  // 1. Token → localStorage (기기 고유키로 암호화)
-  try{
-    const enc=localStorage.getItem('et_tok');
-    if(enc){
-      const t=await decrypt(enc, getDeviceSeed());
-      if(t){
-        cfg.token=t;
-        const el=document.getElementById('cToken');
-        if(el)el.value=t;
-      }
-    }
-  }catch(e){}
-
-  // 2. URL 해시 + localStorage 중 최신값 사용, 누락 키는 보충
-  const hash=location.hash.slice(1);
-  const lsEnc=localStorage.getItem('et_cfg')||'';
-  let hashObj=null, lsObj=null;
+  try{const enc=localStorage.getItem('et_tok');if(enc){const t=await decrypt(enc,getDeviceSeed());if(t){cfg.token=t;const el=document.getElementById('cToken');if(el)el.value=t;}}}catch(e){}
+  const hash=location.hash.slice(1);const lsEnc=localStorage.getItem('et_cfg')||'';
+  let hashObj=null,lsObj=null;
   if(hash){const p=await decrypt(hash,'EternalToday-Hash-2026');if(p){try{hashObj=JSON.parse(p);}catch(e){}}}
   if(lsEnc){const p=await decrypt(lsEnc,'EternalToday-Hash-2026');if(p){try{lsObj=JSON.parse(p);}catch(e){}}}
-
-  // 두 소스 병합 — URL 해시 우선, 없는 키는 localStorage로 채움
   const obj=hashObj||lsObj;
   if(obj){
     if(hashObj&&lsObj){HASH_KEYS.forEach(k=>{if(!hashObj[k]&&lsObj[k])obj[k]=lsObj[k];});}
-    HASH_KEYS.forEach((k,i)=>{
-      cfg[k]=obj[k]||'';
-      const el=document.getElementById(HASH_IDS[i]);
-      if(el)el.value=cfg[k];
-    });
-    // 로드된 값을 localStorage에도 최신화
+    HASH_KEYS.forEach((k,i)=>{cfg[k]=obj[k]||'';const el=document.getElementById(HASH_IDS[i]);if(el)el.value=cfg[k];});
     if(hashObj&&hash){try{localStorage.setItem('et_cfg',hash);}catch(e){}}
     return;
   }
-
-  // 3. 구버전 하위 호환
-  try{
-    const LS={cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};
-    Object.entries(LS).forEach(([id,lk])=>{
-      const k=CFG_KEYS[CFG_IDS.indexOf(id)];
-      if(k){cfg[k]=localStorage.getItem(lk)||'';const el=document.getElementById(id);if(el)el.value=cfg[k];}
-    });
-  }catch(e){}
+  try{const LS={cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};Object.entries(LS).forEach(([id,lk])=>{const k=CFG_KEYS[CFG_IDS.indexOf(id)];if(k){cfg[k]=localStorage.getItem(lk)||'';const el=document.getElementById(id);if(el)el.value=cfg[k];}});}catch(e){}
 }
 
 async function nFetch(path,method='GET',body=null,retry=0){
@@ -926,10 +813,7 @@ function gp(p,k,t){const v=p.properties?.[k];if(!v)return null;if(t==='title')re
 
 async function loadAll(){
   if(!cfg.token){demoData();return;}
-  if(!cfg.proxy||!isValidUrl(cfg.proxy)){
-    showToast('⚠ CORS 프록시 URL이 설정되지 않았습니다. 설정(⚙)을 확인해주세요.','error');
-    demoData();return;
-  }
+  if(!cfg.proxy||!isValidUrl(cfg.proxy)){showToast('⚠ CORS 프록시 URL이 설정되지 않았습니다.','error');demoData();return;}
   try{
     setSS('loading');
     const[g,i,s,m]=await Promise.all([qDB(cfg.goals),qDB(cfg.invest),qDB(cfg.subs),qDB(cfg.memo)]);
@@ -937,31 +821,15 @@ async function loadAll(){
     D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',currency:gp(p,'Currency','select')||'KRW',qty:gp(p,'Qty','number')||1,costPrice:gp(p,'CostPrice','number')||0,currentPrice:gp(p,'CurrentPrice','number')||0,costRate:gp(p,'CostRate','number')||0,curRate:gp(p,'CurRate','number')||0,memo:gp(p,'Memo','text')||'',updatedAt:gp(p,'UpdatedAt','date')}));
     D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,currency:gp(p,'Currency','select')||'KRW',feeKrw:gp(p,'FeeKRW','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),memo:gp(p,'Memo','text')||'',alert:gp(p,'Alert','check')!==false,active:gp(p,'Active','check')!==false}));
     D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,showInDash:gp(p,'ShowInDash','check')!==false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
-    // Todo는 별도 로드 — 실패해도 나머지에 영향 없음
-    if(cfg.todo){
-      try{
-        const td=await qDB(cfg.todo);
-    D.todo=td.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'personal').toLowerCase(),due:gp(p,'Due','date'),done:gp(p,'Done','check')||false,priority:gp(p,'Priority','select')||'보통'}))
-      .filter(t=>!t.done)
-      .sort((a,b)=>{
-        if(!a.due&&!b.due) return 0;
-        if(!a.due) return 1;
-        if(!b.due) return -1;
-        return a.due.localeCompare(b.due);
-      });
-      }catch(e){D.todo=[];}
-    }
-    setSS('ok');
-    render();
-    loadCalendars();
+    if(cfg.todo){try{const td=await qDB(cfg.todo);D.todo=td.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'personal').toLowerCase(),due:gp(p,'Due','date'),done:gp(p,'Done','check')||false,priority:gp(p,'Priority','select')||'보통'})).filter(t=>!t.done).sort((a,b)=>{if(!a.due&&!b.due)return 0;if(!a.due)return 1;if(!b.due)return -1;return a.due.localeCompare(b.due);});}catch(e){D.todo=[];}}
+    setSS('ok');render();loadCalendars();
   }catch(e){
     const msg=e?.message||String(e);
-    if(msg==='401') showToast('❌ Token 인증 실패 (401). 설정에서 Token을 다시 확인해주세요.','error');
-    else if(msg==='403') showToast('❌ 접근 권한 없음 (403). DB에 Integration 연결이 됐는지 확인해주세요.','error');
-    else if(msg==='404') showToast('❌ DB를 찾을 수 없음 (404). DB ID를 다시 확인해주세요.','error');
-    else showToast(`❌ 로드 실패 (${msg}). 설정(⚙)을 확인해주세요.`,'error');
-    setSS('err');
-    demoData();
+    if(msg==='401') showToast('❌ Token 인증 실패 (401).','error');
+    else if(msg==='403') showToast('❌ 접근 권한 없음 (403).','error');
+    else if(msg==='404') showToast('❌ DB를 찾을 수 없음 (404).','error');
+    else showToast(`❌ 로드 실패 (${msg}).`,'error');
+    setSS('err');demoData();
   }
 }
 
@@ -970,13 +838,7 @@ async function loadCalendars(){
   try{
     const groups=['family','work','personal'];
     await Promise.all(groups.map(async g=>{
-      try{
-        const r=await fetch(`${cfg.proxy}/calendar?group=${encodeURIComponent(g)}`);
-        if(!r.ok) return;
-        const data=await r.json();
-        D.sched[g]=parseCalEvents(data.items||[]);
-        rSched('home-'+g+'-sched',g);
-      }catch(e){}
+      try{const r=await fetch(`${cfg.proxy}/calendar?group=${encodeURIComponent(g)}`);if(!r.ok)return;const data=await r.json();D.sched[g]=parseCalEvents(data.items||[]);rSched('home-'+g+'-sched',g);}catch(e){}
     }));
   }catch(e){}
 }
@@ -989,23 +851,18 @@ function parseCalEvents(items){
   const tomorrowStr=`${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth()+1).padStart(2,'0')}-${String(tomorrowDate.getDate()).padStart(2,'0')}`;
   return items.slice(0,2).map(ev=>{
     const raw=ev.start?.dateTime||ev.start?.date||'';
-    const dateStr=raw.slice(0,10); // YYYY-MM-DD만 추출
-    const dt=new Date(dateStr+'T00:00:00'); // 로컬 시간 기준
+    const dateStr=raw.slice(0,10);
+    const dt=new Date(dateStr+'T00:00:00');
     let time='';
     if(dateStr===todayStr) time='오늘';
     else if(dateStr===tomorrowStr) time='내일';
     else time=days[dt.getDay()];
-    return{time, title:ev.summary||'(제목 없음)', htmlLink:ev.htmlLink||''};
+    return{time,title:ev.summary||'(제목 없음)',htmlLink:ev.htmlLink||''};
   });
 }
+
 function setSS(s){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');if(s==='ok'){d.className='sync-dot ok';t.textContent='동기화 완료';}else if(s==='loading'){d.className='sync-dot';t.textContent='로딩 중...';}else{d.className='sync-dot';t.textContent='데모 모드';}}
-
-function demoData(){
-  D.goals=[];D.invest=[];D.subs=[];D.memo=[];D.todo=[];
-  setSS('err');
-  render();
-}
-
+function demoData(){D.goals=[];D.invest=[];D.subs=[];D.memo=[];D.todo=[];setSS('err');render();}
 function render(){rHome();rGoalPage('family');rGoalPage('work');rGoalPage('personal');rInvest();rSubs();rMemo();rQuickMemoRecent();}
 function byGroup(g){return D.goals.filter(x=>(AMAP[x.area]?.g||'personal')===g&&x.status!=='완료');}
 function avg(arr){return arr.length?Math.round(arr.reduce((a,g)=>a+g.progress,0)/arr.length):0;}
@@ -1024,55 +881,39 @@ function rHome(){
   rMini('home-family-goals',fam.slice(0,2),'var(--family-c)');
   rMini('home-work-goals',wrk.slice(0,2),'var(--work-c)');
   rMini('home-personal-goals',per.slice(0,2),'var(--personal-c)');
-  // 30일 이내 갱신 구독만 알림 표시 (카드 아래 별도 영역)
   const soon=D.subs.filter(s=>s.active&&s.alert!==false&&s.renewDate&&dUntil(s.renewDate)<=30).sort((a,b)=>new Date(a.renewDate)-new Date(b.renewDate));
   const alertEl=document.getElementById('home-personal-sub-alert');
   if(soon.length){
-    const chips=soon.map(s=>{
-      const d=dUntil(s.renewDate);
-      const dayTxt=d<=0?'오늘':d+'일 후';
-      const isToday=d<=0;
-      return`<span class="sub-alert-chip"><span class="sub-alert-chip-name">${esc(s.service)}</span><span class="sub-alert-chip-day${isToday?' today':''}">${dayTxt}</span></span>`;
-    }).join('');
+    const chips=soon.map(s=>{const d=dUntil(s.renewDate);const dayTxt=d<=0?'오늘':d+'일 후';const isToday=d<=0;return`<span class="sub-alert-chip"><span class="sub-alert-chip-name">${esc(s.service)}</span><span class="sub-alert-chip-day${isToday?' today':''}">${dayTxt}</span></span>`;}).join('');
     alertEl.innerHTML=`<div class="sub-alert-wrap"><span class="sub-alert-lbl">⚠ 갱신 임박</span><div class="sub-alert-items">${chips}</div></div>`;
-  } else {
-    alertEl.innerHTML='';
-  }
+  } else {alertEl.innerHTML='';}
 }
+
 function rSched(id,g){
   const items=D.sched[g]||[];
   const el=document.getElementById(id);
   if(!el)return;
-  if(!items.length){
-    el.innerHTML='<div class="ph-txt">이번 주 일정 없음</div>';
-    return;
-  }
-  el.innerHTML='<div style="padding-bottom:0.375rem">'+items.map(s=>{
-    const isToday=s.time==='오늘';
-    const isTomorrow=s.time==='내일';
+  if(!items.length){el.innerHTML='<div class="ph-txt">이번 주 일정 없음</div>';return;}
+  el.innerHTML=items.map(s=>{
+    const isToday=s.time==='오늘';const isTomorrow=s.time==='내일';
     const timeStyle=isToday?'color:var(--danger);font-weight:700;':isTomorrow?'color:var(--work-c);font-weight:700;':'';
     const titleStyle=isToday?'color:var(--text-h);font-weight:700;':isTomorrow?'color:var(--text-b);font-weight:600;':'';
     const dot=isToday?'<span style="width:5px;height:5px;border-radius:50%;background:var(--danger);flex-shrink:0;display:inline-block;margin-right:2px"></span>':'';
     return`<a class="sched-link" href="#" onclick="openCalendar(event,'${g}')"><span class="sched-time" style="${timeStyle}">${s.time}</span>${dot}<span class="sched-title" style="${titleStyle}">${esc(s.title)}</span><span class="sched-arrow">›</span></a>`;
-  }).join('')+'</div>';
+  }).join('');
 }
 
-function openCalendar(e, group){
+function openCalendar(e,group){
   e.preventDefault();
-  const calIdMap={family:cfg.calFamily, work:cfg.calWork, personal:cfg.calPersonal};
+  const calIdMap={family:cfg.calFamily,work:cfg.calWork,personal:cfg.calPersonal};
   const calId=calIdMap[group]||'';
   const base='https://calendar.google.com/calendar/r/eventedit';
   const webUrl=calId?`${base}?src=${encodeURIComponent(calId)}`:base;
-  const ua=navigator.userAgent;
-  const isAndroid=/Android/i.test(ua);
-  if(isAndroid){
-    const fallback=encodeURIComponent(webUrl);
-    const path=calId?`/calendar/r/eventedit?src=${encodeURIComponent(calId)}`:'/calendar/r/eventedit';
-    window.location.href=`intent://calendar.google.com${path}#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=${fallback};end`;
-  } else {
-    window.open(webUrl,'_blank');
-  }
+  const ua=navigator.userAgent;const isAndroid=/Android/i.test(ua);
+  if(isAndroid){const fallback=encodeURIComponent(webUrl);const path=calId?`/calendar/r/eventedit?src=${encodeURIComponent(calId)}`:'/calendar/r/eventedit';window.location.href=`intent://calendar.google.com${path}#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=${fallback};end`;}
+  else{window.open(webUrl,'_blank');}
 }
+
 function rMini(id,goals,color){const el=document.getElementById(id);if(!goals.length){el.innerHTML='<div class="ph-txt">목표가 없습니다</div>';return;}el.innerHTML=goals.map(g=>`<div class="goal-mini"><div class="gm-bar-wrap"><div class="gm-bar" style="width:${g.progress}%;background:${color}"></div></div><div class="gm-title">${esc(g.title)}</div><div class="gm-pct">${g.progress}%</div></div>`).join('');}
 
 function rGoalPage(group){
@@ -1084,22 +925,14 @@ function rGoalPage(group){
   if(!list.length){grid.innerHTML='<div class="empty-msg" style="grid-column:1/-1"><p>목표가 없습니다</p><span>+ 목표 추가로 시작해보세요</span></div>';return;}
   grid.innerHTML=list.map(g=>{const a=AMAP[g.area]||AMAP.growth;return`<div class="goal-card"><div class="gc-stripe" style="background:${a.c}"></div><div class="gc-top"><span class="gc-tag tag" style="background:${a.bg};color:${a.c}">${a.l}</span><span class="gc-period">${g.period}</span></div><div class="gc-title">${esc(g.title)}</div>${g.desc?`<div class="gc-desc">${esc(g.desc)}</div>`:''}<div class="gc-pw"><div class="gc-pf" style="width:${g.progress}%;background:${a.c}"></div></div><div class="gc-foot"><span>${g.progress}% 달성</span><span>${g.due?fd(g.due):'—'}</span></div></div>`;}).join('');}
 
-function calcReturn(cost,cur){
-  if(!cost||cost===0)return 0;
-  return Math.round((cur-cost)/cost*1000)/10;
-}
+function calcReturn(cost,cur){if(!cost||cost===0)return 0;return Math.round((cur-cost)/cost*1000)/10;}
 const DEBT_CATS=['주택담보대출','신용대출','마이너스통장','기타대출'];
 function isDebt(i){return DEBT_CATS.includes(i.category);}
-function toKrw(inv,type){
-  const price=type==='cost'?inv.costPrice:inv.currentPrice;
-  const rate=type==='cost'?inv.costRate:inv.curRate;
-  if(!inv.currency||inv.currency==='KRW') return price;
-  return rate?price*rate:0;
-}
+function toKrw(inv,type){const price=type==='cost'?inv.costPrice:inv.currentPrice;const rate=type==='cost'?inv.costRate:inv.curRate;if(!inv.currency||inv.currency==='KRW')return price;return rate?price*rate:0;}
 const CSYM={'KRW':'₩','USD':'$','EUR':'€','JPY':'¥','GBP':'£'};
+
 function rInvest(){
-  const assets=D.invest.filter(i=>!isDebt(i));
-  const debts=D.invest.filter(i=>isDebt(i));
+  const assets=D.invest.filter(i=>!isDebt(i));const debts=D.invest.filter(i=>isDebt(i));
   const totCurrent=assets.reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
   const totCost=assets.reduce((a,i)=>a+toKrw(i,'cost')*(i.qty||1),0);
   const totDebt=debts.reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
@@ -1108,9 +941,7 @@ function rInvest(){
   const bc=c=>assets.filter(i=>i.category===c).reduce((a,i)=>a+toKrw(i,'cur')*(i.qty||1),0);
   document.getElementById('iv1').textContent=fkrw(totCurrent);
   document.getElementById('iv5').textContent=fkrw(totDebt);
-  const nw=document.getElementById('iv6');
-  nw.textContent=fkrw(Math.abs(netWorth));
-  nw.className='inv-stat-v '+(netWorth>=0?'':'neg');
+  const nw=document.getElementById('iv6');nw.textContent=fkrw(Math.abs(netWorth));nw.className='inv-stat-v '+(netWorth>=0?'':'neg');
   document.getElementById('iv2').textContent=fkrw(bc('주식')+bc('ETF'));
   document.getElementById('iv3').textContent=fkrw(bc('예금')+bc('적금'));
   document.getElementById('iv4').textContent=fkrw(totCurrent-bc('주식')-bc('ETF')-bc('예금')-bc('적금'));
@@ -1119,278 +950,90 @@ function rInvest(){
   const sym=i=>CSYM[i.currency||'KRW']||'₩';
   const isMobile=window.innerWidth<1024;
   if(isMobile){
-    const allItems=[
-      ...assets.map(i=>renderInvCard(i,sym,false)),
-      ...(debts.length?['<div style="padding:0.375rem 0;font-size:0.44rem;font-weight:700;color:var(--danger)">── 부채 ──</div>']:[]),
-      ...debts.map(i=>renderInvCard(i,sym,true)),
-    ];
-    const footer=`<div style="padding:0.625rem 0;border-top:1px solid var(--border);margin-top:0.25rem">
-      <div style="display:flex;justify-content:space-between;font-size:0.5rem;margin-bottom:0.25rem"><span style="color:var(--text-m)">총 자산</span><span style="font-weight:700">${fkrw(totCurrent)}원</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:0.5rem;margin-bottom:0.25rem"><span style="color:var(--danger)">총 부채</span><span style="font-weight:700;color:var(--danger)">-${fkrw(totDebt)}원</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:0.56rem"><span style="font-weight:700">순 자산</span><span style="font-weight:700" class="${netWorth>=0?'':'neg'}">${netWorth>=0?'':'-'}${fkrw(Math.abs(netWorth))}원</span></div>
-    </div>`;
+    const allItems=[...assets.map(i=>renderInvCard(i,sym,false)),...(debts.length?['<div style="padding:0.375rem 0;font-size:0.44rem;font-weight:700;color:var(--danger)">── 부채 ──</div>']:[]),...debts.map(i=>renderInvCard(i,sym,true))];
+    const footer=`<div style="padding:0.625rem 0;border-top:1px solid var(--border);margin-top:0.25rem"><div style="display:flex;justify-content:space-between;font-size:0.5rem;margin-bottom:0.25rem"><span style="color:var(--text-m)">총 자산</span><span style="font-weight:700">${fkrw(totCurrent)}원</span></div><div style="display:flex;justify-content:space-between;font-size:0.5rem;margin-bottom:0.25rem"><span style="color:var(--danger)">총 부채</span><span style="font-weight:700;color:var(--danger)">-${fkrw(totDebt)}원</span></div><div style="display:flex;justify-content:space-between;font-size:0.56rem"><span style="font-weight:700">순 자산</span><span style="font-weight:700" class="${netWorth>=0?'':'neg'}">${netWorth>=0?'':'-'}${fkrw(Math.abs(netWorth))}원</span></div></div>`;
     t.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.5rem">${allItems.join('')}${footer}</div>`;
   } else {
     const rateHtml=totCost?`<span class="${totRate>=0?'pos':'neg'}">${totRate>=0?'+':''}${totRate}%</span>`:'—';
-    const rows=[
-      ...assets.map(i=>renderInvRow(i,sym)),
-      ...(debts.length?[`<tr><td colspan="11" style="padding:0.5rem 0.875rem;font-size:0.44rem;font-weight:700;color:var(--danger);background:#fef2f2;border-radius:4px">── 부채 ──</td></tr>`]:[]),
-      ...debts.map(i=>renderDebtRow(i,sym)),
-    ];
+    const rows=[...assets.map(i=>renderInvRow(i,sym)),...(debts.length?[`<tr><td colspan="11" style="padding:0.5rem 0.875rem;font-size:0.44rem;font-weight:700;color:var(--danger);background:#fef2f2;border-radius:4px">── 부채 ──</td></tr>`]:[]),...debts.map(i=>renderDebtRow(i,sym))];
     t.innerHTML=`<table><thead><tr><th>자산명</th><th>분류</th><th>통화</th><th>수량</th><th>취득단가</th><th>총취득(₩)</th><th>현재단가</th><th>현재총액(₩)</th><th>수익률</th><th>기준일</th><th></th></tr></thead><tbody>${rows.join('')}</tbody><tfoot><tr><td colspan="7" style="padding:0.625rem 0.875rem;font-size:0.44rem;color:var(--text-m)">총 자산 / 수익률</td><td style="padding:0.625rem 0.875rem;font-weight:700">${fkrw(totCurrent)}원</td><td class="${totRate>=0?'pos':'neg'}" style="padding:0.625rem 0.875rem">${rateHtml}</td><td colspan="2"></td></tr><tr><td colspan="7" style="padding:0.5rem 0.875rem;font-size:0.44rem;color:var(--danger)">총 부채</td><td style="padding:0.5rem 0.875rem;font-weight:700;color:var(--danger)">-${fkrw(totDebt)}원</td><td colspan="3"></td></tr><tr><td colspan="7" style="padding:0.5rem 0.875rem;font-size:0.44rem;font-weight:700">순 자산</td><td style="padding:0.5rem 0.875rem;font-weight:700;font-size:0.6rem" class="${netWorth>=0?'':'neg'}">${netWorth>=0?'':'-'}${fkrw(Math.abs(netWorth))}원</td><td colspan="3"></td></tr></tfoot></table>`;
   }
 }
 
-function renderInvCard(i, sym, isDebt){
-  const qty=i.qty||1;
-  const costKrw=toKrw(i,'cost');
-  const curKrw=toKrw(i,'cur');
-  const totalCurKrw=curKrw*qty;
-  const totalCostKrw=costKrw*qty;
-  const rate=calcReturn(costKrw,curKrw);
-  const profit=totalCurKrw-totalCostKrw;
-  const isFx=i.currency&&i.currency!=='KRW';
-  const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
-  const bg=isDebt?'background:#fef9f9;border-color:#fecaca;':'';
-  const nameColor=isDebt?'color:var(--danger);':'';
-  return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:0.75rem;${bg}">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.375rem">
-      <div>
-        <div style="font-weight:700;font-size:0.58rem;${nameColor}">${esc(i.asset)}</div>
-        ${i.memo?`<div style="font-size:0.42rem;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}
-      </div>
-      <span class="tag" style="background:${isDebt?'#fee2e2':'var(--subtle)'};color:${isDebt?'var(--danger)':'var(--text-s)'};flex-shrink:0;margin-left:0.5rem">${esc(i.category)}</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.25rem 0.5rem;font-size:0.48rem;margin-bottom:0.5rem">
-      <div><span style="color:var(--text-m)">수량 </span>${qty.toLocaleString()} · ${i.currency||'KRW'}</div>
-      <div><span style="color:var(--text-m)">기준일 </span>${fd(i.updatedAt)}</div>
-      ${!isDebt&&i.costPrice?`<div><span style="color:var(--text-m)">취득단가 </span>${isFx?sym(i):''}${fkrw(i.costPrice)}</div>`:''}
-      <div><span style="color:var(--text-m)">${isDebt?'잔액 ':'현재단가 '}</span><span style="${isDebt?'color:var(--danger);font-weight:700':''}">${isDebt?'-':''} ${curDisp}</span></div>
-      ${totalCostKrw&&!isDebt?`<div><span style="color:var(--text-m)">총취득 </span>${fkrw(totalCostKrw)}원</div>`:''}
-      <div><span style="color:var(--text-m)">${isDebt?'총부채 ':'현재총액 '}</span><span style="font-weight:700;${isDebt?'color:var(--danger)':''}">${isDebt?'-':''}${fkrw(totalCurKrw)}원</span></div>
-      ${!isDebt&&costKrw?`<div style="grid-column:1/-1"><span style="color:var(--text-m)">수익률 </span><span class="${rate>=0?'pos':'neg'}">${rate>=0?'+':''}${rate}% (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)</span></div>`:''}
-    </div>
-    <div class="item-actions">
-      <button class="btn-ord" onclick="moveInv('${i.id}',-1)">↑</button>
-      <button class="btn-ord" onclick="moveInv('${i.id}',1)">↓</button>
-      <button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button>
-      <button class="btn-del" onclick="confirmDelInv('${i.id}','${esc(i.asset)}')">삭제</button>
-    </div>
-  </div>`;
+function renderInvCard(i,sym,isDebtCard){
+  const qty=i.qty||1;const costKrw=toKrw(i,'cost');const curKrw=toKrw(i,'cur');const totalCurKrw=curKrw*qty;const totalCostKrw=costKrw*qty;const rate=calcReturn(costKrw,curKrw);const profit=totalCurKrw-totalCostKrw;const isFx=i.currency&&i.currency!=='KRW';const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';const bg=isDebtCard?'background:#fef9f9;border-color:#fecaca;':'';const nameColor=isDebtCard?'color:var(--danger);':'';
+  return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:0.75rem;${bg}"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.375rem"><div><div style="font-weight:700;font-size:0.58rem;${nameColor}">${esc(i.asset)}</div>${i.memo?`<div style="font-size:0.42rem;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</div><span class="tag" style="background:${isDebtCard?'#fee2e2':'var(--subtle)'};color:${isDebtCard?'var(--danger)':'var(--text-s)'};flex-shrink:0;margin-left:0.5rem">${esc(i.category)}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:0.25rem 0.5rem;font-size:0.48rem;margin-bottom:0.5rem"><div><span style="color:var(--text-m)">수량 </span>${qty.toLocaleString()} · ${i.currency||'KRW'}</div><div><span style="color:var(--text-m)">기준일 </span>${fd(i.updatedAt)}</div>${!isDebtCard&&i.costPrice?`<div><span style="color:var(--text-m)">취득단가 </span>${isFx?sym(i):''}${fkrw(i.costPrice)}</div>`:''}<div><span style="color:var(--text-m)">${isDebtCard?'잔액 ':'현재단가 '}</span><span style="${isDebtCard?'color:var(--danger);font-weight:700':''}">${isDebtCard?'-':''} ${curDisp}</span></div>${totalCostKrw&&!isDebtCard?`<div><span style="color:var(--text-m)">총취득 </span>${fkrw(totalCostKrw)}원</div>`:''}<div><span style="color:var(--text-m)">${isDebtCard?'총부채 ':'현재총액 '}</span><span style="font-weight:700;${isDebtCard?'color:var(--danger)':''}">${isDebtCard?'-':''}${fkrw(totalCurKrw)}원</span></div>${!isDebtCard&&costKrw?`<div style="grid-column:1/-1"><span style="color:var(--text-m)">수익률 </span><span class="${rate>=0?'pos':'neg'}">${rate>=0?'+':''}${rate}% (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)</span></div>`:''}</div><div class="item-actions"><button class="btn-ord" onclick="moveInv('${i.id}',-1)">↑</button><button class="btn-ord" onclick="moveInv('${i.id}',1)">↓</button><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button><button class="btn-del" onclick="confirmDelInv('${i.id}','${esc(i.asset)}')">삭제</button></div></div>`;
 }
 
 function renderInvRow(i,sym){
-  const qty=i.qty||1;
-  const costKrw=toKrw(i,'cost');
-  const curKrw=toKrw(i,'cur');
-  const totalCostKrw=costKrw*qty;
-  const totalCurKrw=curKrw*qty;
-  const rate=calcReturn(costKrw,curKrw);
-  const profit=totalCurKrw-totalCostKrw;
-  const isFx=i.currency&&i.currency!=='KRW';
-  const costDisp=isFx?`${sym(i)}${i.costPrice.toLocaleString()}`:fkrw(i.costPrice)+'원';
-  const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
-  return`<tr>
-    <td style="font-weight:600">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td>
-    <td><span class="tag" style="background:var(--subtle);color:var(--text-s);white-space:nowrap">${esc(i.category)}</span></td>
-    <td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td>
-    <td style="text-align:right">${qty.toLocaleString()}</td>
-    <td style="text-align:right">${i.costPrice?costDisp:'—'}</td>
-    <td style="text-align:right">${totalCostKrw?fkrw(totalCostKrw)+'원':'—'}</td>
-    <td style="text-align:right">${i.currentPrice?curDisp:'—'}</td>
-    <td style="text-align:right;font-weight:600">${totalCurKrw?fkrw(totalCurKrw)+'원':'—'}</td>
-    <td class="${rate>=0?'pos':'neg'}" style="text-align:right">${costKrw?`${rate>=0?'+':''}${rate}%<br><span style="font-size:0.42rem;font-weight:400">${profit>=0?'+':''}${fkrw(Math.abs(profit))}</span>`:'—'}</td>
-    <td style="color:var(--text-m)">${fd(i.updatedAt)}</td>
-    <td><div class="item-actions"><button class="btn-ord" onclick="moveInv('${i.id}',-1)">↑</button><button class="btn-ord" onclick="moveInv('${i.id}',1)">↓</button><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button><button class="btn-del" onclick="confirmDelInv('${i.id}','${esc(i.asset)}')">삭제</button></div></td>
-  </tr>`;
+  const qty=i.qty||1;const costKrw=toKrw(i,'cost');const curKrw=toKrw(i,'cur');const totalCostKrw=costKrw*qty;const totalCurKrw=curKrw*qty;const rate=calcReturn(costKrw,curKrw);const profit=totalCurKrw-totalCostKrw;const isFx=i.currency&&i.currency!=='KRW';const costDisp=isFx?`${sym(i)}${i.costPrice.toLocaleString()}`:fkrw(i.costPrice)+'원';const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
+  return`<tr><td style="font-weight:600">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td><td><span class="tag" style="background:var(--subtle);color:var(--text-s);white-space:nowrap">${esc(i.category)}</span></td><td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td><td style="text-align:right">${qty.toLocaleString()}</td><td style="text-align:right">${i.costPrice?costDisp:'—'}</td><td style="text-align:right">${totalCostKrw?fkrw(totalCostKrw)+'원':'—'}</td><td style="text-align:right">${i.currentPrice?curDisp:'—'}</td><td style="text-align:right;font-weight:600">${totalCurKrw?fkrw(totalCurKrw)+'원':'—'}</td><td class="${rate>=0?'pos':'neg'}" style="text-align:right">${costKrw?`${rate>=0?'+':''}${rate}%<br><span style="font-size:0.42rem;font-weight:400">${profit>=0?'+':''}${fkrw(Math.abs(profit))}</span>`:'—'}</td><td style="color:var(--text-m)">${fd(i.updatedAt)}</td><td><div class="item-actions"><button class="btn-ord" onclick="moveInv('${i.id}',-1)">↑</button><button class="btn-ord" onclick="moveInv('${i.id}',1)">↓</button><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button><button class="btn-del" onclick="confirmDelInv('${i.id}','${esc(i.asset)}')">삭제</button></div></td></tr>`;
 }
 
 function renderDebtRow(i,sym){
-  const qty=i.qty||1;
-  const curKrw=toKrw(i,'cur');
-  const totalKrw=curKrw*qty;
-  const isFx=i.currency&&i.currency!=='KRW';
-  const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
-  return`<tr style="background:#fef9f9">
-    <td style="font-weight:600;color:var(--danger)">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td>
-    <td><span class="tag" style="background:#fee2e2;color:var(--danger);white-space:nowrap">${esc(i.category)}</span></td>
-    <td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td>
-    <td style="text-align:right">${qty.toLocaleString()}</td>
-    <td colspan="2" style="text-align:center;color:var(--text-m);font-size:0.44rem">—</td>
-    <td style="text-align:right;color:var(--danger)">${i.currentPrice?curDisp:'—'}</td>
-    <td style="text-align:right;font-weight:600;color:var(--danger)">${totalKrw?'-'+fkrw(totalKrw)+'원':'—'}</td>
-    <td colspan="2" style="color:var(--text-m);font-size:0.44rem;text-align:center">—</td>
-    <td><div class="item-actions"><button class="btn-ord" onclick="moveInv('${i.id}',-1)">↑</button><button class="btn-ord" onclick="moveInv('${i.id}',1)">↓</button><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button><button class="btn-del" onclick="confirmDelInv('${i.id}','${esc(i.asset)}')">삭제</button></div></td>
-  </tr>`;
+  const qty=i.qty||1;const curKrw=toKrw(i,'cur');const totalKrw=curKrw*qty;const isFx=i.currency&&i.currency!=='KRW';const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
+  return`<tr style="background:#fef9f9"><td style="font-weight:600;color:var(--danger)">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td><td><span class="tag" style="background:#fee2e2;color:var(--danger);white-space:nowrap">${esc(i.category)}</span></td><td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td><td style="text-align:right">${qty.toLocaleString()}</td><td colspan="2" style="text-align:center;color:var(--text-m);font-size:0.44rem">—</td><td style="text-align:right;color:var(--danger)">${i.currentPrice?curDisp:'—'}</td><td style="text-align:right;font-weight:600;color:var(--danger)">${totalKrw?'-'+fkrw(totalKrw)+'원':'—'}</td><td colspan="2" style="color:var(--text-m);font-size:0.44rem;text-align:center">—</td><td><div class="item-actions"><button class="btn-ord" onclick="moveInv('${i.id}',-1)">↑</button><button class="btn-ord" onclick="moveInv('${i.id}',1)">↓</button><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button><button class="btn-del" onclick="confirmDelInv('${i.id}','${esc(i.asset)}')">삭제</button></div></td></tr>`;
 }
 
 async function saveInv(){
-  const asset=document.getElementById('iAsset').value.trim();
-  if(!asset){showToast('자산명을 입력해주세요','error');return;}
+  const asset=document.getElementById('iAsset').value.trim();if(!asset){showToast('자산명을 입력해주세요','error');return;}
   const VALID_INV_CURRENCIES=['KRW','USD','EUR','JPY','GBP'];
   const currency=VALID_INV_CURRENCIES.includes(document.getElementById('iCurrency').value)?document.getElementById('iCurrency').value:'KRW';
   const qty=Math.min(Math.max(parseFloat(document.getElementById('iQty').value)||1,0.000001),1000000000);
-  const costPrice=safeFloat(document.getElementById('iCost').value);
-  const currentPrice=safeFloat(document.getElementById('iCurrent').value);
-  const costRate=safeFloat(document.getElementById('iCostRate').value);
-  const curRate=safeFloat(document.getElementById('iCurRate').value);
-  const memo=document.getElementById('iMemo').value.trim().slice(0,500);
-  const editId=document.getElementById('iEditId').value;
+  const costPrice=safeFloat(document.getElementById('iCost').value);const currentPrice=safeFloat(document.getElementById('iCurrent').value);const costRate=safeFloat(document.getElementById('iCostRate').value);const curRate=safeFloat(document.getElementById('iCurRate').value);const memo=document.getElementById('iMemo').value.trim().slice(0,500);const editId=document.getElementById('iEditId').value;
   const inv={id:editId||'l'+Date.now(),asset:asset.slice(0,100),category:document.getElementById('iCat').value,currency,qty,costPrice,currentPrice,costRate,curRate,memo,updatedAt:document.getElementById('iDate').value};
   if(cfg.token&&cfg.invest){
-    try{
-      const props={Asset:{title:[{text:{content:inv.asset}}]},Category:{select:{name:inv.category}},Currency:{select:{name:inv.currency}},Qty:{number:inv.qty},CostPrice:{number:inv.costPrice},CurrentPrice:{number:inv.currentPrice},CostRate:{number:inv.costRate||0},CurRate:{number:inv.curRate||0},Memo:{rich_text:[{text:{content:inv.memo}}]},UpdatedAt:inv.updatedAt?{date:{start:inv.updatedAt}}:{date:null}};
-      if(editId) await nFetch(`pages/${editId}`,'PATCH',{properties:props});
-      else await mkPage(cfg.invest,props);
-    }catch(e){
-      showToast('❌ Notion 저장 실패 — DB 컬럼을 확인해주세요 (Currency, Qty, CostRate, CurRate, Memo)','error');
-      console.error('saveInv error:',e);
-      return;
-    }
+    try{const props={Asset:{title:[{text:{content:inv.asset}}]},Category:{select:{name:inv.category}},Currency:{select:{name:inv.currency}},Qty:{number:inv.qty},CostPrice:{number:inv.costPrice},CurrentPrice:{number:inv.currentPrice},CostRate:{number:inv.costRate||0},CurRate:{number:inv.curRate||0},Memo:{rich_text:[{text:{content:inv.memo}}]},UpdatedAt:inv.updatedAt?{date:{start:inv.updatedAt}}:{date:null}};if(editId)await nFetch(`pages/${editId}`,'PATCH',{properties:props});else await mkPage(cfg.invest,props);}
+    catch(e){showToast('❌ Notion 저장 실패','error');console.error('saveInv error:',e);return;}
   }
-  if(editId){const idx=D.invest.findIndex(i=>i.id===editId);if(idx>-1)D.invest[idx]=inv;}
-  else D.invest.push(inv);
+  if(editId){const idx=D.invest.findIndex(i=>i.id===editId);if(idx>-1)D.invest[idx]=inv;}else D.invest.push(inv);
   render();closeModal('invModal');
   ['iAsset','iQty','iCost','iCurrent','iCostRate','iCurRate','iMemo','iDebtAmt'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('iEditId').value='';
-  document.getElementById('iCurrency').value='KRW';
-  document.getElementById('invModalTitle').textContent='자산 추가';
-  document.getElementById('iCalcPreview').textContent='';
-  document.getElementById('iKrwRow').style.display='none';
-  updateInvCurrency();
+  document.getElementById('iEditId').value='';document.getElementById('iCurrency').value='KRW';document.getElementById('invModalTitle').textContent='자산 추가';document.getElementById('iCalcPreview').textContent='';document.getElementById('iKrwRow').style.display='none';updateInvCurrency();
   showToast(`✅ 자산 ${editId?'수정':'저장'} 완료!`,'success');
 }
 
 function editInv(id){
-  const inv=D.invest.find(i=>i.id===id);
-  if(!inv)return;
-  document.getElementById('invModalTitle').textContent='자산 수정';
-  document.getElementById('iEditId').value=inv.id;
-  document.getElementById('iAsset').value=inv.asset;
-  document.getElementById('iCat').value=inv.category;
-  document.getElementById('iCurrency').value=inv.currency||'KRW';
-  document.getElementById('iQty').value=inv.qty||1;
-  document.getElementById('iCost').value=inv.costPrice||'';
-  document.getElementById('iCurrent').value=inv.currentPrice||'';
-  document.getElementById('iDebtAmt').value=isDebtCat(inv.category)?inv.currentPrice||'':'';
-  document.getElementById('iCostRate').value=inv.costRate||'';
-  document.getElementById('iCurRate').value=inv.curRate||'';
-  document.getElementById('iMemo').value=inv.memo||'';
-  document.getElementById('iDate').value=inv.updatedAt||'';
-  updateInvCurrency();
-  updateInvPreview();
-  openModal('invModal');
+  const inv=D.invest.find(i=>i.id===id);if(!inv)return;
+  document.getElementById('invModalTitle').textContent='자산 수정';document.getElementById('iEditId').value=inv.id;document.getElementById('iAsset').value=inv.asset;document.getElementById('iCat').value=inv.category;document.getElementById('iCurrency').value=inv.currency||'KRW';document.getElementById('iQty').value=inv.qty||1;document.getElementById('iCost').value=inv.costPrice||'';document.getElementById('iCurrent').value=inv.currentPrice||'';document.getElementById('iDebtAmt').value=isDebtCat(inv.category)?inv.currentPrice||'':'';document.getElementById('iCostRate').value=inv.costRate||'';document.getElementById('iCurRate').value=inv.curRate||'';document.getElementById('iMemo').value=inv.memo||'';document.getElementById('iDate').value=inv.updatedAt||'';
+  updateInvCurrency();updateInvPreview();openModal('invModal');
 }
 
 function isDebtCat(cat){return DEBT_CATS.includes(cat);}
-
 function updateInvCurrency(){
-  const cur=document.getElementById('iCurrency').value;
-  const cat=document.getElementById('iCat').value;
-  const isFx=cur&&cur!=='KRW';
-  const isDebt=isDebtCat(cat);
-  // 대출 카테고리면 단순 잔액 입력 모드
-  document.getElementById('iCostRow').style.display=isDebt?'none':'';
-  document.getElementById('iDebtRow').style.display=isDebt?'':'none';
-  document.getElementById('iKrwRow').style.display=(!isDebt&&isFx)?'':'none';
-  if(!isDebt){
-    document.getElementById('iCostLbl').textContent=isFx?`취득단가 (${cur})`:'취득단가 (원)';
-    document.getElementById('iCurLbl').textContent=isFx?`현재단가 (${cur})`:'현재단가 (원)';
-  }
+  const cur=document.getElementById('iCurrency').value;const cat=document.getElementById('iCat').value;const isFx=cur&&cur!=='KRW';const isDebt=isDebtCat(cat);
+  document.getElementById('iCostRow').style.display=isDebt?'none':'';document.getElementById('iDebtRow').style.display=isDebt?'':'none';document.getElementById('iKrwRow').style.display=(!isDebt&&isFx)?'':'none';
+  if(!isDebt){document.getElementById('iCostLbl').textContent=isFx?`취득단가 (${cur})`:'취득단가 (원)';document.getElementById('iCurLbl').textContent=isFx?`현재단가 (${cur})`:'현재단가 (원)';}
   updateInvPreview();
 }
-
-function syncDebtAmt(){
-  // 잔액 입력을 현재단가에 동기화
-  const v=document.getElementById('iDebtAmt').value;
-  document.getElementById('iCurrent').value=v;
-  updateInvPreview();
-}
-
+function syncDebtAmt(){const v=document.getElementById('iDebtAmt').value;document.getElementById('iCurrent').value=v;updateInvPreview();}
 function updateInvPreview(){
-  const cat=document.getElementById('iCat')?.value||'';
-  const isDebt=isDebtCat(cat);
-  const curSel=document.getElementById('iCurrency')?.value||'KRW';
-  const isFx=curSel&&curSel!=='KRW';
-  const qty=Math.min(Math.max(parseFloat(document.getElementById('iQty')?.value)||1,0.000001),1000000000);
-  const el=document.getElementById('iCalcPreview');
-
-  if(isDebt){
-    const bal=safeFloat(document.getElementById('iDebtAmt')?.value)||safeFloat(document.getElementById('iCurrent')?.value)||0;
-    if(!bal){el.textContent='현재 잔액을 입력해주세요.';return;}
-    el.innerHTML='';
-    const s=document.createElement('span');
-    s.style.cssText='color:var(--danger);font-weight:700;';
-    s.textContent=`부채 잔액: -${fkrw(bal*qty)}원`;
-    el.appendChild(s);
-    return;
-  }
-
-  const cost=safeFloat(document.getElementById('iCost').value);
-  const curP=safeFloat(document.getElementById('iCurrent').value);
-  const costRate=safeFloat(document.getElementById('iCostRate')?.value)||0;
-  const curRate=safeFloat(document.getElementById('iCurRate')?.value)||0;
+  const cat=document.getElementById('iCat')?.value||'';const isDebt=isDebtCat(cat);const curSel=document.getElementById('iCurrency')?.value||'KRW';const isFx=curSel&&curSel!=='KRW';const qty=Math.min(Math.max(parseFloat(document.getElementById('iQty')?.value)||1,0.000001),1000000000);const el=document.getElementById('iCalcPreview');
+  if(isDebt){const bal=safeFloat(document.getElementById('iDebtAmt')?.value)||safeFloat(document.getElementById('iCurrent')?.value)||0;if(!bal){el.textContent='현재 잔액을 입력해주세요.';return;}el.innerHTML='';const s=document.createElement('span');s.style.cssText='color:var(--danger);font-weight:700;';s.textContent=`부채 잔액: -${fkrw(bal*qty)}원`;el.appendChild(s);return;}
+  const cost=safeFloat(document.getElementById('iCost').value);const curP=safeFloat(document.getElementById('iCurrent').value);const costRate=safeFloat(document.getElementById('iCostRate')?.value)||0;const curRate=safeFloat(document.getElementById('iCurRate')?.value)||0;
   if(!cost&&!curP){el.textContent='취득단가·현재단가 입력 시 수익률이 자동 계산됩니다.';return;}
-  const costKrw=isFx?(costRate?cost*costRate:0):cost;
-  const curKrw=isFx?(curRate?curP*curRate:0):curP;
-  const totalCostKrw=costKrw*qty;
-  const totalCurKrw=curKrw*qty;
-  const rate=calcReturn(costKrw,curKrw);
-  const profit=totalCurKrw-totalCostKrw;
-  el.innerHTML='';
-  const span=document.createElement('span');
-  span.className=`calc-rate ${rate>=0?'pos':'neg'}`;
-  if(isFx&&(!costRate||!curRate)){
-    span.textContent='환율을 입력하면 원화 수익률이 계산됩니다.';
-  } else {
-    span.textContent=`₩${fkrw(totalCostKrw)} → ₩${fkrw(totalCurKrw)}   ${rate>=0?'+':''}${rate}%  (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)`;
-  }
+  const costKrw=isFx?(costRate?cost*costRate:0):cost;const curKrw=isFx?(curRate?curP*curRate:0):curP;const totalCostKrw=costKrw*qty;const totalCurKrw=curKrw*qty;const rate=calcReturn(costKrw,curKrw);const profit=totalCurKrw-totalCostKrw;
+  el.innerHTML='';const span=document.createElement('span');span.className=`calc-rate ${rate>=0?'pos':'neg'}`;
+  if(isFx&&(!costRate||!curRate)){span.textContent='환율을 입력하면 원화 수익률이 계산됩니다.';}else{span.textContent=`₩${fkrw(totalCostKrw)} → ₩${fkrw(totalCurKrw)}   ${rate>=0?'+':''}${rate}%  (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)`;}
   el.appendChild(span);
 }
+
 async function saveSub(){
   const service=document.getElementById('sService').value.trim();if(!service){showToast('서비스명을 입력해주세요','error');return;}
-  const fee=safeInt(document.getElementById('sFee').value,0,100000000);
-  const VALID_CURRENCIES=['KRW','USD','EUR','JPY','GBP'];
-  const currency=VALID_CURRENCIES.includes(document.getElementById('sCurrency').value)?document.getElementById('sCurrency').value:'KRW';
-  const feeKrw=safeInt(document.getElementById('sFeeKrw').value,0,100000000000);
-  const memo=document.getElementById('sMemo').value.trim().slice(0,200);
-  const alert=document.getElementById('sAlert').checked;
-  const editId=document.getElementById('sEditId').value;
+  const fee=safeInt(document.getElementById('sFee').value,0,100000000);const VALID_CURRENCIES=['KRW','USD','EUR','JPY','GBP'];const currency=VALID_CURRENCIES.includes(document.getElementById('sCurrency').value)?document.getElementById('sCurrency').value:'KRW';const feeKrw=safeInt(document.getElementById('sFeeKrw').value,0,100000000000);const memo=document.getElementById('sMemo').value.trim().slice(0,200);const alert=document.getElementById('sAlert').checked;const editId=document.getElementById('sEditId').value;
   const sub={id:editId||'l'+Date.now(),service:service.slice(0,100),category:document.getElementById('sCat').value,fee,currency,feeKrw,cycle:document.getElementById('sCycle').value,renewDate:document.getElementById('sRenew').value,memo,alert,active:true};
-  if(cfg.token&&cfg.subs){
-    try{
-      const props={Service:{title:[{text:{content:sub.service}}]},Category:{select:{name:sub.category}},Fee:{number:sub.fee},Cycle:{select:{name:sub.cycle}},RenewDate:sub.renewDate?{date:{start:sub.renewDate}}:{date:null},Active:{checkbox:true},Alert:{checkbox:sub.alert},Currency:{select:{name:sub.currency}},FeeKRW:{number:sub.feeKrw||0},Memo:{rich_text:[{text:{content:sub.memo}}]}};
-      if(editId) await nFetch(`pages/${editId}`,'PATCH',{properties:props});
-      else await mkPage(cfg.subs,props);
-    }catch(e){}
-  }
-  if(editId){const idx=D.subs.findIndex(s=>s.id===editId);if(idx>-1)D.subs[idx]=sub;}
-  else D.subs.push(sub);
-  render();closeModal('subModal');
-  ['sService','sFee','sFeeKrw','sMemo'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('sCurrency').value='KRW';
-  document.getElementById('sAlert').checked=true;
-  document.getElementById('sEditId').value='';
-  document.getElementById('subModalTitle').textContent='정기 지출 추가';
+  if(cfg.token&&cfg.subs){try{const props={Service:{title:[{text:{content:sub.service}}]},Category:{select:{name:sub.category}},Fee:{number:sub.fee},Cycle:{select:{name:sub.cycle}},RenewDate:sub.renewDate?{date:{start:sub.renewDate}}:{date:null},Active:{checkbox:true},Alert:{checkbox:sub.alert},Currency:{select:{name:sub.currency}},FeeKRW:{number:sub.feeKrw||0},Memo:{rich_text:[{text:{content:sub.memo}}]}};if(editId)await nFetch(`pages/${editId}`,'PATCH',{properties:props});else await mkPage(cfg.subs,props);}catch(e){}}
+  if(editId){const idx=D.subs.findIndex(s=>s.id===editId);if(idx>-1)D.subs[idx]=sub;}else D.subs.push(sub);
+  render();closeModal('subModal');['sService','sFee','sFeeKrw','sMemo'].forEach(id=>document.getElementById(id).value='');document.getElementById('sCurrency').value='KRW';document.getElementById('sAlert').checked=true;document.getElementById('sEditId').value='';document.getElementById('subModalTitle').textContent='정기 지출 추가';
   showToast(`✅ 정기 지출 ${editId?'수정':'저장'} 완료!`,'success');
 }
 
 function editSub(id){
-  const s=D.subs.find(s=>s.id===id);
-  if(!s)return;
-  document.getElementById('subModalTitle').textContent='정기 지출 수정';
-  document.getElementById('sEditId').value=s.id;
-  document.getElementById('sService').value=s.service;
-  document.getElementById('sCat').value=s.category;
-  document.getElementById('sCycle').value=s.cycle||'월';
-  document.getElementById('sFee').value=s.fee||'';
-  document.getElementById('sCurrency').value=s.currency||'KRW';
-  document.getElementById('sFeeKrw').value=s.feeKrw||'';
-  document.getElementById('sRenew').value=s.renewDate||'';
-  document.getElementById('sMemo').value=s.memo||'';
-  document.getElementById('sAlert').checked=s.alert!==false;
+  const s=D.subs.find(s=>s.id===id);if(!s)return;
+  document.getElementById('subModalTitle').textContent='정기 지출 수정';document.getElementById('sEditId').value=s.id;document.getElementById('sService').value=s.service;document.getElementById('sCat').value=s.category;document.getElementById('sCycle').value=s.cycle||'월';document.getElementById('sFee').value=s.fee||'';document.getElementById('sCurrency').value=s.currency||'KRW';document.getElementById('sFeeKrw').value=s.feeKrw||'';document.getElementById('sRenew').value=s.renewDate||'';document.getElementById('sMemo').value=s.memo||'';document.getElementById('sAlert').checked=s.alert!==false;
   openModal('subModal');
 }
+
 async function saveMemo(){
   const content=document.getElementById('nmText').value.trim().slice(0,1000);if(!content)return;
   const showInDash=document.getElementById('nmDash').checked;
@@ -1400,226 +1043,98 @@ async function saveMemo(){
 }
 
 async function saveQuickMemo(){
-  const content=document.getElementById('qmText').value.trim().slice(0,1000);
-  if(!content){showToast('내용을 입력해주세요','error');return;}
-  const btn=document.querySelector('.quick-memo-btn');
-  btn.disabled=true;btn.textContent='저장 중...';
-  const area=document.getElementById('qmArea').value;
-  const pinned=document.getElementById('qmPin').checked;
-  const showInDash=document.getElementById('qmDash').checked;
+  const content=document.getElementById('qmText').value.trim().slice(0,1000);if(!content){showToast('내용을 입력해주세요','error');return;}
+  const btn=document.querySelector('.quick-memo-btn');btn.disabled=true;btn.textContent='저장 중...';
+  const area=document.getElementById('qmArea').value;const pinned=document.getElementById('qmPin').checked;const showInDash=document.getElementById('qmDash').checked;
   const m={id:'l'+Date.now(),content,area,pinned,showInDash,createdAt:new Date().toISOString()};
-  if(cfg.token&&cfg.memo){
-    try{await mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}});}
-    catch(e){showToast('Notion 저장 실패','error');}
-  }
-  D.memo.unshift(m);
-  rMemo();
-  rQuickMemoRecent();
-  document.getElementById('qmText').value='';
-  document.getElementById('qmPin').checked=false;
-  document.getElementById('qmDash').checked=true;
-  btn.disabled=false;btn.textContent='저장';
+  if(cfg.token&&cfg.memo){try{await mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}});}catch(e){showToast('Notion 저장 실패','error');}}
+  D.memo.unshift(m);rMemo();rQuickMemoRecent();document.getElementById('qmText').value='';document.getElementById('qmPin').checked=false;document.getElementById('qmDash').checked=true;btn.disabled=false;btn.textContent='저장';
   showToast('✅ 메모가 저장되었습니다!','success');
 }
 
 function rQuickMemoRecent(){
-  const el=document.getElementById('qmRecent');
-  if(!el)return;
+  const el=document.getElementById('qmRecent');if(!el)return;
   const recent=D.memo.filter(m=>m.showInDash!==false).slice(0,3);
   if(!recent.length){el.innerHTML='';return;}
-  el.innerHTML=recent.map(m=>{
-    const a=AMAP[m.area];
-    const aTag=a?`<span class="qm-item-area tag" style="background:${a.bg};color:${a.c}">${a.l}</span>`:'';
-    return`<div class="qm-item">${aTag}<span class="qm-item-text">${esc(m.content)}</span><span class="qm-item-time">${fdt(m.createdAt)}</span></div>`;
-  }).join('');
+  el.innerHTML=recent.map(m=>{const a=AMAP[m.area];const aTag=a?`<span class="qm-item-area tag" style="background:${a.bg};color:${a.c}">${a.l}</span>`:'';return`<div class="qm-item">${aTag}<span class="qm-item-text">${esc(m.content)}</span><span class="qm-item-time">${fdt(m.createdAt)}</span></div>`;}).join('');
 }
 
 function rSubs(){
   const act=D.subs.filter(s=>s.active);
-  const mf=act.reduce((a,s)=>{
-    const krw=s.currency==='KRW'?s.fee:(s.feeKrw||0);
-    return a+(s.cycle==='월'?krw:Math.round(krw/12));
-  },0);
-  document.getElementById('sv1').textContent=fkrw(mf);
-  document.getElementById('sv2').textContent=fkrw(mf*12);
-  document.getElementById('sv3').textContent=act.length;
-  const icons={'엔터테인먼트':'▶','AI/개발':'◆','업무/생산성':'◉','헬스':'◎','통신비':'📡','보험':'🛡','대출/이자':'🏦','교육':'📚','관리비/공과금':'🏠','기타':'○'};
-  const csym={'KRW':'₩','USD':'$','EUR':'€','JPY':'¥','GBP':'£'};
+  const mf=act.reduce((a,s)=>{const krw=s.currency==='KRW'?s.fee:(s.feeKrw||0);return a+(s.cycle==='월'?krw:Math.round(krw/12));},0);
+  document.getElementById('sv1').textContent=fkrw(mf);document.getElementById('sv2').textContent=fkrw(mf*12);document.getElementById('sv3').textContent=act.length;
+  const icons={'엔터테인먼트':'▶','AI/개발':'◆','업무/생산성':'◉','헬스':'◎','통신비':'📡','보험':'🛡','대출/이자':'🏦','교육':'📚','관리비/공과금':'🏠','기타':'○'};const csym={'KRW':'₩','USD':'$','EUR':'€','JPY':'¥','GBP':'£'};
   const g=document.getElementById('subCards');
   if(!act.length){g.innerHTML='<div class="loading-msg">정기 지출을 추가해보세요</div>';return;}
   g.innerHTML=act.map((s,idx)=>{
-    const d=dUntil(s.renewDate),soon=d<=7&&s.renewDate;
-    const sym=csym[s.currency||'KRW']||'₩';
-    const feeDisplay=(!s.currency||s.currency==='KRW')?`${fkrw(s.fee)}원`:`${sym}${s.fee.toLocaleString()}`;
-    const krwNote=(s.currency&&s.currency!=='KRW'&&s.feeKrw)?` <span style="font-size:0.4rem;color:var(--text-m)">(≈${fkrw(s.feeKrw)}원)</span>`:'';
-    const renewBadge=s.renewDate?`<span class="sub-rb" style="background:${soon?'#fef2f2':'var(--subtle)'};color:${soon?'var(--danger)':'var(--text-m)'}">${d<=0?'오늘':d+'일 후'}</span>`:'';
-    return`<div class="sub-card">
-      <div class="sub-ico">${icons[s.category]||'○'}</div>
-      <div style="flex:1;min-width:0">
-        <div class="sub-cn">${esc(s.service)}</div>
-        <div class="sub-cf">${feeDisplay}${krwNote} / ${s.cycle}간</div>
-        <div class="sub-cc">${esc(s.category)}${s.memo?` · ${esc(s.memo)}`:''}</div>
-      </div>
-      <div class="sub-cr">
-        <div class="sub-rd">${fd(s.renewDate)}</div>
-        ${renewBadge}
-        <div class="item-actions">
-          <button class="btn-ord" onclick="moveSub(${idx},-1)" ${idx===0?'disabled':''} title="위로">↑</button>
-          <button class="btn-ord" onclick="moveSub(${idx},1)" ${idx===act.length-1?'disabled':''} title="아래로">↓</button>
-          <button class="inv-edit-btn" onclick="editSub('${s.id}')">수정</button>
-          <button class="btn-del" onclick="confirmDelSub('${s.id}','${esc(s.service)}')">삭제</button>
-        </div>
-      </div>
-    </div>`;
+    const d=dUntil(s.renewDate),soon=d<=7&&s.renewDate;const sym=csym[s.currency||'KRW']||'₩';const feeDisplay=(!s.currency||s.currency==='KRW')?`${fkrw(s.fee)}원`:`${sym}${s.fee.toLocaleString()}`;const krwNote=(s.currency&&s.currency!=='KRW'&&s.feeKrw)?` <span style="font-size:0.4rem;color:var(--text-m)">(≈${fkrw(s.feeKrw)}원)</span>`:'';const renewBadge=s.renewDate?`<span class="sub-rb" style="background:${soon?'#fef2f2':'var(--subtle)'};color:${soon?'var(--danger)':'var(--text-m)'}">${d<=0?'오늘':d+'일 후'}</span>`:'';
+    return`<div class="sub-card"><div class="sub-ico">${icons[s.category]||'○'}</div><div style="flex:1;min-width:0"><div class="sub-cn">${esc(s.service)}</div><div class="sub-cf">${feeDisplay}${krwNote} / ${s.cycle}간</div><div class="sub-cc">${esc(s.category)}${s.memo?` · ${esc(s.memo)}`:''}</div></div><div class="sub-cr"><div class="sub-rd">${fd(s.renewDate)}</div>${renewBadge}<div class="item-actions"><button class="btn-ord" onclick="moveSub(${idx},-1)" ${idx===0?'disabled':''} title="위로">↑</button><button class="btn-ord" onclick="moveSub(${idx},1)" ${idx===act.length-1?'disabled':''} title="아래로">↓</button><button class="inv-edit-btn" onclick="editSub('${s.id}')">수정</button><button class="btn-del" onclick="confirmDelSub('${s.id}','${esc(s.service)}')">삭제</button></div></div></div>`;
   }).join('');
 }
 
-function rTodo(id, group){
+function rTodo(id,group){
   const areaMap={family:'family',work:'work',personal:'personal',growth:'personal',health:'personal',side:'personal',finance:'personal'};
   const items=D.todo.filter(t=>areaMap[t.area]===group||t.area===group).slice(0,3);
-  const el=document.getElementById(id);
-  if(!el)return;
-  if(!items.length){
-    el.innerHTML='<div class="ph-txt">할 일 없음</div>';
-    return;
-  }
+  const el=document.getElementById(id);if(!el)return;
+  if(!items.length){el.innerHTML='<div class="ph-txt">할 일 없음</div>';return;}
   const today=new Date().toISOString().slice(0,10);
   el.innerHTML=items.map(t=>{
-    const overdue=t.due&&t.due<today;
-    const isToday=t.due&&t.due===today;
-    const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';
-    const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
-    return`<div class="todo-item">
-      <div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div>
-      <div class="todo-priority ${pClass}"></div>
-      <span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>
-      ${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}
-      <button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button>
-    </div>`;
+    const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
+    return`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button></div>`;
   }).join('');
 }
 
 function editMemoItem(id){
-  const m=D.memo.find(x=>x.id===id);
-  if(!m)return;
-  document.getElementById('meEditId').value=m.id;
-  document.getElementById('meText').value=m.content;
-  document.getElementById('meArea').value=m.area||'';
-  document.getElementById('mePin').checked=m.pinned||false;
-  document.getElementById('meDash').checked=m.showInDash!==false;
+  const m=D.memo.find(x=>x.id===id);if(!m)return;
+  document.getElementById('meEditId').value=m.id;document.getElementById('meText').value=m.content;document.getElementById('meArea').value=m.area||'';document.getElementById('mePin').checked=m.pinned||false;document.getElementById('meDash').checked=m.showInDash!==false;
   openModal('memoEditModal');
 }
 async function saveMemoEdit(){
-  const id=document.getElementById('meEditId').value;
-  const content=document.getElementById('meText').value.trim().slice(0,1000);
-  if(!content){showToast('내용을 입력해주세요','error');return;}
-  const area=document.getElementById('meArea').value;
-  const pinned=document.getElementById('mePin').checked;
-  const showInDash=document.getElementById('meDash').checked;
-  const idx=D.memo.findIndex(x=>x.id===id);
-  if(idx>-1){D.memo[idx]={...D.memo[idx],content,area,pinned,showInDash};}
-  rMemo();rHome();closeModal('memoEditModal');
-  showToast('✅ 메모 수정 완료!','success');
-  // Notion 백그라운드 저장
-  if(cfg.token&&cfg.memo){
-    nFetch(`pages/${id}`,'PATCH',{properties:{Content:{title:[{text:{content}}]},Area:area?{select:{name:area}}:{select:null},Pinned:{checkbox:pinned},ShowInDash:{checkbox:showInDash}}}).catch(e=>console.warn('memo edit failed:',e));
-  }
+  const id=document.getElementById('meEditId').value;const content=document.getElementById('meText').value.trim().slice(0,1000);if(!content){showToast('내용을 입력해주세요','error');return;}
+  const area=document.getElementById('meArea').value;const pinned=document.getElementById('mePin').checked;const showInDash=document.getElementById('meDash').checked;
+  const idx=D.memo.findIndex(x=>x.id===id);if(idx>-1){D.memo[idx]={...D.memo[idx],content,area,pinned,showInDash};}
+  rMemo();rHome();closeModal('memoEditModal');showToast('✅ 메모 수정 완료!','success');
+  if(cfg.token&&cfg.memo){nFetch(`pages/${id}`,'PATCH',{properties:{Content:{title:[{text:{content}}]},Area:area?{select:{name:area}}:{select:null},Pinned:{checkbox:pinned},ShowInDash:{checkbox:showInDash}}}).catch(e=>console.warn('memo edit failed:',e));}
 }
-function confirmDelMemo(id,preview){
-  if(!confirm(`"${preview}..." 메모를 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`)) return;
-  deleteMemo(id);
-}
-async function deleteMemo(id){
-  if(cfg.token){nFetch(`pages/${id}`,'PATCH',{archived:true}).catch(e=>console.warn('memo delete failed:',e));}
-  D.memo=D.memo.filter(x=>x.id!==id);
-  rMemo();rHome();
-  showToast('🗑 메모가 삭제됐습니다.','success');
-}
+
+function confirmDelMemo(id,preview){if(!confirm(`"${preview}..." 메모를 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`))return;deleteMemo(id);}
+async function deleteMemo(id){if(cfg.token){nFetch(`pages/${id}`,'PATCH',{archived:true}).catch(e=>console.warn('memo delete failed:',e));}D.memo=D.memo.filter(x=>x.id!==id);rMemo();rHome();showToast('🗑 메모가 삭제됐습니다.','success');}
+
 function editTodoItem(id){
-  const t=D.todo.find(x=>x.id===id);
-  if(!t)return;
-  document.getElementById('todoModalTitle').textContent='할 일 수정';
-  document.getElementById('tEditId').value=t.id;
-  document.getElementById('tTitle').value=t.title;
-  document.getElementById('tArea').value=t.area||'personal';
-  document.getElementById('tPriority').value=t.priority||'보통';
-  document.getElementById('tDue').value=t.due||'';
+  const t=D.todo.find(x=>x.id===id);if(!t)return;
+  document.getElementById('todoModalTitle').textContent='할 일 수정';document.getElementById('tEditId').value=t.id;document.getElementById('tTitle').value=t.title;document.getElementById('tArea').value=t.area||'personal';document.getElementById('tPriority').value=t.priority||'보통';document.getElementById('tDue').value=t.due||'';
   openModal('todoModal');
 }
 function openTodoModal(area){
-  document.getElementById('todoModalTitle').textContent='할 일 추가';
-  document.getElementById('tEditId').value='';
-  document.getElementById('tTitle').value='';
-  document.getElementById('tArea').value=area||'personal';
-  document.getElementById('tPriority').value='보통';
-  document.getElementById('tDue').value='';
+  document.getElementById('todoModalTitle').textContent='할 일 추가';document.getElementById('tEditId').value='';document.getElementById('tTitle').value='';document.getElementById('tArea').value=area||'personal';document.getElementById('tPriority').value='보통';document.getElementById('tDue').value='';
   openModal('todoModal');
 }
 
 async function saveTodo(){
-  const title=document.getElementById('tTitle').value.trim();
-  if(!title){showToast('제목을 입력해주세요','error');return;}
-  const VALID_AREAS=['family','work','personal'];
-  const VALID_PRIORITY=['높음','보통','낮음'];
-  const area=VALID_AREAS.includes(document.getElementById('tArea').value)?document.getElementById('tArea').value:'personal';
-  const priority=VALID_PRIORITY.includes(document.getElementById('tPriority').value)?document.getElementById('tPriority').value:'보통';
-  const due=document.getElementById('tDue').value;
-  const editId=document.getElementById('tEditId').value;
+  const title=document.getElementById('tTitle').value.trim();if(!title){showToast('제목을 입력해주세요','error');return;}
+  const VALID_AREAS=['family','work','personal'];const VALID_PRIORITY=['높음','보통','낮음'];
+  const area=VALID_AREAS.includes(document.getElementById('tArea').value)?document.getElementById('tArea').value:'personal';const priority=VALID_PRIORITY.includes(document.getElementById('tPriority').value)?document.getElementById('tPriority').value:'보통';const due=document.getElementById('tDue').value;const editId=document.getElementById('tEditId').value;
   const t={id:editId||'l'+Date.now(),title:title.slice(0,200),area,priority,due,done:false};
-
-  if(!cfg.token){showToast('❌ Notion Token이 없습니다.','error');return;}
-  if(!cfg.todo){showToast('❌ Todo DB ID가 없습니다.','error');return;}
-
-  // UI 즉시 반응
-  if(editId){const idx=D.todo.findIndex(x=>x.id===editId);if(idx>-1)D.todo[idx]=t;}
-  else D.todo.unshift(t);
-  // 날짜순 정렬 유지
-  D.todo.sort((a,b)=>{
-    if(!a.due&&!b.due) return 0;
-    if(!a.due) return 1;
-    if(!b.due) return -1;
-    return a.due.localeCompare(b.due);
-  });
-  render();
-  closeModal('todoModal');
-  showToast('✅ 할 일 저장 완료!','success');
-
-  // Notion 저장은 백그라운드
+  if(!cfg.token){showToast('❌ Notion Token이 없습니다.','error');return;}if(!cfg.todo){showToast('❌ Todo DB ID가 없습니다.','error');return;}
+  if(editId){const idx=D.todo.findIndex(x=>x.id===editId);if(idx>-1)D.todo[idx]=t;}else D.todo.unshift(t);
+  D.todo.sort((a,b)=>{if(!a.due&&!b.due)return 0;if(!a.due)return 1;if(!b.due)return -1;return a.due.localeCompare(b.due);});
+  render();closeModal('todoModal');showToast('✅ 할 일 저장 완료!','success');
   const props={Title:{title:[{text:{content:t.title}}]},Area:{select:{name:t.area}},Priority:{select:{name:t.priority}},Done:{checkbox:false},...(t.due?{Due:{date:{start:t.due}}}:{})};
-  if(editId) nFetch(`pages/${editId}`,'PATCH',{properties:props}).catch(e=>console.warn('Todo update failed:',e));
+  if(editId)nFetch(`pages/${editId}`,'PATCH',{properties:props}).catch(e=>console.warn('Todo update failed:',e));
   else mkPage(cfg.todo,props).catch(e=>console.warn('Todo create failed:',e));
 }
 
 async function completeTodo(id){
-  // 즉시 UI 반응 — 체크 표시 후 0.4초 뒤 목록에서 제거
-  const check=document.querySelector(`[onclick="completeTodo('${id}')"]`);
-  if(check)check.classList.add('done');
+  const check=document.querySelector(`[onclick="completeTodo('${id}')"]`);if(check)check.classList.add('done');
   setTimeout(()=>{D.todo=D.todo.filter(x=>x.id!==id);render();},400);
-  // Notion 저장은 백그라운드 (UI 블로킹 없음)
-  if(cfg.token&&cfg.todo){
-    nFetch(`pages/${id}`,'PATCH',{properties:{Done:{checkbox:true}}}).catch(e=>console.warn('completeTodo sync failed:',e));
-  }
+  if(cfg.token&&cfg.todo){nFetch(`pages/${id}`,'PATCH',{properties:{Done:{checkbox:true}}}).catch(e=>console.warn('completeTodo sync failed:',e));}
 }
 
 function rMemo(){
   const list=[...D.memo].sort((a,b)=>(b.pinned-a.pinned)||(new Date(b.createdAt)-new Date(a.createdAt)));
   const el=document.getElementById('memoList');
   if(!list.length){el.innerHTML='<div class="empty-msg"><p>메모가 없습니다</p></div>';return;}
-  el.innerHTML=list.map(m=>{
-    const a=AMAP[m.area];
-    return`<div class="memo-card ${m.pinned?'pinned':''}">
-      <div class="mc-top">
-        ${m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':''}
-        ${a?`<span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span>`:''}
-        <div style="margin-left:auto;display:flex;gap:0.25rem">
-          <button class="inv-edit-btn" onclick="editMemoItem('${m.id}')">수정</button>
-          <button class="btn-del" onclick="confirmDelMemo('${m.id}','${esc(m.content).slice(0,15)}')">삭제</button>
-        </div>
-      </div>
-      <div class="mc-text">${esc(m.content)}</div>
-      <div class="mc-foot">${fdt(m.createdAt)}</div>
-    </div>`;
-  }).join('');
+  el.innerHTML=list.map(m=>{const a=AMAP[m.area];return`<div class="memo-card ${m.pinned?'pinned':''}"><div class="mc-top">${m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':''}${a?`<span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span>`:''}<div style="margin-left:auto;display:flex;gap:0.25rem"><button class="inv-edit-btn" onclick="editMemoItem('${m.id}')">수정</button><button class="btn-del" onclick="confirmDelMemo('${m.id}','${esc(m.content).slice(0,15)}')">삭제</button></div></div><div class="mc-text">${esc(m.content)}</div><div class="mc-foot">${fdt(m.createdAt)}</div></div>`;}).join('');
 }
 
 function showPage(id,btn){
@@ -1648,31 +1163,15 @@ function openGoalModal(group){document.getElementById('gArea').value={family:'fa
 async function testNotion(){await saveCfg();if(!cfg.token){showToast('Token을 입력해주세요','error');return;}try{await nFetch('users/me');showToast('✅ 연결 성공!','success');loadAll();}catch(e){showToast('❌ 연결 실패 — CORS 프록시를 확인해주세요','error');}}
 
 async function diagCheck(){
-  const lines=[];
-  lines.push(`Token: ${cfg.token?'✅ 입력됨':'❌ 없음'}`);
-  lines.push(`Proxy: ${cfg.proxy?'✅ '+cfg.proxy.slice(0,30)+'...':'❌ 없음'}`);
-  lines.push(`Goals DB: ${cfg.goals?'✅':'❌ 없음'}`);
-  lines.push(`Invest DB: ${cfg.invest?'✅':'❌ 없음'}`);
-  lines.push(`Subs DB: ${cfg.subs?'✅':'❌ 없음'}`);
-  lines.push(`Memo DB: ${cfg.memo?'✅':'❌ 없음'}`);
-  if(cfg.token&&cfg.proxy){
-    try{
-      await nFetch('users/me');
-      lines.push('API 연결: ✅ 성공');
-    }catch(e){
-      lines.push(`API 연결: ❌ 실패 (${e.message})`);
-    }
-  }
+  const lines=[];lines.push(`Token: ${cfg.token?'✅ 입력됨':'❌ 없음'}`);lines.push(`Proxy: ${cfg.proxy?'✅ '+cfg.proxy.slice(0,30)+'...':'❌ 없음'}`);lines.push(`Goals DB: ${cfg.goals?'✅':'❌ 없음'}`);lines.push(`Invest DB: ${cfg.invest?'✅':'❌ 없음'}`);lines.push(`Subs DB: ${cfg.subs?'✅':'❌ 없음'}`);lines.push(`Memo DB: ${cfg.memo?'✅':'❌ 없음'}`);
+  if(cfg.token&&cfg.proxy){try{await nFetch('users/me');lines.push('API 연결: ✅ 성공');}catch(e){lines.push(`API 연결: ❌ 실패 (${e.message})`);}}
   alert(lines.join('\n'));
 }
 
 async function saveGoal(){
   const title=document.getElementById('gTitle').value.trim();if(!title){showToast('제목을 입력해주세요','error');return;}
   const btn=document.getElementById('bSaveGoal');btn.disabled=true;btn.textContent='저장 중...';
-  const area=document.getElementById('gArea').value;
-  const progress=safeProgress(document.getElementById('gProgress').value);
-  const due=document.getElementById('gDue').value;
-  const desc=document.getElementById('gDesc').value.slice(0,2000);
+  const area=document.getElementById('gArea').value;const progress=safeProgress(document.getElementById('gProgress').value);const due=document.getElementById('gDue').value;const desc=document.getElementById('gDesc').value.slice(0,2000);
   const g={id:'l'+Date.now(),title:title.slice(0,200),area,period:document.getElementById('gPeriod').value,progress,status:'진행중',due,desc};
   if(cfg.token&&cfg.goals){try{await mkPage(cfg.goals,{Title:{title:[{text:{content:g.title}}]},Area:{select:{name:area}},Period:{select:{name:g.period}},Progress:{number:g.progress},Status:{select:{name:'진행중'}},Due:g.due?{date:{start:g.due}}:{date:null},Description:{rich_text:[{text:{content:g.desc}}]}});}catch(e){showToast('Notion 저장 실패','error');}}
   D.goals.push(g);render();closeModal('goalModal');btn.disabled=false;btn.textContent='저장';
@@ -1680,76 +1179,19 @@ async function saveGoal(){
   showToast('✅ 목표 저장 완료!','success');
 }
 
-/* ── 삭제·순서 변경 ── */
-function confirmDelInv(id, name){
-  if(!confirm(`"${name}"을(를) 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`)) return;
-  deleteInv(id);
-}
-async function deleteInv(id){
-  if(cfg.token){
-    try{ await nFetch(`pages/${id}`,'PATCH',{archived:true}); }catch(e){}
-  }
-  D.invest=D.invest.filter(i=>i.id!==id);
-  render();
-  showToast('🗑 삭제됐습니다.','success');
-}
-function moveInv(id, dir){
-  const idx=D.invest.findIndex(i=>i.id===id);
-  const to=idx+dir;
-  if(to<0||to>=D.invest.length) return;
-  [D.invest[idx],D.invest[to]]=[D.invest[to],D.invest[idx]];
-  rInvest();
-}
+function confirmDelInv(id,name){if(!confirm(`"${name}"을(를) 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`))return;deleteInv(id);}
+async function deleteInv(id){if(cfg.token){try{await nFetch(`pages/${id}`,'PATCH',{archived:true});}catch(e){}}D.invest=D.invest.filter(i=>i.id!==id);render();showToast('🗑 삭제됐습니다.','success');}
+function moveInv(id,dir){const idx=D.invest.findIndex(i=>i.id===id);const to=idx+dir;if(to<0||to>=D.invest.length)return;[D.invest[idx],D.invest[to]]=[D.invest[to],D.invest[idx]];rInvest();}
 
-function confirmDelSub(id, name){
-  if(!confirm(`"${name}"을(를) 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`)) return;
-  deleteSub(id);
-}
-async function deleteSub(id){
-  if(cfg.token){
-    try{ await nFetch(`pages/${id}`,'PATCH',{archived:true}); }catch(e){}
-  }
-  D.subs=D.subs.filter(s=>s.id!==id);
-  render();
-  showToast('🗑 삭제됐습니다.','success');
-}
-function moveSub(idx, dir){
-  const act=D.subs.filter(s=>s.active);
-  const to=idx+dir;
-  if(to<0||to>=act.length) return;
-  // D.subs 내 실제 인덱스 교환
-  const idxA=D.subs.indexOf(act[idx]);
-  const idxB=D.subs.indexOf(act[to]);
-  [D.subs[idxA],D.subs[idxB]]=[D.subs[idxB],D.subs[idxA]];
-  rSubs();
-}
+function confirmDelSub(id,name){if(!confirm(`"${name}"을(를) 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`))return;deleteSub(id);}
+async function deleteSub(id){if(cfg.token){try{await nFetch(`pages/${id}`,'PATCH',{archived:true});}catch(e){}}D.subs=D.subs.filter(s=>s.id!==id);render();showToast('🗑 삭제됐습니다.','success');}
+function moveSub(idx,dir){const act=D.subs.filter(s=>s.active);const to=idx+dir;if(to<0||to>=act.length)return;const idxA=D.subs.indexOf(act[idx]);const idxB=D.subs.indexOf(act[to]);[D.subs[idxA],D.subs[idxB]]=[D.subs[idxB],D.subs[idxA]];rSubs();}
+
 let _saveCfgTimer=null;
-function debouncedSaveCfg(){
-  clearTimeout(_saveCfgTimer);
-  _saveCfgTimer=setTimeout(async()=>{
-    await saveCfg();
-    showToast('✅ 설정 저장됨 — 북마크 URL을 업데이트하세요!','success');
-  },400);
-}
+function debouncedSaveCfg(){clearTimeout(_saveCfgTimer);_saveCfgTimer=setTimeout(async()=>{await saveCfg();showToast('✅ 설정 저장됨 — 북마크 URL을 업데이트하세요!','success');},400);}
+async function saveCfgAndCopyUrl(){await saveCfg();const url=location.href;navigator.clipboard.writeText(url).then(()=>showToast('✅ URL 복사 완료! 북마크에 추가하세요.','success')).catch(()=>showToast('저장됐습니다. 주소창 URL을 북마크해 주세요.','success'));}
 
-async function saveCfgAndCopyUrl(){
-  await saveCfg();
-  const url=location.href;
-  navigator.clipboard.writeText(url)
-    .then(()=>showToast('✅ URL 복사 완료! 북마크에 추가하세요.','success'))
-    .catch(()=>showToast('저장됐습니다. 주소창 URL을 북마크해 주세요.','success'));
-}
-function copySettings(){
-  saveCfgAndCopyUrl();
-}
-function setToday(id){
-  const today=new Date();
-  const y=today.getFullYear();
-  const m=String(today.getMonth()+1).padStart(2,'0');
-  const d=String(today.getDate()).padStart(2,'0');
-  const el=document.getElementById(id);
-  if(el){el.value=`${y}-${m}-${d}`;}
-}
+function setToday(id){const today=new Date();const y=today.getFullYear();const m=String(today.getMonth()+1).padStart(2,'0');const d=String(today.getDate()).padStart(2,'0');const el=document.getElementById(id);if(el){el.value=`${y}-${m}-${d}`;}}
 function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',type==='error'?6000:3000);}
 function fkrw(n){if(n>=100000000)return(n/100000000).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g,',')+'억';if(n>=10000)return Math.round(n/10000).toLocaleString()+'만';return n.toLocaleString();}
 function fd(d){if(!d)return'—';return d.slice(0,10).replace(/-/g,'.');}
