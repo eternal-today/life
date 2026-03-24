@@ -463,15 +463,27 @@ input,select,textarea{font-family:inherit;}
   <div class="detail-head">
     <div class="area-dot detail-dot" style="background:var(--family-c)"></div><div class="detail-title">가정</div>
     <div class="detail-meta" id="meta-family">—</div>
-    <button class="btn-primary" onclick="openGoalModal('family')">+ 목표 추가</button>
   </div>
-  <div class="toolbar-scroll"><div class="toolbar">
-    <button class="fp active" onclick="filterGoal('family','all',this)">전체</button>
-    <button class="fp" onclick="filterGoal('family','연간',this)">연간</button>
-    <button class="fp" onclick="filterGoal('family','분기',this)">분기</button>
-    <button class="fp" onclick="filterGoal('family','월간',this)">월간</button>
-  </div></div>
-  <div class="goals-grid" id="grid-family"><div class="loading-msg">로딩 중...</div></div>
+  <div class="subtabs">
+    <button class="stab active" onclick="showFamilySub('goals',this)">목표</button>
+    <button class="stab" onclick="showFamilySub('todo',this)">할 일</button>
+  </div>
+  <div id="fsub-goals">
+    <div class="toolbar-scroll"><div class="toolbar">
+      <button class="fp active" onclick="filterGoal('family','all',this)">전체</button>
+      <button class="fp" onclick="filterGoal('family','연간',this)">연간</button>
+      <button class="fp" onclick="filterGoal('family','분기',this)">분기</button>
+      <button class="fp" onclick="filterGoal('family','월간',this)">월간</button>
+      <button class="btn-primary ml-auto" onclick="openGoalModal('family')">+ 목표</button>
+    </div></div>
+    <div class="goals-grid" id="grid-family"><div class="loading-msg">로딩 중...</div></div>
+  </div>
+  <div id="fsub-todo" style="display:none">
+    <div class="toolbar-scroll"><div class="toolbar">
+      <button class="btn-primary ml-auto" onclick="openTodoModal('family')">+ 할 일</button>
+    </div></div>
+    <div id="todo-list-family"></div>
+  </div>
 </div></div>
 
 <!-- WORK -->
@@ -479,15 +491,27 @@ input,select,textarea{font-family:inherit;}
   <div class="detail-head">
     <div class="area-dot detail-dot" style="background:var(--work-c)"></div><div class="detail-title">회사</div>
     <div class="detail-meta" id="meta-work">—</div>
-    <button class="btn-primary" onclick="openGoalModal('work')">+ 목표 추가</button>
   </div>
-  <div class="toolbar-scroll"><div class="toolbar">
-    <button class="fp active" onclick="filterGoal('work','all',this)">전체</button>
-    <button class="fp" onclick="filterGoal('work','연간',this)">연간</button>
-    <button class="fp" onclick="filterGoal('work','분기',this)">분기</button>
-    <button class="fp" onclick="filterGoal('work','월간',this)">월간</button>
-  </div></div>
-  <div class="goals-grid" id="grid-work"><div class="loading-msg">로딩 중...</div></div>
+  <div class="subtabs">
+    <button class="stab active" onclick="showWorkSub('goals',this)">목표</button>
+    <button class="stab" onclick="showWorkSub('todo',this)">할 일</button>
+  </div>
+  <div id="wsub-goals">
+    <div class="toolbar-scroll"><div class="toolbar">
+      <button class="fp active" onclick="filterGoal('work','all',this)">전체</button>
+      <button class="fp" onclick="filterGoal('work','연간',this)">연간</button>
+      <button class="fp" onclick="filterGoal('work','분기',this)">분기</button>
+      <button class="fp" onclick="filterGoal('work','월간',this)">월간</button>
+      <button class="btn-primary ml-auto" onclick="openGoalModal('work')">+ 목표</button>
+    </div></div>
+    <div class="goals-grid" id="grid-work"><div class="loading-msg">로딩 중...</div></div>
+  </div>
+  <div id="wsub-todo" style="display:none">
+    <div class="toolbar-scroll"><div class="toolbar">
+      <button class="btn-primary ml-auto" onclick="openTodoModal('work')">+ 할 일</button>
+    </div></div>
+    <div id="todo-list-work"></div>
+  </div>
 </div></div>
 
 <!-- PERSONAL -->
@@ -497,6 +521,7 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div class="subtabs">
     <button class="stab active" onclick="showSub('goals',this)">목표</button>
+    <button class="stab" onclick="showSub('todo',this)">할 일</button>
     <button class="stab" onclick="showSub('invest',this)">재테크</button>
     <button class="stab" onclick="showSub('subs',this)">정기지출</button>
     <button class="stab" onclick="showSub('memo',this)">메모</button>
@@ -513,6 +538,12 @@ input,select,textarea{font-family:inherit;}
       <button class="btn-primary ml-auto" onclick="openGoalModal('personal')">+ 목표</button>
     </div></div>
     <div class="goals-grid" id="grid-personal"><div class="loading-msg">로딩 중...</div></div>
+  </div>
+  <div id="sub-todo" style="display:none">
+    <div class="toolbar-scroll"><div class="toolbar">
+      <button class="btn-primary ml-auto" onclick="openTodoModal('personal')">+ 할 일</button>
+    </div></div>
+    <div id="todo-list-personal"></div>
   </div>
   <div id="sub-invest" style="display:none">
     <div class="inv-stats">
@@ -868,7 +899,7 @@ function parseCalEvents(items){
 
 function setSS(s){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');if(s==='ok'){d.className='sync-dot ok';t.textContent='동기화 완료';}else if(s==='loading'){d.className='sync-dot';t.textContent='로딩 중...';}else{d.className='sync-dot';t.textContent='데모 모드';}}
 function demoData(){D.goals=[];D.invest=[];D.subs=[];D.memo=[];D.todo=[];setSS('err');render();}
-function render(){rHome();rGoalPage('family');rGoalPage('work');rGoalPage('personal');rInvest();rSubs();rMemo();rQuickMemoRecent();}
+function render(){rHome();rGoalPage('family');rGoalPage('work');rGoalPage('personal');rInvest();rSubs();rMemo();rQuickMemoRecent();rTodoFull('family');rTodoFull('work');rTodoFull('personal');}
 function byGroup(g){return D.goals.filter(x=>(AMAP[x.area]?.g||'personal')===g&&x.status!=='완료');}
 function avg(arr){return arr.length?Math.round(arr.reduce((a,g)=>a+g.progress,0)/arr.length):0;}
 
@@ -1085,12 +1116,15 @@ function rTodo(id,group){
   const el=document.getElementById(id);if(!el)return;
   if(!items.length){el.innerHTML='<div class="ph-txt">할 일 없음</div>';return;}
   const today=new Date().toISOString().slice(0,10);
-  const tabIdx={family:1,work:2,personal:3}[group]||1;
   const areaColor={family:'var(--family-c)',work:'var(--work-c)',personal:'var(--personal-c)'}[group]||'var(--text-s)';
-  el.innerHTML=items.map(t=>{
+  const rows=items.map(t=>{
     const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
     return`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button></div>`;
-  }).join('')+(extra>0?`<button onclick="showPage('${group}',document.querySelectorAll('.tab-btn')[${tabIdx}])" style="background:none;border:none;padding:0.15rem 0;font-size:0.42rem;color:${areaColor};font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">+${extra}개 더 보기 →</button>`:'');
+  });
+  if(extra>0){
+    rows.push(`<div class="todo-item" style="cursor:pointer" onclick="goToTodo('${group}')"><div style="width:0.85rem;height:0.85rem;border:1.5px dashed ${areaColor};border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.35rem;color:${areaColor};font-weight:700">+${extra}</div><span style="font-size:0.46rem;color:${areaColor};font-weight:600;flex:1;">개 더 보기 →</span></div>`);
+  }
+  el.innerHTML=rows.join('');
 }
 
 function editMemoItem(id){
@@ -1155,9 +1189,53 @@ function showPage(id,btn){
   window.scrollTo(0,0);
 }
 function showSub(id,btn){
-  ['goals','invest','subs','memo'].forEach(k=>{const el=document.getElementById('sub-'+k);if(el)el.style.display=k===id?'':'none';});
-  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
+  ['goals','todo','invest','subs','memo'].forEach(k=>{const el=document.getElementById('sub-'+k);if(el)el.style.display=k===id?'':'none';});
+  document.querySelectorAll('#page-personal .stab').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
+  if(id==='todo')rTodoFull('personal');
+}
+function showFamilySub(id,btn){
+  ['goals','todo'].forEach(k=>{const el=document.getElementById('fsub-'+k);if(el)el.style.display=k===id?'':'none';});
+  document.querySelectorAll('#page-family .stab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(id==='todo')rTodoFull('family');
+}
+function showWorkSub(id,btn){
+  ['goals','todo'].forEach(k=>{const el=document.getElementById('wsub-'+k);if(el)el.style.display=k===id?'':'none';});
+  document.querySelectorAll('#page-work .stab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(id==='todo')rTodoFull('work');
+}
+function rTodoFull(group){
+  const areaMap={family:'family',work:'work',personal:'personal',growth:'personal',health:'personal',side:'personal',finance:'personal'};
+  const elId={family:'todo-list-family',work:'todo-list-work',personal:'todo-list-personal'}[group];
+  const el=document.getElementById(elId);if(!el)return;
+  const items=D.todo.filter(t=>areaMap[t.area]===group||t.area===group);
+  if(!items.length){el.innerHTML='<div class="empty-msg"><p>할 일이 없습니다</p><span>+ 할 일 추가로 시작해보세요</span></div>';return;}
+  const today=new Date().toISOString().slice(0,10);
+  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.1rem;margin-top:0.5rem">`+items.map(t=>{
+    const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;
+    const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';
+    const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
+    return`<div class="todo-item" style="padding:0.4rem 0.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:0.25rem"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button><button class="btn-del" onclick="confirmDelTodo('${t.id}')" style="margin-left:0.25rem">삭제</button></div>`;
+  }).join('')+`</div>`;
+}
+function confirmDelTodo(id){
+  const t=D.todo.find(x=>x.id===id);if(!t)return;
+  if(!confirm(`"${t.title}"을(를) 삭제할까요?`))return;
+  D.todo=D.todo.filter(x=>x.id!==id);render();
+  if(cfg.token&&cfg.todo){nFetch(`pages/${id}`,'PATCH',{archived:true}).catch(e=>console.warn('del todo failed:',e));}
+  showToast('🗑 삭제됐습니다.','success');
+}
+function goToTodo(group){
+  const pageMap={family:'family',work:'work',personal:'personal'};
+  const tabIdx={family:1,work:2,personal:3}[group]||1;
+  showPage(group,document.querySelectorAll('.tab-btn')[tabIdx]);
+  setTimeout(()=>{
+    if(group==='family'){const btn=document.querySelector('#page-family .stab:nth-child(2)');if(btn)showFamilySub('todo',btn);}
+    else if(group==='work'){const btn=document.querySelector('#page-work .stab:nth-child(2)');if(btn)showWorkSub('todo',btn);}
+    else if(group==='personal'){const btn=document.querySelector('#page-personal .stab:nth-child(2)');if(btn)showSub('todo',btn);}
+  },50);
 }
 function filterGoal(group,val,btn){gF[group]=val;btn.closest('.toolbar').querySelectorAll('.fp').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rGoalPage(group);}
 function openDrawer(){document.getElementById('dOverlay').classList.add('open');document.getElementById('drawer').classList.add('open');}
