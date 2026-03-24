@@ -1085,10 +1085,11 @@ function rTodo(id,group){
   const el=document.getElementById(id);if(!el)return;
   if(!items.length){el.innerHTML='<div class="ph-txt">할 일 없음</div>';return;}
   const today=new Date().toISOString().slice(0,10);
+  const areaColor={family:'var(--family-c)',work:'var(--work-c)',personal:'var(--personal-c)'}[group]||'var(--text-s)';
   el.innerHTML=items.map(t=>{
     const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
     return`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button></div>`;
-  }).join('')+(extra>0?`<div class="ph-txt" style="color:var(--text-m);font-size:0.42rem;padding-top:0.15rem">+${extra}개 더</div>`:'');
+  }).join('')+(extra>0?`<button onclick="showPage('${group}',document.querySelectorAll('.tab-btn')[${tabIdx}])" style="background:none;border:none;padding:0.15rem 0;font-size:0.42rem;color:${areaColor};font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">+${extra}개 더 보기 →</button>`:'');
 }
 
 function editMemoItem(id){
