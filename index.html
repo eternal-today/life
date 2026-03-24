@@ -282,7 +282,7 @@ input,select,textarea{font-family:inherit;}
 .empty-msg{padding:3rem 1rem;text-align:center;color:var(--text-m);}
 .empty-msg p{font-size:0.6rem;color:var(--text-s);margin-bottom:0.25rem;}
 .tag{display:inline-block;font-size:0.44rem;padding:0.15rem 0.5rem;border-radius:20px;font-weight:700;}
-.ph-txt{font-size:0.5rem;color:var(--text-m);padding:0.125rem 0 0.5rem;}
+.ph-txt{font-size:0.5rem;color:var(--text-m);padding:0.125rem 0 0.375rem;}
 
 /* 빠른 메모 */
 .quick-memo-wrap{margin-top:0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem 1.25rem;box-shadow:var(--sh-sm);}
@@ -312,7 +312,7 @@ input,select,textarea{font-family:inherit;}
   .ds-quote{display:block;}
   .tab-date-wrap{display:flex;}
   .tab-bar{top:2.75rem;}
-  .area-grid{flex-direction:row;align-items:stretch;gap:1rem;}
+  .area-grid{flex-direction:row;align-items:flex-start;gap:1rem;}
   .area-card{flex:1;}
   .area-header{padding:0.75rem 1.25rem;}
   .area-body{padding:1rem 1.25rem;}
@@ -1047,22 +1047,14 @@ function rSched(id,g){
     el.innerHTML='<div class="ph-txt">이번 주 일정 없음</div>';
     return;
   }
-  el.innerHTML=items.map(s=>{
+  el.innerHTML='<div style="padding-bottom:0.375rem">'+items.map(s=>{
     const isToday=s.time==='오늘';
     const isTomorrow=s.time==='내일';
-    const timeStyle=isToday
-      ?'color:var(--danger);font-weight:700;'
-      :isTomorrow
-        ?'color:var(--work-c);font-weight:700;'
-        :'';
-    const titleStyle=isToday
-      ?'color:var(--text-h);font-weight:700;'
-      :isTomorrow
-        ?'color:var(--text-b);font-weight:600;'
-        :'';
+    const timeStyle=isToday?'color:var(--danger);font-weight:700;':isTomorrow?'color:var(--work-c);font-weight:700;':'';
+    const titleStyle=isToday?'color:var(--text-h);font-weight:700;':isTomorrow?'color:var(--text-b);font-weight:600;':'';
     const dot=isToday?'<span style="width:5px;height:5px;border-radius:50%;background:var(--danger);flex-shrink:0;display:inline-block;margin-right:2px"></span>':'';
     return`<a class="sched-link" href="#" onclick="openCalendar(event,'${g}')"><span class="sched-time" style="${timeStyle}">${s.time}</span>${dot}<span class="sched-title" style="${titleStyle}">${esc(s.title)}</span><span class="sched-arrow">›</span></a>`;
-  }).join('');
+  }).join('')+'</div>';
 }
 
 function openCalendar(e, group){
