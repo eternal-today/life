@@ -324,7 +324,7 @@ input,select,textarea{font-family:inherit;}
   .tab-date-wrap{display:flex;}
   .tab-bar{top:2.75rem;}
   .area-grid{flex-direction:row;align-items:stretch;gap:1rem;}
-  .area-card{flex:1;height:18rem;}
+  .area-card{flex:1;height:20rem;}
   .area-header{padding:0.6rem 1.25rem;}
   .area-body{padding:0 1.25rem;}
   /* min-height 방식 제거 — 카드 고정 height + flex:1로 섹션 균등 분배 */
@@ -914,9 +914,9 @@ function rHome(){
   rTodo('home-family-todo','family');
   rTodo('home-work-todo','work');
   rTodo('home-personal-todo','personal');
-  rMini('home-family-goals',fam.slice(0,2),'var(--family-c)');
-  rMini('home-work-goals',wrk.slice(0,2),'var(--work-c)');
-  rMini('home-personal-goals',per.slice(0,2),'var(--personal-c)');
+  rMini('home-family-goals',fam.slice(0,2),'var(--family-c)','family');
+  rMini('home-work-goals',wrk.slice(0,2),'var(--work-c)','work');
+  rMini('home-personal-goals',per.slice(0,2),'var(--personal-c)','personal');
   const soon=D.subs.filter(s=>s.active&&s.alert!==false&&s.renewDate&&dUntil(s.renewDate)<=30).sort((a,b)=>new Date(a.renewDate)-new Date(b.renewDate));
   const alertEl=document.getElementById('home-personal-sub-alert');
   if(soon.length){
@@ -950,7 +950,19 @@ function openCalendar(e,group){
   else{window.open(webUrl,'_blank');}
 }
 
-function rMini(id,goals,color){const el=document.getElementById(id);if(!goals.length){el.innerHTML='<div class="ph-txt">목표가 없습니다</div>';return;}el.innerHTML=goals.map(g=>`<div class="goal-mini"><div class="gm-bar-wrap"><div class="gm-bar" style="width:${g.progress}%;background:${color}"></div></div><div class="gm-title">${esc(g.title)}</div><div class="gm-pct">${g.progress}%</div></div>`).join('');}
+function rMini(id,goals,color,group){
+  const el=document.getElementById(id);if(!el)return;
+  const areaColor={family:'var(--family-c)',work:'var(--work-c)',personal:'var(--personal-c)'}[group]||color;
+  const tabIdx={family:1,work:2,personal:3}[group]||1;
+  const rows=[];
+  if(!goals.length){
+    rows.push('<div class="ph-txt">목표가 없습니다</div>');
+  } else {
+    goals.forEach(g=>rows.push(`<div class="goal-mini"><div class="gm-bar-wrap"><div class="gm-bar" style="width:${g.progress}%;background:${color}"></div></div><div class="gm-title">${esc(g.title)}</div><div class="gm-pct">${g.progress}%</div></div>`));
+  }
+  rows.push(`<div class="goal-mini" style="cursor:pointer;opacity:0.6" onclick="showPage('${group}',document.querySelectorAll('.tab-btn')[${tabIdx}])"><span style="font-size:0.44rem;color:${areaColor};font-weight:500;">전체 보기 →</span></div>`);
+  el.innerHTML=rows.join('');
+}
 
 function rGoalPage(group){
   const f=gF[group];let list=D.goals.filter(g=>(AMAP[g.area]?.g||'personal')===group);
@@ -1114,16 +1126,27 @@ function rTodo(id,group){
   const items=all.slice(0,2);
   const extra=all.length-2;
   const el=document.getElementById(id);if(!el)return;
-  if(!items.length){el.innerHTML='<div class="ph-txt">할 일 없음</div>';return;}
   const today=new Date().toISOString().slice(0,10);
   const areaColor={family:'var(--family-c)',work:'var(--work-c)',personal:'var(--personal-c)'}[group]||'var(--text-s)';
-  const rows=items.map(t=>{
-    const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
-    return`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button></div>`;
-  });
-  if(extra>0){
-    rows.push(`<div class="todo-item" style="cursor:pointer" onclick="goToTodo('${group}')"><div style="width:0.85rem;height:0.85rem;border:1.5px dashed ${areaColor};border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.35rem;color:${areaColor};font-weight:700">+${extra}</div><span style="font-size:0.46rem;color:${areaColor};font-weight:600;flex:1;">개 더 보기 →</span></div>`);
+
+  // 할 일 행 (없으면 빈 행 2개로 고정)
+  const rows=[];
+  if(!items.length){
+    rows.push(`<div class="ph-txt">할 일 없음</div>`);
+  } else {
+    items.forEach(t=>{
+      const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;
+      const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';
+      const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
+      rows.push(`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button></div>`);
+    });
   }
+
+  // 더보기 행 — 항상 고정 표시 (extra 있으면 배지, 없으면 전체보기)
+  const extraBadge=extra>0?`<span style="display:inline-flex;align-items:center;justify-content:center;width:1rem;height:1rem;border-radius:50%;background:${areaColor};color:white;font-size:0.34rem;font-weight:700;flex-shrink:0;">+${extra}</span>`:`<span style="width:1rem;height:1rem;flex-shrink:0;"></span>`;
+  const moreLabel=extra>0?`<span style="font-size:0.44rem;color:${areaColor};font-weight:600;">${extra}개 더 · 전체 보기 →</span>`:`<span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">전체 보기 →</span>`;
+  rows.push(`<div class="todo-item" style="cursor:pointer;opacity:${extra>0?'1':'0.55'}" onclick="goToTodo('${group}')">${extraBadge}${moreLabel}</div>`);
+
   el.innerHTML=rows.join('');
 }
 
