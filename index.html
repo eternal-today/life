@@ -94,7 +94,9 @@ input,select,textarea{font-family:inherit;}
 
 /* sec-lbl: 위아래 동일 margin으로 여백 제어 */
 .sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin:0.4rem 0 0.2rem;display:flex;align-items:center;gap:0.4rem;}
-.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);order:1;}
+.sec-more{font-size:0.4rem;font-weight:500;color:var(--text-m);cursor:pointer;white-space:nowrap;letter-spacing:0;text-transform:none;order:2;flex-shrink:0;}
+.sec-more:hover{color:var(--text-s);}
 .goal-mini{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
 .goal-mini:last-child{border-bottom:none;padding-bottom:0.25rem;}
 .gm-bar-wrap{width:1.6rem;height:2px;background:var(--border);border-radius:2px;flex-shrink:0;}
@@ -381,8 +383,8 @@ input,select,textarea{font-family:inherit;}
       </div>
       <div class="area-body">
         <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-family-sched" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-family-todo" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-family-goals" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">할 일<a class="sec-more" onclick="goToTodo('family')">전체 보기 →</a></div><div id="home-family-todo" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표<a class="sec-more" onclick="showPage('family',document.querySelectorAll('.tab-btn')[1])">전체 보기 →</a></div><div id="home-family-goals" class="area-section-content"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('family',document.querySelectorAll('.tab-btn')[1])">전체 보기</button>
@@ -399,8 +401,8 @@ input,select,textarea{font-family:inherit;}
       </div>
       <div class="area-body">
         <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-work-sched" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-work-todo" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-work-goals" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">할 일<a class="sec-more" onclick="goToTodo('work')">전체 보기 →</a></div><div id="home-work-todo" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표<a class="sec-more" onclick="showPage('work',document.querySelectorAll('.tab-btn')[2])">전체 보기 →</a></div><div id="home-work-goals" class="area-section-content"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('work',document.querySelectorAll('.tab-btn')[2])">전체 보기</button>
@@ -417,8 +419,8 @@ input,select,textarea{font-family:inherit;}
       </div>
       <div class="area-body">
         <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-personal-sched" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">할 일</div><div id="home-personal-todo" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">진행 중 목표</div><div id="home-personal-goals" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">할 일<a class="sec-more" onclick="goToTodo('personal')">전체 보기 →</a></div><div id="home-personal-todo" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표<a class="sec-more" onclick="showPage('personal',document.querySelectorAll('.tab-btn')[3])">전체 보기 →</a></div><div id="home-personal-goals" class="area-section-content"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('personal',document.querySelectorAll('.tab-btn')[3])">전체 보기</button>
@@ -953,16 +955,8 @@ function openCalendar(e,group){
 
 function rMini(id,goals,color,group){
   const el=document.getElementById(id);if(!el)return;
-  const areaColor={family:'var(--family-c)',work:'var(--work-c)',personal:'var(--personal-c)'}[group]||color;
-  const tabIdx={family:1,work:2,personal:3}[group]||1;
-  const rows=[];
-  if(!goals.length){
-    rows.push('<div class="ph-txt">목표가 없습니다</div>');
-  } else {
-    goals.forEach(g=>rows.push(`<div class="goal-mini"><div class="gm-bar-wrap"><div class="gm-bar" style="width:${g.progress}%;background:${color}"></div></div><div class="gm-title">${esc(g.title)}</div><div class="gm-pct">${g.progress}%</div></div>`));
-  }
-  rows.push(`<div class="goal-mini" style="cursor:pointer;" onclick="showPage('${group}',document.querySelectorAll('.tab-btn')[${tabIdx}])"><span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">전체 보기 →</span></div>`);
-  el.innerHTML=rows.join('');
+  if(!goals.length){el.innerHTML='<div class="ph-txt">목표가 없습니다</div>';return;}
+  el.innerHTML=goals.map(g=>`<div class="goal-mini"><div class="gm-bar-wrap"><div class="gm-bar" style="width:${g.progress}%;background:${color}"></div></div><div class="gm-title">${esc(g.title)}</div><div class="gm-pct">${g.progress}%</div></div>`).join('');
 }
 
 function rGoalPage(group){
@@ -1143,11 +1137,10 @@ function rTodo(id,group){
     });
   }
 
-  // 더보기 행 — goal-mini와 동일한 구조, 그레이 컬러로 통일
-  const extraText=extra>0
-    ?`<span style="display:inline-flex;align-items:center;justify-content:center;width:0.9rem;height:0.9rem;border-radius:50%;background:${areaColor};color:white;font-size:0.32rem;font-weight:700;margin-right:0.25rem;flex-shrink:0;">+${extra}</span><span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">${extra}개 더 · 전체 보기 →</span>`
-    :`<span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">전체 보기 →</span>`;
-  rows.push(`<div class="goal-mini" style="cursor:pointer;" onclick="goToTodo('${group}')">${extraText}</div>`);
+  // extra 배지만 — 전체보기는 sec-lbl에 인라인으로 이동
+  if(extra>0){
+    rows.push(`<div class="goal-mini" onclick="goToTodo('${group}')" style="cursor:pointer;"><span style="display:inline-flex;align-items:center;justify-content:center;width:0.9rem;height:0.9rem;border-radius:50%;background:${areaColor};color:white;font-size:0.32rem;font-weight:700;margin-right:0.25rem;flex-shrink:0;">+${extra}</span><span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">${extra}개 더 있음</span></div>`);
+  }
 
   el.innerHTML=rows.join('');
 }
