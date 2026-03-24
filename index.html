@@ -385,7 +385,7 @@ input,select,textarea{font-family:inherit;}
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('family',document.querySelectorAll('.tab-btn')[1])">전체 보기</button>
-        <a class="btn-add-sm btn-add-cal" href="https://calendar.google.com/calendar/r/eventedit" target="_blank">+ 일정</a>
+        <a class="btn-add-sm btn-add-cal" href="#" onclick="openCalendar(event,'family')">+ 일정</a>
         <button class="btn-add-sm" style="background:#0891b2" onclick="openTodoModal('family')">+ 할 일</button>
         <button class="btn-add-sm" style="background:var(--family-c)" onclick="openGoalModal('family')">+ 목표</button>
       </div>
@@ -403,7 +403,7 @@ input,select,textarea{font-family:inherit;}
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('work',document.querySelectorAll('.tab-btn')[2])">전체 보기</button>
-        <a class="btn-add-sm btn-add-cal" href="https://calendar.google.com/calendar/r/eventedit" target="_blank">+ 일정</a>
+        <a class="btn-add-sm btn-add-cal" href="#" onclick="openCalendar(event,'work')">+ 일정</a>
         <button class="btn-add-sm" style="background:#0891b2" onclick="openTodoModal('work')">+ 할 일</button>
         <button class="btn-add-sm" style="background:var(--work-c)" onclick="openGoalModal('work')">+ 목표</button>
       </div>
@@ -421,7 +421,7 @@ input,select,textarea{font-family:inherit;}
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('personal',document.querySelectorAll('.tab-btn')[3])">전체 보기</button>
-        <a class="btn-add-sm btn-add-cal" href="https://calendar.google.com/calendar/r/eventedit" target="_blank">+ 일정</a>
+        <a class="btn-add-sm btn-add-cal" href="#" onclick="openCalendar(event,'personal')">+ 일정</a>
         <button class="btn-add-sm" style="background:#0891b2" onclick="openTodoModal('personal')">+ 할 일</button>
         <button class="btn-add-sm" style="background:var(--personal-c)" onclick="openGoalModal('personal')">+ 목표</button>
       </div>
