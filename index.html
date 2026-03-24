@@ -102,7 +102,7 @@ input,select,textarea{font-family:inherit;}
 .sched-time{font-size:0.42rem;color:var(--text-m);flex-shrink:0;width:1.6rem;font-weight:600;}
 .sched-title{font-size:0.52rem;color:var(--text-b);line-height:1.3;font-weight:500;flex:1;}
 .sched-arrow{font-size:0.5rem;color:var(--text-m);margin-left:auto;flex-shrink:0;}
-.btn-add-cal{display:inline-flex;align-items:center;justify-content:center;padding:0.3rem 0.55rem;border:1px solid var(--border);border-radius:var(--r-md);background:var(--subtle);font-family:inherit;font-size:0.42rem;font-weight:700;color:var(--text-h) !important;text-decoration:none;transition:all var(--ease);white-space:nowrap;flex:1;}
+.btn-add-cal{display:flex;align-items:center;justify-content:center;padding:0.3rem 0.25rem;border:1px solid var(--border);border-radius:var(--r-md);background:var(--subtle);font-family:inherit;font-size:0.42rem;font-weight:700;color:var(--text-h) !important;text-decoration:none;transition:all var(--ease);white-space:nowrap;flex:1;}
 .btn-add-cal:hover{background:var(--border);color:var(--text-h) !important;}
 .btn-add-cal:active{transform:scale(0.98);}
 .memo-mini{font-size:0.5rem;color:var(--text-s);line-height:1.5;background:var(--subtle);border-radius:var(--r-sm);padding:0.4rem 0.625rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
@@ -113,11 +113,11 @@ input,select,textarea{font-family:inherit;}
 .sub-dday{font-size:0.42rem;font-weight:700;color:var(--text-m);width:1.8rem;flex-shrink:0;}
 .sub-dday.soon{color:var(--danger);}
 .sub-mini-name{font-size:0.52rem;color:var(--text-b);font-weight:500;}
-.area-footer{padding:0.3rem 0.75rem;border-top:1px solid var(--border);display:flex;gap:0.3rem;align-items:center;flex-wrap:nowrap;overflow:hidden;}
-.btn-more{flex:1;padding:0.3rem 0.25rem;border:1px solid var(--border);border-radius:var(--r-md);background:none;font-size:0.42rem;font-weight:600;color:var(--text-s);transition:all var(--ease);white-space:nowrap;text-align:center;}
+.area-footer{padding:0.3rem 0.75rem;border-top:1px solid var(--border);display:flex;gap:0.3rem;align-items:stretch;flex-wrap:nowrap;overflow:hidden;}
+.btn-more{flex:1;padding:0.3rem 0.25rem;border:1px solid var(--border);border-radius:var(--r-md);background:none;font-size:0.42rem;font-weight:600;color:var(--text-s);transition:all var(--ease);white-space:nowrap;display:flex;align-items:center;justify-content:center;}
 .btn-more:hover{background:var(--subtle);}
 .btn-more:active{transform:scale(0.98);}
-.btn-add-sm{flex:1;padding:0.3rem 0.25rem;border:none;border-radius:var(--r-md);font-size:0.42rem;font-weight:700;color:white;transition:all var(--ease);white-space:nowrap;cursor:pointer;text-align:center;}
+.btn-add-sm{flex:1;padding:0.3rem 0.25rem;border:none;border-radius:var(--r-md);font-size:0.42rem;font-weight:700;color:white;transition:all var(--ease);white-space:nowrap;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .btn-add-sm:active{transform:scale(0.98);opacity:0.85;}
 
 /* 디테일 */
@@ -189,10 +189,10 @@ input,select,textarea{font-family:inherit;}
 .priority-mid{background:#f59e0b;}
 .priority-low{background:var(--text-m);}
 .pos{color:var(--success);font-weight:700;}.neg{color:var(--danger);font-weight:700;}
-.inv-tbl{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sh-xs);}
-.inv-tbl table{width:100%;border-collapse:collapse;}
-.inv-tbl th{text-align:left;padding:0.625rem 0.875rem;font-size:0.42rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-m);font-weight:600;background:var(--subtle);border-bottom:1px solid var(--border);}
-.inv-tbl td{padding:0.75rem 0.875rem;font-size:0.54rem;color:var(--text-b);border-bottom:1px solid var(--subtle);vertical-align:middle;}
+.inv-tbl{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow-x:auto;box-shadow:var(--sh-xs);}
+.inv-tbl table{width:100%;border-collapse:collapse;min-width:900px;}
+.inv-tbl th{text-align:left;padding:0.5rem 0.625rem;font-size:0.4rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-m);font-weight:600;background:var(--subtle);border-bottom:1px solid var(--border);white-space:nowrap;}
+.inv-tbl td{padding:0.5rem 0.625rem;font-size:0.5rem;color:var(--text-b);border-bottom:1px solid var(--subtle);vertical-align:middle;white-space:nowrap;}
 .inv-tbl tr:last-child td{border-bottom:none;}
 .inv-tbl tr:hover td{background:var(--subtle);}
 
@@ -1145,7 +1145,7 @@ function renderInvRow(i,sym){
   const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
   return`<tr>
     <td style="font-weight:600">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td>
-    <td><span class="tag" style="background:var(--subtle);color:var(--text-s)">${esc(i.category)}</span></td>
+    <td><span class="tag" style="background:var(--subtle);color:var(--text-s);white-space:nowrap">${esc(i.category)}</span></td>
     <td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td>
     <td style="text-align:right">${qty.toLocaleString()}</td>
     <td style="text-align:right">${i.costPrice?costDisp:'—'}</td>
@@ -1166,7 +1166,7 @@ function renderDebtRow(i,sym){
   const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';
   return`<tr style="background:#fef9f9">
     <td style="font-weight:600;color:var(--danger)">${esc(i.asset)}${i.memo?`<div style="font-size:0.4rem;font-weight:400;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</td>
-    <td><span class="tag" style="background:#fee2e2;color:var(--danger)">${esc(i.category)}</span></td>
+    <td><span class="tag" style="background:#fee2e2;color:var(--danger);white-space:nowrap">${esc(i.category)}</span></td>
     <td style="font-size:0.44rem;color:var(--text-m)">${i.currency||'KRW'}</td>
     <td style="text-align:right">${qty.toLocaleString()}</td>
     <td colspan="2" style="text-align:center;color:var(--text-m);font-size:0.44rem">—</td>
