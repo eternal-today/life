@@ -88,11 +88,12 @@ input,select,textarea{font-family:inherit;}
 
 /* ★ 수정 2: area-section 고정 min-height — 내용 유무 무관 레이아웃 통일 */
 .area-section{padding:0;display:flex;flex-direction:column;border-bottom:1px solid var(--border);min-height:4.5rem;}
+.area-section:first-child{padding-top:0.1rem;}
 .area-section:last-child{border-bottom:none;min-height:3.75rem;}
 .area-section-content{flex:1;display:flex;flex-direction:column;justify-content:flex-start;}
 
-/* sec-lbl: margin-top으로 섹션 상단 여백, margin-bottom으로 첫 항목과의 간격 통합 제어 */
-.sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin:0.3rem 0 0.25rem;display:flex;align-items:center;gap:0.4rem;}
+/* sec-lbl: margin-top 제거, bottom만 유지 — 구분선 바로 아래 붙음 */
+.sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin:0.25rem 0 0.25rem;display:flex;align-items:center;gap:0.4rem;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
 .goal-mini{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
 .goal-mini:last-child{border-bottom:none;margin-bottom:0;}
