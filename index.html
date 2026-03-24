@@ -92,7 +92,7 @@ input,select,textarea{font-family:inherit;}
 .area-section-content{flex:1;display:flex;flex-direction:column;justify-content:flex-start;}
 
 /* sec-lbl: 위아래 동일 margin으로 여백 제어 */
-.sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin:0.3rem 0 0.2rem;display:flex;align-items:center;gap:0.4rem;}
+.sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin:0.4rem 0 0.2rem;display:flex;align-items:center;gap:0.4rem;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
 .goal-mini{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
 .goal-mini:last-child{border-bottom:none;margin-bottom:0;}
@@ -324,7 +324,7 @@ input,select,textarea{font-family:inherit;}
   .tab-date-wrap{display:flex;}
   .tab-bar{top:2.75rem;}
   .area-grid{flex-direction:row;align-items:stretch;gap:1rem;}
-  .area-card{flex:1;height:19rem;}
+  .area-card{flex:1;height:18rem;}
   .area-header{padding:0.6rem 1.25rem;}
   .area-body{padding:0 1.25rem;}
   /* min-height 방식 제거 — 카드 고정 height + flex:1로 섹션 균등 분배 */
@@ -1079,14 +1079,16 @@ function rSubs(){
 
 function rTodo(id,group){
   const areaMap={family:'family',work:'work',personal:'personal',growth:'personal',health:'personal',side:'personal',finance:'personal'};
-  const items=D.todo.filter(t=>areaMap[t.area]===group||t.area===group).slice(0,3);
+  const all=D.todo.filter(t=>areaMap[t.area]===group||t.area===group);
+  const items=all.slice(0,2);
+  const extra=all.length-2;
   const el=document.getElementById(id);if(!el)return;
   if(!items.length){el.innerHTML='<div class="ph-txt">할 일 없음</div>';return;}
   const today=new Date().toISOString().slice(0,10);
   el.innerHTML=items.map(t=>{
     const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
     return`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button></div>`;
-  }).join('');
+  }).join('')+(extra>0?`<div class="ph-txt" style="color:var(--text-m);font-size:0.42rem;padding-top:0.15rem">+${extra}개 더</div>`:'');
 }
 
 function editMemoItem(id){
