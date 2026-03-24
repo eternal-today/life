@@ -86,9 +86,9 @@ input,select,textarea{font-family:inherit;}
 /* ★ 수정 1: area-body flex:1로 카드 내 세 섹션이 균등 공간 점유 */
 .area-body{padding:0 1rem;display:flex;flex-direction:column;flex:1;}
 
-/* ★ 수정 2: area-section flex:1 균등 분배 — min-height 대신 카드 고정 height로 통일 */
-.area-section{padding:0;display:flex;flex-direction:column;flex:1;border-bottom:1px solid var(--border);}
-.area-section:last-child{border-bottom:none;}
+/* ★ 수정 2: 모바일 area-section min-height, 데스크탑은 카드 고정 height로 통일 */
+.area-section{padding:0;display:flex;flex-direction:column;flex:1;border-bottom:1px solid var(--border);min-height:4rem;}
+.area-section:last-child{border-bottom:none;min-height:3.25rem;}
 .area-section-content{flex:1;display:flex;flex-direction:column;justify-content:flex-start;}
 
 /* sec-lbl: 위아래 동일 margin으로 여백 제어 */
