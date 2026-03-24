@@ -383,8 +383,8 @@ input,select,textarea{font-family:inherit;}
       </div>
       <div class="area-body">
         <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-family-sched" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">할 일<a class="sec-more" onclick="goToTodo('family')">전체 보기 →</a></div><div id="home-family-todo" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">진행 중 목표<a class="sec-more" onclick="showPage('family',document.querySelectorAll('.tab-btn')[1])">전체 보기 →</a></div><div id="home-family-goals" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">할 일<a class="sec-more" onclick="goToTodo('family')">more</a></div><div id="home-family-todo" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표<a class="sec-more" onclick="showPage('family',document.querySelectorAll('.tab-btn')[1])">more</a></div><div id="home-family-goals" class="area-section-content"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('family',document.querySelectorAll('.tab-btn')[1])">전체 보기</button>
@@ -401,8 +401,8 @@ input,select,textarea{font-family:inherit;}
       </div>
       <div class="area-body">
         <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-work-sched" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">할 일<a class="sec-more" onclick="goToTodo('work')">전체 보기 →</a></div><div id="home-work-todo" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">진행 중 목표<a class="sec-more" onclick="showPage('work',document.querySelectorAll('.tab-btn')[2])">전체 보기 →</a></div><div id="home-work-goals" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">할 일<a class="sec-more" onclick="goToTodo('work')">more</a></div><div id="home-work-todo" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표<a class="sec-more" onclick="showPage('work',document.querySelectorAll('.tab-btn')[2])">more</a></div><div id="home-work-goals" class="area-section-content"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('work',document.querySelectorAll('.tab-btn')[2])">전체 보기</button>
@@ -419,8 +419,8 @@ input,select,textarea{font-family:inherit;}
       </div>
       <div class="area-body">
         <div class="area-section"><div class="sec-lbl">이번 주 일정</div><div id="home-personal-sched" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">할 일<a class="sec-more" onclick="goToTodo('personal')">전체 보기 →</a></div><div id="home-personal-todo" class="area-section-content"></div></div>
-        <div class="area-section"><div class="sec-lbl">진행 중 목표<a class="sec-more" onclick="showPage('personal',document.querySelectorAll('.tab-btn')[3])">전체 보기 →</a></div><div id="home-personal-goals" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">할 일<a class="sec-more" onclick="goToTodo('personal')">more</a></div><div id="home-personal-todo" class="area-section-content"></div></div>
+        <div class="area-section"><div class="sec-lbl">진행 중 목표<a class="sec-more" onclick="showPage('personal',document.querySelectorAll('.tab-btn')[3])">more</a></div><div id="home-personal-goals" class="area-section-content"></div></div>
       </div>
       <div class="area-footer">
         <button class="btn-more" onclick="showPage('personal',document.querySelectorAll('.tab-btn')[3])">전체 보기</button>
@@ -1124,25 +1124,20 @@ function rTodo(id,group){
   const today=new Date().toISOString().slice(0,10);
   const areaColor={family:'var(--family-c)',work:'var(--work-c)',personal:'var(--personal-c)'}[group]||'var(--text-s)';
 
-  // 할 일 행 (없으면 빈 행 2개로 고정)
-  const rows=[];
-  if(!items.length){
-    rows.push(`<div class="ph-txt">할 일 없음</div>`);
-  } else {
-    items.forEach(t=>{
-      const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;
-      const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';
-      const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
-      rows.push(`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button></div>`);
-    });
-  }
+  if(!items.length){el.innerHTML='<div class="ph-txt">할 일 없음</div>';return;}
 
-  // extra 배지만 — 전체보기는 sec-lbl에 인라인으로 이동
-  if(extra>0){
-    rows.push(`<div class="goal-mini" onclick="goToTodo('${group}')" style="cursor:pointer;"><span style="display:inline-flex;align-items:center;justify-content:center;width:0.9rem;height:0.9rem;border-radius:50%;background:${areaColor};color:white;font-size:0.32rem;font-weight:700;margin-right:0.25rem;flex-shrink:0;">+${extra}</span><span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">${extra}개 더 있음</span></div>`);
-  }
+  // extra 배지는 마지막 항목 끝에 인라인으로 삽입 — 별도 행 없음
+  const extraBadge=extra>0
+    ?`<span onclick="goToTodo('${group}')" style="display:inline-flex;align-items:center;justify-content:center;width:0.85rem;height:0.85rem;border-radius:50%;background:${areaColor};color:white;font-size:0.3rem;font-weight:700;margin-left:0.25rem;flex-shrink:0;cursor:pointer;" title="+${extra}개 더">+${extra}</span>`
+    :'';
 
-  el.innerHTML=rows.join('');
+  el.innerHTML=items.map((t,i)=>{
+    const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;
+    const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';
+    const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
+    const isLast=i===items.length-1;
+    return`<div class="todo-item"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button>${isLast?extraBadge:''}</div>`;
+  }).join('');
 }
 
 function editMemoItem(id){
