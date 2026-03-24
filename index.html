@@ -98,7 +98,7 @@ input,select,textarea{font-family:inherit;}
 .goal-mini:last-child{border-bottom:none;margin-bottom:0;}
 .gm-bar-wrap{width:1.6rem;height:2px;background:var(--border);border-radius:2px;flex-shrink:0;}
 .gm-bar{height:100%;border-radius:2px;}
-.gm-title{flex:1;font-size:0.52rem;color:var(--text-b);line-height:1.25;font-weight:500;}
+.gm-title{flex:1;font-size:0.52rem;color:var(--text-b);line-height:1.25;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .gm-pct{font-size:0.42rem;color:var(--text-m);flex-shrink:0;font-weight:600;}
 .sched-item{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
 .sched-item:last-child{border-bottom:none;}
@@ -110,7 +110,7 @@ input,select,textarea{font-family:inherit;}
 .sched-link:hover{background:var(--subtle);}
 .sched-link:active{background:var(--border);}
 .sched-time{font-size:0.42rem;color:var(--text-m);flex-shrink:0;width:1.6rem;font-weight:600;}
-.sched-title{font-size:0.52rem;color:var(--text-b);line-height:1.3;font-weight:500;flex:1;}
+.sched-title{font-size:0.52rem;color:var(--text-b);line-height:1.3;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .sched-arrow{font-size:0.5rem;color:var(--text-m);margin-left:auto;flex-shrink:0;}
 .btn-add-cal{display:flex;align-items:center;justify-content:center;flex:1;height:1.6rem;border:1px solid var(--border);border-radius:var(--r-md);background:var(--subtle);font-family:inherit;font-size:0.42rem;font-weight:700;color:var(--text-h) !important;text-decoration:none;transition:all var(--ease);white-space:nowrap;}
 .btn-add-cal:hover{background:var(--border);color:var(--text-h) !important;}
@@ -190,7 +190,7 @@ input,select,textarea{font-family:inherit;}
 .todo-check:hover{border-color:var(--primary);}
 .todo-check.done{background:var(--primary);border-color:var(--primary);}
 .todo-check.done::after{content:'✓';font-size:0.35rem;color:white;font-weight:700;}
-.todo-title{font-size:0.5rem;color:var(--text-b);flex:1;line-height:1.4;}
+.todo-title{font-size:0.5rem;color:var(--text-b);flex:1;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .todo-title.done{text-decoration:line-through;color:var(--text-m);}
 .todo-due{font-size:0.4rem;color:var(--text-m);flex-shrink:0;}
 .todo-due.overdue{color:var(--danger);font-weight:700;}
