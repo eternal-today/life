@@ -32,7 +32,8 @@ input,select,textarea{font-family:inherit;}
 .header-logo{font-size:1rem;font-weight:700;color:var(--text-h);letter-spacing:-0.02em;}
 .header-logo em{color:var(--text-m);font-style:normal;font-weight:400;}
 .header-right{display:flex;align-items:center;gap:0.625rem;}
-.sync-wrap{display:flex;align-items:center;gap:0.3rem;}
+.sync-wrap{display:flex;align-items:center;gap:0.3rem;padding:0.25rem 0.5rem;border-radius:var(--r-md);transition:background var(--ease);}
+.sync-wrap:hover{background:var(--subtle);}
 .sync-dot{width:0.35rem;height:0.35rem;border-radius:50%;background:var(--text-m);flex-shrink:0;}
 .sync-dot.ok{background:var(--success);}
 .sync-txt{font-size:0.5rem;color:var(--text-m);font-weight:600;}
@@ -95,7 +96,7 @@ input,select,textarea{font-family:inherit;}
 .sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin:0.4rem 0 0.2rem;display:flex;align-items:center;gap:0.4rem;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
 .goal-mini{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
-.goal-mini:last-child{border-bottom:none;margin-bottom:0;}
+.goal-mini:last-child{border-bottom:none;padding-bottom:0.25rem;}
 .gm-bar-wrap{width:1.6rem;height:2px;background:var(--border);border-radius:2px;flex-shrink:0;}
 .gm-bar{height:100%;border-radius:2px;}
 .gm-title{flex:1;font-size:0.52rem;color:var(--text-b);line-height:1.25;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
@@ -185,7 +186,7 @@ input,select,textarea{font-family:inherit;}
 .btn-ord:hover{background:var(--subtle);}
 .item-actions{display:flex;gap:0.25rem;margin-top:0.3rem;flex-wrap:wrap;}
 .todo-item{display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--subtle);}
-.todo-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.todo-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0.25rem;}
 .todo-check{width:0.85rem;height:0.85rem;border:1.5px solid var(--border);border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--ease);background:var(--surface);}
 .todo-check:hover{border-color:var(--primary);}
 .todo-check.done{background:var(--primary);border-color:var(--primary);}
@@ -346,9 +347,9 @@ input,select,textarea{font-family:inherit;}
 <body>
 <header class="app-header">
   <div class="header-inner">
-    <div class="header-logo" onclick="syncNow()" style="cursor:pointer;">Eternal <em>Today</em></div>
+    <div class="header-logo" onclick="showPage('home',document.querySelectorAll('.tab-btn')[0])" style="cursor:pointer;">Eternal <em>Today</em></div>
     <div class="header-right">
-      <div class="sync-wrap"><div class="sync-dot" id="syncDot"></div><span class="sync-txt" id="syncTxt">데모</span></div>
+      <div class="sync-wrap" onclick="syncNow()" style="cursor:pointer;" title="클릭하여 동기화"><div class="sync-dot" id="syncDot"></div><span class="sync-txt" id="syncTxt">데모</span></div>
       <button class="btn-icon" onclick="openDrawer()">⚙</button>
     </div>
   </div>
@@ -960,7 +961,7 @@ function rMini(id,goals,color,group){
   } else {
     goals.forEach(g=>rows.push(`<div class="goal-mini"><div class="gm-bar-wrap"><div class="gm-bar" style="width:${g.progress}%;background:${color}"></div></div><div class="gm-title">${esc(g.title)}</div><div class="gm-pct">${g.progress}%</div></div>`));
   }
-  rows.push(`<div class="goal-mini" style="cursor:pointer;opacity:0.6" onclick="showPage('${group}',document.querySelectorAll('.tab-btn')[${tabIdx}])"><span style="font-size:0.44rem;color:${areaColor};font-weight:500;">전체 보기 →</span></div>`);
+  rows.push(`<div class="goal-mini" style="cursor:pointer;" onclick="showPage('${group}',document.querySelectorAll('.tab-btn')[${tabIdx}])"><span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">전체 보기 →</span></div>`);
   el.innerHTML=rows.join('');
 }
 
@@ -1142,10 +1143,11 @@ function rTodo(id,group){
     });
   }
 
-  // 더보기 행 — 항상 고정 표시 (extra 있으면 배지, 없으면 전체보기)
-  const extraBadge=extra>0?`<span style="display:inline-flex;align-items:center;justify-content:center;width:1rem;height:1rem;border-radius:50%;background:${areaColor};color:white;font-size:0.34rem;font-weight:700;flex-shrink:0;">+${extra}</span>`:`<span style="width:1rem;height:1rem;flex-shrink:0;"></span>`;
-  const moreLabel=extra>0?`<span style="font-size:0.44rem;color:${areaColor};font-weight:600;">${extra}개 더 · 전체 보기 →</span>`:`<span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">전체 보기 →</span>`;
-  rows.push(`<div class="todo-item" style="cursor:pointer;opacity:${extra>0?'1':'0.55'}" onclick="goToTodo('${group}')">${extraBadge}${moreLabel}</div>`);
+  // 더보기 행 — goal-mini와 동일한 구조, 그레이 컬러로 통일
+  const extraText=extra>0
+    ?`<span style="display:inline-flex;align-items:center;justify-content:center;width:0.9rem;height:0.9rem;border-radius:50%;background:${areaColor};color:white;font-size:0.32rem;font-weight:700;margin-right:0.25rem;flex-shrink:0;">+${extra}</span><span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">${extra}개 더 · 전체 보기 →</span>`
+    :`<span style="font-size:0.44rem;color:var(--text-m);font-weight:500;">전체 보기 →</span>`;
+  rows.push(`<div class="goal-mini" style="cursor:pointer;" onclick="goToTodo('${group}')">${extraText}</div>`);
 
   el.innerHTML=rows.join('');
 }
