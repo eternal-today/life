@@ -102,7 +102,7 @@ input,select,textarea{font-family:inherit;}
 .sched-time{font-size:0.42rem;color:var(--text-m);flex-shrink:0;width:1.6rem;font-weight:600;}
 .sched-title{font-size:0.52rem;color:var(--text-b);line-height:1.3;font-weight:500;flex:1;}
 .sched-arrow{font-size:0.5rem;color:var(--text-m);margin-left:auto;flex-shrink:0;}
-.btn-add-cal{display:inline-flex;align-items:center;justify-content:center;padding:0.3rem 0.55rem;border:1px solid var(--border);border-radius:var(--r-md);background:var(--subtle);font-family:inherit;font-size:0.42rem;font-weight:700;color:var(--text-b);text-decoration:none;transition:all var(--ease);white-space:nowrap;flex-shrink:0;}
+.btn-add-cal{display:inline-flex;align-items:center;justify-content:center;padding:0.3rem 0.55rem;border:1px solid var(--border);border-radius:var(--r-md);background:var(--subtle);font-family:inherit;font-size:0.42rem;font-weight:700;color:var(--text-h);text-decoration:none;transition:all var(--ease);white-space:nowrap;flex-shrink:0;}
 .btn-add-cal:hover{background:var(--border);color:var(--text-h);}
 .btn-add-cal:active{transform:scale(0.98);}
 .memo-mini{font-size:0.5rem;color:var(--text-s);line-height:1.5;background:var(--subtle);border-radius:var(--r-sm);padding:0.4rem 0.625rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
@@ -114,10 +114,10 @@ input,select,textarea{font-family:inherit;}
 .sub-dday.soon{color:var(--danger);}
 .sub-mini-name{font-size:0.52rem;color:var(--text-b);font-weight:500;}
 .area-footer{padding:0.3rem 0.75rem;border-top:1px solid var(--border);display:flex;gap:0.3rem;align-items:center;flex-wrap:nowrap;overflow:hidden;}
-.btn-more{flex-shrink:0;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:var(--r-md);background:none;font-size:0.42rem;font-weight:600;color:var(--text-s);transition:all var(--ease);white-space:nowrap;}
+.btn-more{flex:1;padding:0.3rem 0.25rem;border:1px solid var(--border);border-radius:var(--r-md);background:none;font-size:0.42rem;font-weight:600;color:var(--text-s);transition:all var(--ease);white-space:nowrap;text-align:center;}
 .btn-more:hover{background:var(--subtle);}
 .btn-more:active{transform:scale(0.98);}
-.btn-add-sm{flex-shrink:0;padding:0.3rem 0.55rem;border:none;border-radius:var(--r-md);font-size:0.42rem;font-weight:700;color:white;transition:all var(--ease);white-space:nowrap;cursor:pointer;}
+.btn-add-sm{flex:1;padding:0.3rem 0.25rem;border:none;border-radius:var(--r-md);font-size:0.42rem;font-weight:700;color:white;transition:all var(--ease);white-space:nowrap;cursor:pointer;text-align:center;}
 .btn-add-sm:active{transform:scale(0.98);opacity:0.85;}
 
 /* 디테일 */
@@ -989,7 +989,7 @@ function rSched(id,g){
   const el=document.getElementById(id);
   if(!el)return;
   if(!items.length){
-    el.innerHTML=`<a class="sched-link" href="#" onclick="openCalendar(event,'${g}')"><span class="sched-time" style="color:var(--text-m)">+</span><span class="sched-title" style="color:var(--text-m)">새 일정 추가</span></a>`;
+    el.innerHTML='<div class="ph-txt">이번 주 일정 없음</div>';
     return;
   }
   el.innerHTML=items.map(s=>{
@@ -1433,7 +1433,7 @@ function rTodo(id, group){
   const el=document.getElementById(id);
   if(!el)return;
   if(!items.length){
-    el.innerHTML=`<div class="ph-txt" style="cursor:pointer" onclick="openTodoModal('${group}')">+ 할 일 추가</div>`;
+    el.innerHTML='<div class="ph-txt">할 일 없음</div>';
     return;
   }
   const today=new Date().toISOString().slice(0,10);
@@ -1462,8 +1462,6 @@ function openTodoModal(area){
 async function saveTodo(){
   const title=document.getElementById('tTitle').value.trim();
   if(!title){showToast('제목을 입력해주세요','error');return;}
-  const btn=document.getElementById('bSaveTodo');
-  btn.disabled=true;btn.textContent='저장 중...';
   const VALID_AREAS=['family','work','personal'];
   const VALID_PRIORITY=['높음','보통','낮음'];
   const area=VALID_AREAS.includes(document.getElementById('tArea').value)?document.getElementById('tArea').value:'personal';
@@ -1472,25 +1470,20 @@ async function saveTodo(){
   const editId=document.getElementById('tEditId').value;
   const t={id:editId||'l'+Date.now(),title:title.slice(0,200),area,priority,due,done:false};
 
-  if(!cfg.token){showToast('❌ Notion Token이 없습니다. 설정을 확인해주세요.','error');btn.disabled=false;btn.textContent='저장';return;}
-  if(!cfg.todo){showToast('❌ Todo DB ID가 없습니다. 설정을 확인해주세요.','error');btn.disabled=false;btn.textContent='저장';return;}
+  if(!cfg.token){showToast('❌ Notion Token이 없습니다.','error');return;}
+  if(!cfg.todo){showToast('❌ Todo DB ID가 없습니다.','error');return;}
 
-  try{
-    const props={Title:{title:[{text:{content:t.title}}]},Area:{select:{name:t.area}},Priority:{select:{name:t.priority}},Done:{checkbox:false},...(t.due?{Due:{date:{start:t.due}}}:{})};
-    if(editId) await nFetch(`pages/${editId}`,'PATCH',{properties:props});
-    else await mkPage(cfg.todo,props);
-  }catch(e){
-    console.error('saveTodo error:',e);
-    showToast(`❌ Notion 저장 실패 (${e.message}) — Todo DB에 Connection이 추가됐는지 확인해주세요.`,'error');
-    btn.disabled=false;btn.textContent='저장';
-    return;
-  }
-
+  // UI 즉시 반응
   if(editId){const idx=D.todo.findIndex(x=>x.id===editId);if(idx>-1)D.todo[idx]=t;}
   else D.todo.unshift(t);
-  render();closeModal('todoModal');
-  btn.disabled=false;btn.textContent='저장';
+  render();
+  closeModal('todoModal');
   showToast('✅ 할 일 저장 완료!','success');
+
+  // Notion 저장은 백그라운드
+  const props={Title:{title:[{text:{content:t.title}}]},Area:{select:{name:t.area}},Priority:{select:{name:t.priority}},Done:{checkbox:false},...(t.due?{Due:{date:{start:t.due}}}:{})};
+  if(editId) nFetch(`pages/${editId}`,'PATCH',{properties:props}).catch(e=>console.warn('Todo update failed:',e));
+  else mkPage(cfg.todo,props).catch(e=>console.warn('Todo create failed:',e));
 }
 
 async function completeTodo(id){
