@@ -83,7 +83,7 @@ input,select,textarea{font-family:inherit;}
 .area-badge{font-size:0.44rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:20px;}
 .area-arrow{font-size:0.7rem;color:var(--text-m);}
 .area-body{flex:1;padding:0.375rem 1rem;display:flex;flex-direction:column;}
-.area-section{flex:1;padding:0.5rem 0;display:flex;flex-direction:column;border-bottom:1px solid var(--border);}
+.area-section{flex:1;padding:0.5rem 0;display:flex;flex-direction:column;border-bottom:1px solid var(--border);min-height:3.5rem;}
 .area-section:last-child{border-bottom:none;}
 .sec-lbl{font-size:0.42rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin-bottom:0.25rem;display:flex;align-items:center;gap:0.4rem;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -722,6 +722,29 @@ input,select,textarea{font-family:inherit;}
   <div class="m-acts"><button class="m-cancel" onclick="closeModal('todoModal')">취소</button><button class="m-save" id="bSaveTodo" onclick="saveTodo()">저장</button></div>
 </div></div>
 
+<div class="m-wrap" id="memoEditModal"><div class="modal">
+  <div class="modal-handle"></div>
+  <div class="m-title">메모 수정</div>
+  <input type="hidden" id="meEditId" value="">
+  <div class="m-fr"><textarea class="m-ta" id="meText" placeholder="메모 내용..."></textarea></div>
+  <div class="m-row2" style="margin-bottom:0.75rem;align-items:center">
+    <div><label class="m-fl">영역</label>
+      <select class="m-sel" id="meArea">
+        <option value="">영역 없음</option>
+        <option value="growth">개인 성장</option>
+        <option value="health">건강</option>
+        <option value="side">사이드</option>
+        <option value="finance">재테크</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:0.75rem;align-items:center;padding-top:1rem">
+      <label class="nm-pin"><input type="checkbox" id="mePin"> 📌 고정</label>
+      <label class="nm-pin"><input type="checkbox" id="meDash"> 🏠 대시보드</label>
+    </div>
+  </div>
+  <div class="m-acts"><button class="m-cancel" onclick="closeModal('memoEditModal')">취소</button><button class="m-save" onclick="saveMemoEdit()">저장</button></div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -806,6 +829,32 @@ async function decrypt(str, seed){
   }catch(e){return '';}
 }
 
+/* ── 설정 저장 ── */
+async function saveCfg(){
+  CFG_KEYS.forEach((k,i)=>{const el=document.getElementById(CFG_IDS[i]);if(el)cfg[k]=el.value.trim();});
+
+  // Token → 기기 고유키로 암호화 후 localStorage
+  try{
+    if(cfg.token){
+      const enc=await encrypt(cfg.token, getDeviceSeed());
+      if(enc) localStorage.setItem('et_tok',enc);
+    } else {
+      localStorage.removeItem('et_tok');
+    }
+    localStorage.removeItem('el_t');
+    sessionStorage.removeItem('et_token');
+  }catch(e){}
+
+  // 나머지 → URL 해시 암호화 + localStorage 동시 저장
+  const hashObj={};
+  HASH_KEYS.forEach(k=>{hashObj[k]=cfg[k]||'';});
+  const enc=await encrypt(JSON.stringify(hashObj),'EternalToday-Hash-2026');
+  if(enc){
+    history.replaceState(null,'','#'+enc);
+    try{localStorage.setItem('et_cfg',enc);}catch(e){}
+  }
+}
+
 /* ── 설정 로드 ── */
 async function loadCfg(){
   // 1. Token → localStorage (기기 고유키로 암호화)
@@ -821,24 +870,28 @@ async function loadCfg(){
     }
   }catch(e){}
 
-  // 2. 나머지 → URL 해시 복호화
+  // 2. URL 해시 + localStorage 중 최신값 사용, 누락 키는 보충
   const hash=location.hash.slice(1);
-  if(hash){
-    const plain=await decrypt(hash,'EternalToday-Hash-2026');
-    if(plain){
-      try{
-        const obj=JSON.parse(plain);
-        HASH_KEYS.forEach((k,i)=>{
-          cfg[k]=obj[k]||'';
-          const el=document.getElementById(HASH_IDS[i]);
-          if(el)el.value=cfg[k];
-        });
-        return;
-      }catch(e){}
-    }
+  const lsEnc=localStorage.getItem('et_cfg')||'';
+  let hashObj=null, lsObj=null;
+  if(hash){const p=await decrypt(hash,'EternalToday-Hash-2026');if(p){try{hashObj=JSON.parse(p);}catch(e){}}}
+  if(lsEnc){const p=await decrypt(lsEnc,'EternalToday-Hash-2026');if(p){try{lsObj=JSON.parse(p);}catch(e){}}}
+
+  // 두 소스 병합 — URL 해시 우선, 없는 키는 localStorage로 채움
+  const obj=hashObj||lsObj;
+  if(obj){
+    if(hashObj&&lsObj){HASH_KEYS.forEach(k=>{if(!hashObj[k]&&lsObj[k])obj[k]=lsObj[k];});}
+    HASH_KEYS.forEach((k,i)=>{
+      cfg[k]=obj[k]||'';
+      const el=document.getElementById(HASH_IDS[i]);
+      if(el)el.value=cfg[k];
+    });
+    // 로드된 값을 localStorage에도 최신화
+    if(hashObj&&hash){try{localStorage.setItem('et_cfg',hash);}catch(e){}}
+    return;
   }
 
-  // 3. 하위 호환 — localStorage
+  // 3. 구버전 하위 호환
   try{
     const LS={cGoals:'el_g',cInvest:'el_i',cSubs:'el_s',cMemo:'el_m',cProxy:'el_p',cCalFamily:'el_cf',cCalWork:'el_cw',cCalPersonal:'el_cp'};
     Object.entries(LS).forEach(([id,lk])=>{
@@ -846,30 +899,6 @@ async function loadCfg(){
       if(k){cfg[k]=localStorage.getItem(lk)||'';const el=document.getElementById(id);if(el)el.value=cfg[k];}
     });
   }catch(e){}
-}
-
-/* ── 설정 저장 ── */
-async function saveCfg(){
-  CFG_KEYS.forEach((k,i)=>{const el=document.getElementById(CFG_IDS[i]);if(el)cfg[k]=el.value.trim();});
-
-  // Token → 기기 고유키로 암호화 후 localStorage
-  try{
-    if(cfg.token){
-      const enc=await encrypt(cfg.token, getDeviceSeed());
-      if(enc) localStorage.setItem('et_tok',enc);
-    } else {
-      localStorage.removeItem('et_tok');
-    }
-    // 구버전 잔재 제거
-    localStorage.removeItem('el_t');
-    sessionStorage.removeItem('et_token');
-  }catch(e){}
-
-  // 나머지 → URL 해시 암호화
-  const hashObj={};
-  HASH_KEYS.forEach(k=>{hashObj[k]=cfg[k]||'';});
-  const enc=await encrypt(JSON.stringify(hashObj),'EternalToday-Hash-2026');
-  if(enc) history.replaceState(null,'','#'+enc);
 }
 
 async function nFetch(path,method='GET',body=null,retry=0){
@@ -1459,10 +1488,58 @@ function rTodo(id, group){
       <div class="todo-priority ${pClass}"></div>
       <span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>
       ${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}
+      <button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button>
     </div>`;
   }).join('');
 }
 
+function editMemoItem(id){
+  const m=D.memo.find(x=>x.id===id);
+  if(!m)return;
+  document.getElementById('meEditId').value=m.id;
+  document.getElementById('meText').value=m.content;
+  document.getElementById('meArea').value=m.area||'';
+  document.getElementById('mePin').checked=m.pinned||false;
+  document.getElementById('meDash').checked=m.showInDash!==false;
+  openModal('memoEditModal');
+}
+async function saveMemoEdit(){
+  const id=document.getElementById('meEditId').value;
+  const content=document.getElementById('meText').value.trim().slice(0,1000);
+  if(!content){showToast('내용을 입력해주세요','error');return;}
+  const area=document.getElementById('meArea').value;
+  const pinned=document.getElementById('mePin').checked;
+  const showInDash=document.getElementById('meDash').checked;
+  const idx=D.memo.findIndex(x=>x.id===id);
+  if(idx>-1){D.memo[idx]={...D.memo[idx],content,area,pinned,showInDash};}
+  rMemo();rHome();closeModal('memoEditModal');
+  showToast('✅ 메모 수정 완료!','success');
+  // Notion 백그라운드 저장
+  if(cfg.token&&cfg.memo){
+    nFetch(`pages/${id}`,'PATCH',{properties:{Content:{title:[{text:{content}}]},Area:area?{select:{name:area}}:{select:null},Pinned:{checkbox:pinned},ShowInDash:{checkbox:showInDash}}}).catch(e=>console.warn('memo edit failed:',e));
+  }
+}
+function confirmDelMemo(id,preview){
+  if(!confirm(`"${preview}..." 메모를 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`)) return;
+  deleteMemo(id);
+}
+async function deleteMemo(id){
+  if(cfg.token){nFetch(`pages/${id}`,'PATCH',{archived:true}).catch(e=>console.warn('memo delete failed:',e));}
+  D.memo=D.memo.filter(x=>x.id!==id);
+  rMemo();rHome();
+  showToast('🗑 메모가 삭제됐습니다.','success');
+}
+function editTodoItem(id){
+  const t=D.todo.find(x=>x.id===id);
+  if(!t)return;
+  document.getElementById('todoModalTitle').textContent='할 일 수정';
+  document.getElementById('tEditId').value=t.id;
+  document.getElementById('tTitle').value=t.title;
+  document.getElementById('tArea').value=t.area||'personal';
+  document.getElementById('tPriority').value=t.priority||'보통';
+  document.getElementById('tDue').value=t.due||'';
+  openModal('todoModal');
+}
 function openTodoModal(area){
   document.getElementById('todoModalTitle').textContent='할 일 추가';
   document.getElementById('tEditId').value='';
@@ -1522,7 +1599,21 @@ function rMemo(){
   const list=[...D.memo].sort((a,b)=>(b.pinned-a.pinned)||(new Date(b.createdAt)-new Date(a.createdAt)));
   const el=document.getElementById('memoList');
   if(!list.length){el.innerHTML='<div class="empty-msg"><p>메모가 없습니다</p></div>';return;}
-  el.innerHTML=list.map(m=>{const a=AMAP[m.area];return`<div class="memo-card ${m.pinned?'pinned':''}"><div class="mc-top">${m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':''}${a?`<span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span>`:''}</div><div class="mc-text">${esc(m.content)}</div><div class="mc-foot">${fdt(m.createdAt)}</div></div>`;}).join('');
+  el.innerHTML=list.map(m=>{
+    const a=AMAP[m.area];
+    return`<div class="memo-card ${m.pinned?'pinned':''}">
+      <div class="mc-top">
+        ${m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':''}
+        ${a?`<span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span>`:''}
+        <div style="margin-left:auto;display:flex;gap:0.25rem">
+          <button class="inv-edit-btn" onclick="editMemoItem('${m.id}')">수정</button>
+          <button class="btn-del" onclick="confirmDelMemo('${m.id}','${esc(m.content).slice(0,15)}')">삭제</button>
+        </div>
+      </div>
+      <div class="mc-text">${esc(m.content)}</div>
+      <div class="mc-foot">${fdt(m.createdAt)}</div>
+    </div>`;
+  }).join('');
 }
 
 function showPage(id,btn){
