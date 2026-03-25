@@ -576,7 +576,7 @@ input,select,textarea{font-family:inherit;}
         <div class="nm-title">새 메모</div>
         <textarea class="nm-ta" id="nmText" placeholder="생각, 아이디어, 기록..."></textarea>
         <div class="nm-opts">
-          <select class="nm-sel" id="nmArea"><option value="">영역 선택</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
+          <select class="nm-sel" id="nmArea"><option value="">영역 선택</option><option value="family">가정</option><option value="work">회사</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
           <label class="nm-pin"><input type="checkbox" id="nmPin"> 고정</label>
           <label class="nm-pin"><input type="checkbox" id="nmDash" checked> 🏠 대시보드</label>
           <button class="nm-save" onclick="saveMemo()">저장</button>
@@ -628,7 +628,7 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div class="d-sec">
     <div class="d-lbl">DB 컬럼 구조</div>
-    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타/주택담보대출/신용대출/마이너스통장/기타대출) · Currency(KRW/USD/EUR/JPY/GBP) · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo(Text) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category · Fee · Currency · FeeKRW · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Todo:</b> Title · Area(select: family/work/personal) · Priority(select: 높음/보통/낮음) · Due(Date) · Done(Checkbox)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · ShowInDash(Checkbox) · CreatedAt(Created time)</div>
+    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타/주택담보대출/신용대출/마이너스통장/기타대출) · Currency(KRW/USD/EUR/JPY/GBP) · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo(Text) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category · Fee · Currency · FeeKRW · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Todo:</b> Title · Area(select: family/work/personal) · Priority(select: 높음/보통/낮음) · Due(Date) · Done(Checkbox)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · ShowInDash(Checkbox) · CreatedAt(Created time) · <b>LinkedTodo(Text) ← 할 일 결과 기록용</b></div>
   </div>
 </div>
 
@@ -744,7 +744,7 @@ input,select,textarea{font-family:inherit;}
   <div class="m-fr"><textarea class="m-ta" id="meText" placeholder="메모 내용..."></textarea></div>
   <div class="m-row2" style="margin-bottom:0.75rem;align-items:center">
     <div><label class="m-fl">영역</label>
-      <select class="m-sel" id="meArea"><option value="">영역 없음</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
+      <select class="m-sel" id="meArea"><option value="">영역 없음</option><option value="family">가정</option><option value="work">회사</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
     </div>
     <div style="display:flex;gap:0.75rem;align-items:center;padding-top:1rem">
       <label class="nm-pin"><input type="checkbox" id="mePin"> 📌 고정</label>
@@ -752,6 +752,23 @@ input,select,textarea{font-family:inherit;}
     </div>
   </div>
   <div class="m-acts"><button class="m-cancel" onclick="closeModal('memoEditModal')">취소</button><button class="m-save" onclick="saveMemoEdit()">저장</button></div>
+</div></div>
+
+<div class="m-wrap" id="todoLogModal"><div class="modal">
+  <div class="modal-handle"></div>
+  <div class="m-title">📝 결과 기록</div>
+  <input type="hidden" id="tlTodoId" value="">
+  <input type="hidden" id="tlTodoArea" value="">
+  <div class="m-fr">
+    <label class="m-fl">할 일</label>
+    <div id="tlTodoTitle" style="font-size:0.56rem;font-weight:600;color:var(--text-h);padding:0.5rem 0.75rem;background:var(--subtle);border-radius:var(--r-md);line-height:1.5;"></div>
+  </div>
+  <div class="m-fr"><label class="m-fl">결과 내용</label><textarea class="m-ta" id="tlContent" placeholder="결과, 후속 조치, 메모 등을 자유롭게 적어주세요..." rows="4"></textarea></div>
+  <div class="m-row2" style="margin-bottom:0.75rem;align-items:center">
+    <label class="nm-pin" style="font-size:0.54rem;gap:0.5rem"><input type="checkbox" id="tlPin"> 📌 고정</label>
+    <label class="nm-pin" style="font-size:0.54rem;gap:0.5rem"><input type="checkbox" id="tlDash" checked> 🏠 대시보드</label>
+  </div>
+  <div class="m-acts"><button class="m-cancel" onclick="closeModal('todoLogModal')">취소</button><button class="m-save" id="bSaveTodoLog" onclick="saveTodoLog()">저장</button></div>
 </div></div>
 
 <div class="toast" id="toast"></div>
@@ -859,7 +876,7 @@ async function loadAll(){
     D.goals=g.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'growth').toLowerCase(),period:gp(p,'Period','select')||'월간',progress:gp(p,'Progress','number')||0,status:gp(p,'Status','select')||'진행중',due:gp(p,'Due','date'),desc:gp(p,'Description','text')}));
     D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',currency:gp(p,'Currency','select')||'KRW',qty:gp(p,'Qty','number')||1,costPrice:gp(p,'CostPrice','number')||0,currentPrice:gp(p,'CurrentPrice','number')||0,costRate:gp(p,'CostRate','number')||0,curRate:gp(p,'CurRate','number')||0,memo:gp(p,'Memo','text')||'',updatedAt:gp(p,'UpdatedAt','date')}));
     D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,currency:gp(p,'Currency','select')||'KRW',feeKrw:gp(p,'FeeKRW','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),memo:gp(p,'Memo','text')||'',alert:gp(p,'Alert','check')!==false,active:gp(p,'Active','check')!==false}));
-    D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,showInDash:gp(p,'ShowInDash','check')!==false,createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
+    D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,showInDash:gp(p,'ShowInDash','check')!==false,linkedTodo:gp(p,'LinkedTodo','text')||'',createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
     if(cfg.todo){try{const td=await qDB(cfg.todo);D.todo=td.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'personal').toLowerCase(),due:gp(p,'Due','date'),done:gp(p,'Done','check')||false,priority:gp(p,'Priority','select')||'보통'})).filter(t=>!t.done).sort((a,b)=>{if(!a.due&&!b.due)return 0;if(!a.due)return 1;if(!b.due)return -1;return a.due.localeCompare(b.due);});}catch(e){D.todo=[];}}
     setSS('ok');render();loadCalendars();
   }catch(e){
@@ -1190,7 +1207,13 @@ function rMemo(){
   const list=[...D.memo].sort((a,b)=>(b.pinned-a.pinned)||(new Date(b.createdAt)-new Date(a.createdAt)));
   const el=document.getElementById('memoList');
   if(!list.length){el.innerHTML='<div class="empty-msg"><p>메모가 없습니다</p></div>';return;}
-  el.innerHTML=list.map(m=>{const a=AMAP[m.area];return`<div class="memo-card ${m.pinned?'pinned':''}"><div class="mc-top">${m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':''}${a?`<span class="tag" style="background:${a.bg};color:${a.c}">${a.l}</span>`:''}<div style="margin-left:auto;display:flex;gap:0.25rem"><button class="inv-edit-btn" onclick="editMemoItem('${m.id}')">수정</button><button class="btn-del" onclick="confirmDelMemo('${m.id}','${esc(m.content).slice(0,15)}')">삭제</button></div></div><div class="mc-text">${esc(m.content)}</div><div class="mc-foot">${fdt(m.createdAt)}</div></div>`;}).join('');
+  el.innerHTML=list.map(m=>{
+    const a=AMAP[m.area];
+    const pinBadge=m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':'';
+    const areaBadge=a?'<span class="tag" style="background:'+a.bg+';color:'+a.c+'">'+a.l+'</span>':'';
+    const linkedBadge=m.linkedTodo?'<span style="display:inline-flex;align-items:center;gap:0.2rem;font-size:0.38rem;color:var(--text-m);background:var(--subtle);padding:0.1rem 0.4rem;border-radius:20px;max-width:8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+esc(m.linkedTodo)+'">📝 '+esc(m.linkedTodo)+'</span>':'';
+    return '<div class="memo-card '+(m.pinned?'pinned':'')+'"><div class="mc-top">'+pinBadge+areaBadge+linkedBadge+'<div style="margin-left:auto;display:flex;gap:0.25rem"><button class="inv-edit-btn" onclick="editMemoItem(\''+m.id+'\')">수정</button><button class="btn-del" onclick="confirmDelMemo(\''+m.id+'\',\''+esc(m.content).slice(0,15)+'\')">삭제</button></div></div><div class="mc-text">'+esc(m.content)+'</div><div class="mc-foot">'+fdt(m.createdAt)+'</div></div>';
+  }).join('');
 }
 
 function showPage(id,btn){
@@ -1226,12 +1249,60 @@ function rTodoFull(group){
   const items=D.todo.filter(t=>areaMap[t.area]===group||t.area===group);
   if(!items.length){el.innerHTML='<div class="empty-msg"><p>할 일이 없습니다</p><span>+ 할 일 추가로 시작해보세요</span></div>';return;}
   const today=new Date().toISOString().slice(0,10);
-  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.1rem;margin-top:0.5rem">`+items.map(t=>{
+  el.innerHTML='<div style="display:flex;flex-direction:column;gap:0.25rem;margin-top:0.5rem">'+items.map(t=>{
     const overdue=t.due&&t.due<today;const isToday=t.due&&t.due===today;
     const pClass={'높음':'priority-high','보통':'priority-mid','낮음':'priority-low'}[t.priority]||'priority-mid';
     const titleStyle=isToday?'font-weight:700;color:var(--text-h)':'';
-    return`<div class="todo-item" style="padding:0.4rem 0.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:0.25rem"><div class="todo-check${t.done?' done':''}" onclick="completeTodo('${t.id}')"></div><div class="todo-priority ${pClass}"></div><span class="todo-title${t.done?' done':''}" style="${titleStyle}">${esc(t.title)}</span>${t.due?`<span class="todo-due${overdue?' overdue':isToday?' overdue':''}">${isToday?'오늘':fd(t.due)}</span>`:''}<button class="btn-ord" onclick="editTodoItem('${t.id}')" style="margin-left:0.25rem;font-size:0.38rem">✎</button><button class="btn-del" onclick="confirmDelTodo('${t.id}')" style="margin-left:0.25rem">삭제</button></div>`;
-  }).join('')+`</div>`;
+    const dueHtml=t.due?'<span class="todo-due'+(overdue||isToday?' overdue':'')+'>'+(isToday?'오늘':fd(t.due))+'</span>':'';
+    return '<div class="todo-item" style="padding:0.5rem 0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:0.1rem">'
+      +'<div class="todo-check'+(t.done?' done':'')+'" onclick="completeTodo(\''+t.id+'\')"></div>'
+      +'<div class="todo-priority '+pClass+'"></div>'
+      +'<span class="todo-title'+(t.done?' done':'')+'" style="'+titleStyle+';white-space:normal;">'+esc(t.title)+'</span>'
+      +dueHtml
+      +'<button class="btn-ord" onclick="editTodoItem(\''+t.id+'\')" style="margin-left:0.25rem;font-size:0.38rem" title="수정">✎</button>'
+      +'<button class="inv-edit-btn" onclick="openTodoLog(\''+t.id+'\',\''+esc(t.title)+'\',\''+t.area+'\')" style="margin-left:0.25rem;font-size:0.38rem;color:var(--work-c);border-color:var(--work-c)" title="결과 기록">📝</button>'
+      +'<button class="btn-del" onclick="confirmDelTodo(\''+t.id+'\')" style="margin-left:0.25rem">삭제</button>'
+      +'</div>';
+  }).join('')+'</div>';
+}
+function openTodoLog(todoId,todoTitle,todoArea){
+  document.getElementById('tlTodoId').value=todoId;
+  document.getElementById('tlTodoArea').value=todoArea||'';
+  document.getElementById('tlTodoTitle').textContent=todoTitle;
+  document.getElementById('tlContent').value='';
+  document.getElementById('tlPin').checked=false;
+  document.getElementById('tlDash').checked=true;
+  openModal('todoLogModal');
+  setTimeout(()=>document.getElementById('tlContent').focus(),300);
+}
+
+async function saveTodoLog(){
+  const content=document.getElementById('tlContent').value.trim().slice(0,1000);
+  if(!content){showToast('내용을 입력해주세요','error');return;}
+  const btn=document.getElementById('bSaveTodoLog');btn.disabled=true;btn.textContent='저장 중...';
+  const todoTitle=document.getElementById('tlTodoTitle').textContent;
+  const todoArea=document.getElementById('tlTodoArea').value;
+  const pinned=document.getElementById('tlPin').checked;
+  const showInDash=document.getElementById('tlDash').checked;
+  // 영역 매핑 — 할 일 영역을 메모 영역으로 변환
+  const areaMap={family:'family',work:'work',personal:'growth'};
+  const memoArea=areaMap[todoArea]||'';
+  const m={id:'l'+Date.now(),content,area:memoArea,pinned,showInDash,linkedTodo:todoTitle,createdAt:new Date().toISOString()};
+  if(cfg.token&&cfg.memo){
+    try{
+      await mkPage(cfg.memo,{
+        Content:{title:[{text:{content:m.content}}]},
+        Area:m.area?{select:{name:m.area}}:{select:null},
+        Pinned:{checkbox:m.pinned},
+        ShowInDash:{checkbox:m.showInDash},
+        LinkedTodo:{rich_text:[{text:{content:todoTitle}}]}
+      });
+    }catch(e){showToast('Notion 저장 실패','error');btn.disabled=false;btn.textContent='저장';return;}
+  }
+  D.memo.unshift(m);rMemo();rHome();
+  closeModal('todoLogModal');
+  btn.disabled=false;btn.textContent='저장';
+  showToast('✅ 결과가 기록됐습니다!','success');
 }
 function confirmDelTodo(id){
   const t=D.todo.find(x=>x.id===id);if(!t)return;
