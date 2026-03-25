@@ -785,6 +785,14 @@ window.addEventListener('DOMContentLoaded',async()=>{
   initDate();
   loadAll();
   setInterval(()=>{ if(document.visibilityState!=='hidden') syncNow(false); }, 5*60*1000);
+  // 결과 기록 버튼 — 이벤트 위임으로 처리 (동적 생성 요소)
+  document.body.addEventListener('click',e=>{
+    const btn=e.target.closest('.todo-log-btn');
+    if(btn){
+      e.stopPropagation();
+      openTodoLog(btn.dataset.id, btn.dataset.title, btn.dataset.area);
+    }
+  });
 });
 
 async function syncNow(showFeedback=true){
@@ -1260,7 +1268,7 @@ function rTodoFull(group){
       +'<span class="todo-title'+(t.done?' done':'')+'" style="'+titleStyle+';white-space:normal;">'+esc(t.title)+'</span>'
       +dueHtml
       +'<button class="btn-ord" onclick="editTodoItem(\''+t.id+'\')" style="margin-left:0.25rem;font-size:0.38rem" title="수정">✎</button>'
-      +'<button class="inv-edit-btn" onclick="openTodoLog(\''+t.id+'\',\''+esc(t.title)+'\',\''+t.area+'\')" style="margin-left:0.25rem;font-size:0.38rem;color:var(--work-c);border-color:var(--work-c)" title="결과 기록">📝</button>'
+      +'<button class="inv-edit-btn todo-log-btn" data-id="'+t.id+'" data-title="'+esc(t.title)+'" data-area="'+t.area+'" style="margin-left:0.25rem;font-size:0.38rem;color:var(--work-c);border-color:var(--work-c)" title="결과 기록">📝</button>'
       +'<button class="btn-del" onclick="confirmDelTodo(\''+t.id+'\')" style="margin-left:0.25rem">삭제</button>'
       +'</div>';
   }).join('')+'</div>';
