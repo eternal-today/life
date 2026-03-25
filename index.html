@@ -5,9 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Eternal Today">
+<meta name="application-name" content="Eternal Today">
+<meta name="theme-color" content="#18181B">
 <title>Eternal Today</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script>
+// PWA 아이콘 — SVG를 data URL로 변환해 동적 주입
+(function(){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#18181B"/><text x="256" y="210" font-family="Georgia,serif" font-size="200" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="-4">E</text><text x="256" y="370" font-family="'Helvetica Neue',Arial,sans-serif" font-size="88" font-weight="300" fill="#A1A1AA" text-anchor="middle" dominant-baseline="middle" letter-spacing="12">TODAY</text></svg>`;
+  const url='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svg)));
+  const sizes=[57,60,72,76,114,120,144,152,180,192,512];
+  sizes.forEach(s=>{
+    const l=document.createElement('link');
+    l.rel=s>=180?'apple-touch-icon':'apple-touch-icon-precomposed';
+    l.setAttribute('sizes',s+'x'+s);l.href=url;
+    document.head.appendChild(l);
+  });
+  // Android / PWA manifest icon
+  const l192=document.createElement('link');l192.rel='icon';l192.type='image/svg+xml';l192.href=url;document.head.appendChild(l192);
+  // manifest.json 동적 생성
+  const manifest={name:'Eternal Today',short_name:'Eternal',start_url:location.href,display:'standalone',background_color:'#18181B',theme_color:'#18181B',icons:sizes.map(s=>({src:url,sizes:s+'x'+s,type:'image/svg+xml'}))};
+  const mUrl='data:application/json;base64,'+btoa(unescape(encodeURIComponent(JSON.stringify(manifest))));
+  const ml=document.createElement('link');ml.rel='manifest';ml.href=mUrl;document.head.appendChild(ml);
+})();
+</script>
 <style>
 :root {
   --bg:#FAFAFA;--surface:#FFFFFF;--subtle:#F4F4F5;--border:#E4E4E7;
