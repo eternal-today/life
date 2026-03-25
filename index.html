@@ -795,10 +795,6 @@ input,select,textarea{font-family:inherit;}
     <div id="tlTodoTitle" style="font-size:0.56rem;font-weight:600;color:var(--text-h);padding:0.5rem 0.75rem;background:var(--subtle);border-radius:var(--r-md);line-height:1.5;"></div>
   </div>
   <div class="m-fr"><label class="m-fl">결과 내용 (선택)</label><textarea class="m-ta" id="tlContent" placeholder="결과, 후속 조치, 메모 등을 자유롭게 적어주세요..." rows="4"></textarea></div>
-  <div class="m-row2" style="margin-bottom:0.75rem;align-items:center">
-    <label class="nm-pin" style="font-size:0.54rem;gap:0.5rem"><input type="checkbox" id="tlPin"> 📌 고정</label>
-    <label class="nm-pin" style="font-size:0.54rem;gap:0.5rem"><input type="checkbox" id="tlDash" checked> 🏠 대시보드</label>
-  </div>
   <div class="m-acts">
     <button class="m-cancel" onclick="closeModal('todoLogModal')">나중에</button>
     <button class="m-save" id="bSaveTodoLog" onclick="saveTodoLog()">기록 저장</button>
@@ -1384,11 +1380,9 @@ async function saveTodoLog(){
   if(!content){closeModal('todoLogModal');return;}
   const todoTitle=document.getElementById('tlTodoTitle').textContent;
   const todoArea=document.getElementById('tlTodoArea').value;
-  const pinned=document.getElementById('tlPin').checked;
-  const showInDash=document.getElementById('tlDash').checked;
   const areaMap={family:'family',work:'work',personal:'growth'};
   const memoArea=areaMap[todoArea]||'';
-  const m={id:'l'+Date.now(),content,area:memoArea,pinned,showInDash,linkedTodo:todoTitle,createdAt:new Date().toISOString()};
+  const m={id:'l'+Date.now(),content,area:memoArea,pinned:false,showInDash:false,linkedTodo:todoTitle,createdAt:new Date().toISOString()};
   // Optimistic Update — UI 즉시 반영
   D.memo.unshift(m);rMemo();rHome();
   closeModal('todoLogModal');
@@ -1398,8 +1392,8 @@ async function saveTodoLog(){
     mkPage(cfg.memo,{
       Content:{title:[{text:{content:m.content}}]},
       Area:m.area?{select:{name:m.area}}:{select:null},
-      Pinned:{checkbox:m.pinned},
-      ShowInDash:{checkbox:m.showInDash},
+      Pinned:{checkbox:false},
+      ShowInDash:{checkbox:false},
       LinkedTodo:{rich_text:[{text:{content:todoTitle}}]}
     }).catch(e=>console.warn('saveTodoLog failed:',e));
   }
