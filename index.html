@@ -796,8 +796,9 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div class="m-fr"><label class="m-fl">결과 내용 (선택)</label><textarea class="m-ta" id="tlContent" placeholder="결과, 후속 조치, 메모 등을 자유롭게 적어주세요..." rows="4"></textarea></div>
   <div class="m-acts">
-    <button class="m-cancel" onclick="closeModal('todoLogModal')">나중에</button>
-    <button class="m-save" id="bSaveTodoLog" onclick="saveTodoLog()">기록 저장</button>
+    <button class="m-cancel" onclick="cancelCompleteTodo()">↩ 완료 취소</button>
+    <button class="m-cancel" onclick="closeModal('todoLogModal')" style="flex:1;">나중에</button>
+    <button class="m-save" id="bSaveTodoLog" onclick="saveTodoLog()" style="flex:2;">기록 저장</button>
   </div>
 </div></div>
 
@@ -1359,6 +1360,23 @@ function rTodoFull(group){
       +'</div>';
   }).join('')+'</div>';
 }
+function cancelCompleteTodo(){
+  const id=document.getElementById('tlTodoId').value;
+  // D.todo에서 이미 제거됐을 수 있으니 복원
+  const area=document.getElementById('tlTodoArea').value;
+  const title=document.getElementById('tlTodoTitle').textContent;
+  // 아직 남아있으면 done 상태만 해제, 없으면 복원
+  const existing=D.todo.find(x=>x.id===id);
+  if(existing){existing.done=false;}
+  else{D.todo.unshift({id,title,area,done:false,priority:'보통',due:''});}
+  D.todo.sort((a,b)=>{if(!a.due&&!b.due)return 0;if(!a.due)return 1;if(!b.due)return -1;return a.due.localeCompare(b.due);});
+  render();
+  closeModal('todoLogModal');
+  // Notion 롤백
+  if(cfg.token&&cfg.todo){nFetch(`pages/${id}`,'PATCH',{properties:{Done:{checkbox:false}}}).catch(e=>console.warn('cancelComplete failed:',e));}
+  showToast('↩ 할 일이 복원됐습니다','success');
+}
+
 function openTodoLog(todoId,todoTitle,todoArea,fromComplete){
   document.getElementById('tlTodoId').value=todoId;
   document.getElementById('tlTodoArea').value=todoArea||'';
