@@ -1364,8 +1364,6 @@ function openTodoLog(todoId,todoTitle,todoArea,fromComplete){
   document.getElementById('tlTodoArea').value=todoArea||'';
   document.getElementById('tlTodoTitle').textContent=todoTitle;
   document.getElementById('tlContent').value='';
-  document.getElementById('tlPin').checked=false;
-  document.getElementById('tlDash').checked=true;
   // 완료 후 호출 시 안내 문구 표시
   const notice=document.getElementById('tlNotice');
   if(notice){notice.style.display=fromComplete?'':'none';}
