@@ -262,7 +262,7 @@ input,select,textarea{font-family:inherit;}
 .nm-title{font-size:0.6rem;font-weight:700;color:var(--text-h);margin-bottom:0.625rem;}
 .nm-ta,.d-fi,.m-fi,.m-sel,.m-ta{width:100%;background:var(--subtle);border:1px solid var(--border);border-radius:var(--r-md);padding:0.875rem 1rem;font-family:inherit;font-size:0.6rem;color:var(--text-h);outline:none;transition:border-color var(--ease);appearance:none;-webkit-appearance:none;}
 .nm-ta:focus,.d-fi:focus,.m-fi:focus,.m-sel:focus,.m-ta:focus{border-color:var(--primary);}
-.nm-ta,.m-ta{resize:vertical;min-height:5rem;line-height:1.6;}
+.nm-ta,.m-ta{resize:vertical;min-height:8rem;line-height:1.6;}
 .nm-opts{display:flex;align-items:center;gap:0.5rem;margin-top:0.625rem;flex-wrap:wrap;}
 .nm-sel{flex:1;min-width:5rem;font-size:0.56rem;}
 .nm-pin{display:flex;align-items:center;gap:0.3rem;font-size:0.52rem;color:var(--text-s);cursor:pointer;white-space:nowrap;}
@@ -472,12 +472,15 @@ input,select,textarea{font-family:inherit;}
           <option value="side">사이드</option>
           <option value="finance">재테크</option>
         </select>
+        <select class="quick-memo-sel" id="qmProject" style="max-width:7rem;">
+          <option value="">프로젝트 없음</option>
+        </select>
         <label class="quick-memo-pin"><input type="checkbox" id="qmPin"> 📌 고정</label>
-        <label class="quick-memo-pin"><input type="checkbox" id="qmDash" checked> 🏠 대시보드</label>
+        <label class="quick-memo-pin"><input type="checkbox" id="qmDash"> 🏠 대시보드</label>
       </div>
     </div>
     <div class="quick-memo-input-row">
-      <textarea class="quick-memo-ta" id="qmText" placeholder="지금 떠오르는 생각을 바로 기록하세요..." rows="2"></textarea>
+      <textarea class="quick-memo-ta" id="qmText" placeholder="지금 떠오르는 생각을 바로 기록하세요..." rows="4"></textarea>
       <button class="quick-memo-btn" onclick="saveQuickMemo()">저장</button>
     </div>
     <div class="quick-memo-recent" id="qmRecent"></div>
@@ -520,7 +523,7 @@ input,select,textarea{font-family:inherit;}
         <textarea class="nm-ta" id="nmText-family" placeholder="가정 관련 메모..."></textarea>
         <div class="nm-opts">
           <label class="nm-pin"><input type="checkbox" id="nmPin-family"> 고정</label>
-          <label class="nm-pin"><input type="checkbox" id="nmDash-family" checked> 🏠 대시보드</label>
+          <label class="nm-pin"><input type="checkbox" id="nmDash-family"> 🏠 대시보드</label>
           <button class="nm-save" onclick="saveMemoArea('family')">저장</button>
         </div>
       </div>
@@ -563,7 +566,7 @@ input,select,textarea{font-family:inherit;}
         <textarea class="nm-ta" id="nmText-work" placeholder="업무 관련 메모..."></textarea>
         <div class="nm-opts">
           <label class="nm-pin"><input type="checkbox" id="nmPin-work"> 고정</label>
-          <label class="nm-pin"><input type="checkbox" id="nmDash-work" checked> 🏠 대시보드</label>
+          <label class="nm-pin"><input type="checkbox" id="nmDash-work"> 🏠 대시보드</label>
           <button class="nm-save" onclick="saveMemoArea('work')">저장</button>
         </div>
       </div>
@@ -631,8 +634,9 @@ input,select,textarea{font-family:inherit;}
         <textarea class="nm-ta" id="nmText" placeholder="생각, 아이디어, 기록..."></textarea>
         <div class="nm-opts">
           <select class="nm-sel" id="nmArea"><option value="">영역 선택</option><option value="family">가정</option><option value="work">회사</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
+          <select class="nm-sel" id="nmProject"><option value="">프로젝트 없음</option></select>
           <label class="nm-pin"><input type="checkbox" id="nmPin"> 고정</label>
-          <label class="nm-pin"><input type="checkbox" id="nmDash" checked> 🏠 대시보드</label>
+          <label class="nm-pin"><input type="checkbox" id="nmDash"> 🏠 대시보드</label>
           <button class="nm-save" onclick="saveMemo()">저장</button>
         </div>
       </div>
@@ -667,6 +671,7 @@ input,select,textarea{font-family:inherit;}
     <div class="d-fr"><label class="d-fl">Subscription</label><input class="d-fi" id="cSubs" oninput="debouncedSaveCfg()"></div>
     <div class="d-fr"><label class="d-fl">Memo</label><input class="d-fi" id="cMemo" oninput="debouncedSaveCfg()"></div>
     <div class="d-fr"><label class="d-fl">Todo</label><input class="d-fi" id="cTodo" oninput="debouncedSaveCfg()"></div>
+    <div class="d-fr"><label class="d-fl">Projects</label><input class="d-fi" id="cProjects" value="32fec5750b208024a5acfe9baaa023cb" oninput="debouncedSaveCfg()"></div>
   </div>
   <div class="d-sec">
     <div class="d-lbl">CORS 프록시</div>
@@ -682,7 +687,7 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div class="d-sec">
     <div class="d-lbl">DB 컬럼 구조</div>
-    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타/주택담보대출/신용대출/마이너스통장/기타대출) · Currency(KRW/USD/EUR/JPY/GBP) · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo(Text) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category · Fee · Currency · FeeKRW · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Todo:</b> Title · Area(select: family/work/personal) · Priority(select: 높음/보통/낮음) · Due(Date) · Done(Checkbox)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · ShowInDash(Checkbox) · CreatedAt(Created time) · <b>LinkedTodo(Text) ← 할 일 결과 기록용</b></div>
+    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타/주택담보대출/신용대출/마이너스통장/기타대출) · Currency(KRW/USD/EUR/JPY/GBP) · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo(Text) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category · Fee · Currency · FeeKRW · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Todo:</b> Title · Area(select: family/work/personal) · Priority(select: 높음/보통/낮음) · Due(Date) · Done(Checkbox)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · ShowInDash(Checkbox) · CreatedAt(Created time) · LinkedTodo(Text) · <b>Project(Relation → Projects DB) ← 프로젝트 연결</b><br><br><b>Projects:</b> Title · Status(시작전/진행중/보류/완료) · Category(Select) · StartDate(Date) · TargetDate(Date) · Summary(Text) · Budget(Number) · Result(Text) · Memo(Relation → Memo DB)</div>
   </div>
 </div>
 
@@ -800,6 +805,9 @@ input,select,textarea{font-family:inherit;}
     <div><label class="m-fl">영역</label>
       <select class="m-sel" id="meArea"><option value="">영역 없음</option><option value="family">가정</option><option value="work">회사</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
     </div>
+    <div><label class="m-fl">프로젝트</label>
+      <select class="m-sel" id="meProject"><option value="">프로젝트 없음</option></select>
+    </div>
     <div style="display:flex;gap:0.75rem;align-items:center;padding-top:1rem">
       <label class="nm-pin"><input type="checkbox" id="mePin"> 📌 고정</label>
       <label class="nm-pin"><input type="checkbox" id="meDash"> 🏠 대시보드</label>
@@ -831,8 +839,8 @@ input,select,textarea{font-family:inherit;}
 <script>
 const AMAP={family:{l:'가정/가족',c:'var(--family-c)',bg:'var(--family-bg)',g:'family'},work:{l:'회사/업무',c:'var(--work-c)',bg:'var(--work-bg)',g:'work'},growth:{l:'개인 성장',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},health:{l:'건강/운동',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},side:{l:'사이드',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},finance:{l:'재테크',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'}};
 const DS={family:[],work:[],personal:[]};
-let cfg={token:'',goals:'',invest:'',subs:'',memo:'',todo:'',proxy:'',calFamily:'',calWork:'',calPersonal:''};
-let D={goals:[],invest:[],subs:[],memo:[],todo:[],sched:{family:[],work:[],personal:[]}};
+let cfg={token:'',goals:'',invest:'',subs:'',memo:'',todo:'',proxy:'',calFamily:'',calWork:'',calPersonal:'',projects:''};
+let D={goals:[],invest:[],subs:[],memo:[],todo:[],sched:{family:[],work:[],personal:[]},projects:[]};
 let gF={family:'all',work:'all',personal:'all'};
 
 window.addEventListener('DOMContentLoaded',async()=>{
@@ -871,10 +879,10 @@ function initDate(){
   if(metaEl) metaEl.textContent=`${n.getFullYear()} Q${q}`;
 }
 
-const CFG_KEYS=['token','goals','invest','subs','memo','todo','proxy','calFamily','calWork','calPersonal'];
-const CFG_IDS =['cToken','cGoals','cInvest','cSubs','cMemo','cTodo','cProxy','cCalFamily','cCalWork','cCalPersonal'];
-const HASH_KEYS=['goals','invest','subs','memo','todo','proxy','calFamily','calWork','calPersonal'];
-const HASH_IDS =['cGoals','cInvest','cSubs','cMemo','cTodo','cProxy','cCalFamily','cCalWork','cCalPersonal'];
+const CFG_KEYS=['token','goals','invest','subs','memo','todo','proxy','calFamily','calWork','calPersonal','projects'];
+const CFG_IDS =['cToken','cGoals','cInvest','cSubs','cMemo','cTodo','cProxy','cCalFamily','cCalWork','cCalPersonal','cProjects'];
+const HASH_KEYS=['goals','invest','subs','memo','todo','proxy','calFamily','calWork','calPersonal','projects'];
+const HASH_IDS =['cGoals','cInvest','cSubs','cMemo','cTodo','cProxy','cCalFamily','cCalWork','cCalPersonal','cProjects'];
 
 function getDeviceSeed(){
   try{let id=localStorage.getItem('et_did');if(!id){const arr=crypto.getRandomValues(new Uint8Array(24));id=btoa(String.fromCharCode(...arr));localStorage.setItem('et_did',id);}return id;}
@@ -939,9 +947,11 @@ async function loadAll(){
     D.goals=g.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'growth').toLowerCase(),period:gp(p,'Period','select')||'월간',progress:gp(p,'Progress','number')||0,status:gp(p,'Status','select')||'진행중',due:gp(p,'Due','date'),desc:gp(p,'Description','text')}));
     D.invest=i.map(p=>({id:p.id,asset:gp(p,'Asset','title'),category:gp(p,'Category','select')||'기타',currency:gp(p,'Currency','select')||'KRW',qty:gp(p,'Qty','number')||1,costPrice:gp(p,'CostPrice','number')||0,currentPrice:gp(p,'CurrentPrice','number')||0,costRate:gp(p,'CostRate','number')||0,curRate:gp(p,'CurRate','number')||0,memo:gp(p,'Memo','text')||'',updatedAt:gp(p,'UpdatedAt','date')}));
     D.subs=s.map(p=>({id:p.id,service:gp(p,'Service','title'),category:gp(p,'Category','select')||'기타',fee:gp(p,'Fee','number')||0,currency:gp(p,'Currency','select')||'KRW',feeKrw:gp(p,'FeeKRW','number')||0,cycle:gp(p,'Cycle','select')||'월',renewDate:gp(p,'RenewDate','date'),memo:gp(p,'Memo','text')||'',alert:gp(p,'Alert','check')!==false,active:gp(p,'Active','check')!==false}));
-    D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,showInDash:gp(p,'ShowInDash','check')!==false,linkedTodo:gp(p,'LinkedTodo','text')||'',createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
+    D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,showInDash:gp(p,'ShowInDash','check')!==false,linkedTodo:gp(p,'LinkedTodo','text')||'',projectId:p.properties?.Project?.relation?.[0]?.id||'',createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
     if(cfg.todo){try{const td=await qDB(cfg.todo);D.todo=td.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'personal').toLowerCase(),due:gp(p,'Due','date'),done:gp(p,'Done','check')||false,priority:gp(p,'Priority','select')||'보통'})).filter(t=>!t.done).sort((a,b)=>{if(!a.due&&!b.due)return 0;if(!a.due)return 1;if(!b.due)return -1;return a.due.localeCompare(b.due);});}catch(e){D.todo=[];}}
-    setSS('ok');render();loadCalendars();
+    // 프로젝트 목록 로드
+    if(cfg.projects){try{const pj=await qDB(cfg.projects);D.projects=pj.map(p=>({id:p.id,name:gp(p,'Title','title'),status:gp(p,'Status','select')||''})).filter(p=>p.name);}catch(e){D.projects=[];}}
+    setSS('ok');render();loadCalendars();rProjectSelects();
   }catch(e){
     const msg=e?.message||String(e);
     if(msg==='401') showToast('❌ Token 인증 실패 (401).','error');
@@ -1158,29 +1168,29 @@ function editSub(id){
 }
 
 async function saveMemo(){
-  const content=document.getElementById('nmText').value.trim().slice(0,1000);if(!content)return;
+  const content=document.getElementById('nmText').value.trim().slice(0,3000);if(!content)return;
   const showInDash=document.getElementById('nmDash').checked;
-  const m={id:'l'+Date.now(),content,area:document.getElementById('nmArea').value,pinned:document.getElementById('nmPin').checked,showInDash,createdAt:new Date().toISOString()};
-  // Optimistic Update — UI 즉시 반영
+  const projectId=document.getElementById('nmProject').value;
+  const m={id:'l'+Date.now(),content,area:document.getElementById('nmArea').value,pinned:document.getElementById('nmPin').checked,showInDash,projectId,createdAt:new Date().toISOString()};
   D.memo.unshift(m);rMemo();rHome();
-  document.getElementById('nmText').value='';document.getElementById('nmPin').checked=false;document.getElementById('nmDash').checked=true;
+  document.getElementById('nmText').value='';document.getElementById('nmPin').checked=false;document.getElementById('nmDash').checked=false;document.getElementById('nmProject').value='';
   showToast('✅ 메모 저장 완료!','success');
-  // 백그라운드 Notion 저장
-  if(cfg.token&&cfg.memo){mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}}).catch(e=>console.warn('saveMemo failed:',e));}
+  const props={Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash},...(projectId?{Project:{relation:[{id:projectId}]}}:{})};
+  if(cfg.token&&cfg.memo){mkPage(cfg.memo,props).catch(e=>console.warn('saveMemo failed:',e));}
 }
 
 async function saveQuickMemo(){
-  const content=document.getElementById('qmText').value.trim().slice(0,1000);if(!content){showToast('내용을 입력해주세요','error');return;}
+  const content=document.getElementById('qmText').value.trim().slice(0,3000);if(!content){showToast('내용을 입력해주세요','error');return;}
   const btn=document.querySelector('.quick-memo-btn');btn.disabled=true;btn.textContent='저장 중...';
   const area=document.getElementById('qmArea').value;const pinned=document.getElementById('qmPin').checked;const showInDash=document.getElementById('qmDash').checked;
-  const m={id:'l'+Date.now(),content,area,pinned,showInDash,createdAt:new Date().toISOString()};
-  // Optimistic Update — UI 즉시 반영
+  const projectId=document.getElementById('qmProject').value;
+  const m={id:'l'+Date.now(),content,area,pinned,showInDash,projectId,createdAt:new Date().toISOString()};
   D.memo.unshift(m);rMemo();rQuickMemoRecent();
-  document.getElementById('qmText').value='';document.getElementById('qmPin').checked=false;document.getElementById('qmDash').checked=true;
+  document.getElementById('qmText').value='';document.getElementById('qmPin').checked=false;document.getElementById('qmDash').checked=false;document.getElementById('qmProject').value='';
   btn.disabled=false;btn.textContent='저장';
   showToast('✅ 메모가 저장되었습니다!','success');
-  // 백그라운드 Notion 저장
-  if(cfg.token&&cfg.memo){mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}}).catch(e=>console.warn('saveQuickMemo failed:',e));}
+  const props={Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash},...(projectId?{Project:{relation:[{id:projectId}]}}:{})};
+  if(cfg.token&&cfg.memo){mkPage(cfg.memo,props).catch(e=>console.warn('saveQuickMemo failed:',e));}
 }
 
 function rQuickMemoRecent(){
@@ -1243,15 +1253,22 @@ function rTodo(id,group){
 
 function editMemoItem(id){
   const m=D.memo.find(x=>x.id===id);if(!m)return;
-  document.getElementById('meEditId').value=m.id;document.getElementById('meText').value=m.content;document.getElementById('meArea').value=m.area||'';document.getElementById('mePin').checked=m.pinned||false;document.getElementById('meDash').checked=m.showInDash!==false;
+  document.getElementById('meEditId').value=m.id;
+  document.getElementById('meText').value=m.content;
+  document.getElementById('meArea').value=m.area||'';
+  document.getElementById('mePin').checked=m.pinned||false;
+  document.getElementById('meDash').checked=m.showInDash!==false;
+  document.getElementById('meProject').value=m.projectId||'';
   openModal('memoEditModal');
 }
 async function saveMemoEdit(){
-  const id=document.getElementById('meEditId').value;const content=document.getElementById('meText').value.trim().slice(0,1000);if(!content){showToast('내용을 입력해주세요','error');return;}
+  const id=document.getElementById('meEditId').value;const content=document.getElementById('meText').value.trim().slice(0,3000);if(!content){showToast('내용을 입력해주세요','error');return;}
   const area=document.getElementById('meArea').value;const pinned=document.getElementById('mePin').checked;const showInDash=document.getElementById('meDash').checked;
-  const idx=D.memo.findIndex(x=>x.id===id);if(idx>-1){D.memo[idx]={...D.memo[idx],content,area,pinned,showInDash};}
+  const projectId=document.getElementById('meProject').value;
+  const idx=D.memo.findIndex(x=>x.id===id);if(idx>-1){D.memo[idx]={...D.memo[idx],content,area,pinned,showInDash,projectId};}
   rMemo();rHome();closeModal('memoEditModal');showToast('✅ 메모 수정 완료!','success');
-  if(cfg.token&&cfg.memo){nFetch(`pages/${id}`,'PATCH',{properties:{Content:{title:[{text:{content}}]},Area:area?{select:{name:area}}:{select:null},Pinned:{checkbox:pinned},ShowInDash:{checkbox:showInDash}}}).catch(e=>console.warn('memo edit failed:',e));}
+  const props={Content:{title:[{text:{content}}]},Area:area?{select:{name:area}}:{select:null},Pinned:{checkbox:pinned},ShowInDash:{checkbox:showInDash},...(projectId?{Project:{relation:[{id:projectId}]}}:{Project:{relation:[]}})};
+  if(cfg.token&&cfg.memo){nFetch(`pages/${id}`,'PATCH',{properties:props}).catch(e=>console.warn('memo edit failed:',e));}
 }
 
 function confirmDelMemo(id,preview){if(!confirm(`"${preview}..." 메모를 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`))return;deleteMemo(id);}
@@ -1294,6 +1311,11 @@ async function completeTodo(id){
   }
 }
 
+function rProjectSelects(){
+  const opts='<option value="">프로젝트 없음</option>'+D.projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  ['qmProject','nmProject','meProject'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=opts;el.value=cur;}});
+}
+
 function rMemoArea(area){
   const elId='memoList-'+area;
   const el=document.getElementById(elId);if(!el)return;
@@ -1308,13 +1330,13 @@ function rMemoArea(area){
 
 async function saveMemoArea(area){
   const taId='nmText-'+area;const pinId='nmPin-'+area;const dashId='nmDash-'+area;
-  const content=document.getElementById(taId).value.trim().slice(0,1000);if(!content)return;
+  const content=document.getElementById(taId).value.trim().slice(0,3000);if(!content)return;
   const pinned=document.getElementById(pinId).checked;
   const showInDash=document.getElementById(dashId).checked;
   const m={id:'l'+Date.now(),content,area,pinned,showInDash,createdAt:new Date().toISOString()};
   // Optimistic Update
   D.memo.unshift(m);rMemoArea(area);rHome();
-  document.getElementById(taId).value='';document.getElementById(pinId).checked=false;document.getElementById(dashId).checked=true;
+  document.getElementById(taId).value='';document.getElementById(pinId).checked=false;document.getElementById(dashId).checked=false;
   showToast('✅ 메모 저장 완료!','success');
   // 백그라운드 Notion 저장
   if(cfg.token&&cfg.memo){mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:{select:{name:area}},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}}).catch(e=>console.warn('saveMemoArea failed:',e));}
@@ -1328,8 +1350,10 @@ function rMemo(){
     const a=AMAP[m.area];
     const pinBadge=m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':'';
     const areaBadge=a?'<span class="tag" style="background:'+a.bg+';color:'+a.c+'">'+a.l+'</span>':'';
+    const proj=D.projects.find(p=>p.id===m.projectId);
+    const projBadge=proj?'<span style="display:inline-flex;align-items:center;font-size:0.38rem;color:var(--work-c);background:var(--work-bg);padding:0.1rem 0.4rem;border-radius:20px;white-space:nowrap;">◈ '+esc(proj.name)+'</span>':'';
     const linkedBadge=m.linkedTodo?'<span style="display:inline-flex;align-items:center;gap:0.2rem;font-size:0.38rem;color:var(--text-m);background:var(--subtle);padding:0.1rem 0.4rem;border-radius:20px;max-width:8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+esc(m.linkedTodo)+'">📝 '+esc(m.linkedTodo)+'</span>':'';
-    return '<div class="memo-card '+(m.pinned?'pinned':'')+'"><div class="mc-top">'+pinBadge+areaBadge+linkedBadge+'<div style="margin-left:auto;display:flex;gap:0.25rem"><button class="inv-edit-btn" onclick="editMemoItem(\''+m.id+'\')">수정</button><button class="btn-del" onclick="confirmDelMemo(\''+m.id+'\',\''+esc(m.content).slice(0,15)+'\')">삭제</button></div></div><div class="mc-text">'+esc(m.content)+'</div><div class="mc-foot">'+fdt(m.createdAt)+'</div></div>';
+    return '<div class="memo-card '+(m.pinned?'pinned':'')+'"><div class="mc-top">'+pinBadge+areaBadge+projBadge+linkedBadge+'<div style="margin-left:auto;display:flex;gap:0.25rem"><button class="inv-edit-btn" onclick="editMemoItem(\''+m.id+'\')">수정</button><button class="btn-del" onclick="confirmDelMemo(\''+m.id+'\',\''+esc(m.content).slice(0,15)+'\')">삭제</button></div></div><div class="mc-text">'+esc(m.content)+'</div><div class="mc-foot">'+fdt(m.createdAt)+'</div></div>';
   }).join('');
 }
 
@@ -1416,7 +1440,7 @@ function openTodoLog(todoId,todoTitle,todoArea,fromComplete){
 }
 
 async function saveTodoLog(){
-  const content=document.getElementById('tlContent').value.trim().slice(0,1000);
+  const content=document.getElementById('tlContent').value.trim().slice(0,3000);
   if(!content){closeModal('todoLogModal');return;}
   const todoTitle=document.getElementById('tlTodoTitle').textContent;
   const todoArea=document.getElementById('tlTodoArea').value;
