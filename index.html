@@ -554,11 +554,13 @@ input,select,textarea{font-family:inherit;}
       <div class="new-memo">
         <div class="nm-title">새 메모</div>
         <textarea class="nm-ta" id="nmText-family" placeholder="가정 관련 메모..."></textarea>
-        <div class="nm-opts">
+        <div class="nm-opts" style="flex-direction:column;align-items:stretch;gap:0.5rem;">
           <select class="nm-sel" id="nmProject-family" onchange="onProjectSelectChange(this,'nmProject-family')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
-          <label class="nm-pin"><input type="checkbox" id="nmPin-family"> 고정</label>
-          <label class="nm-pin"><input type="checkbox" id="nmDash-family"> 🏠 대시보드</label>
-          <button class="nm-save" onclick="saveMemoArea('family')">저장</button>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <label class="nm-pin"><input type="checkbox" id="nmPin-family"> 📌 고정</label>
+            <label class="nm-pin"><input type="checkbox" id="nmDash-family"> 🏠 대시보드</label>
+            <button class="nm-save" style="margin-left:auto;" onclick="saveMemoArea('family')">저장</button>
+          </div>
         </div>
       </div>
     </div>
@@ -604,11 +606,13 @@ input,select,textarea{font-family:inherit;}
       <div class="new-memo">
         <div class="nm-title">새 메모</div>
         <textarea class="nm-ta" id="nmText-work" placeholder="업무 관련 메모..."></textarea>
-        <div class="nm-opts">
+        <div class="nm-opts" style="flex-direction:column;align-items:stretch;gap:0.5rem;">
           <select class="nm-sel" id="nmProject-work" onchange="onProjectSelectChange(this,'nmProject-work')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
-          <label class="nm-pin"><input type="checkbox" id="nmPin-work"> 고정</label>
-          <label class="nm-pin"><input type="checkbox" id="nmDash-work"> 🏠 대시보드</label>
-          <button class="nm-save" onclick="saveMemoArea('work')">저장</button>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <label class="nm-pin"><input type="checkbox" id="nmPin-work"> 📌 고정</label>
+            <label class="nm-pin"><input type="checkbox" id="nmDash-work"> 🏠 대시보드</label>
+            <button class="nm-save" style="margin-left:auto;" onclick="saveMemoArea('work')">저장</button>
+          </div>
         </div>
       </div>
     </div>
@@ -675,16 +679,20 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div id="sub-memo" style="display:none">
     <div class="memo-layout">
-      <div class="memo-list" id="memoList"><div class="loading-msg">로딩 중...</div></div>
+      <div class="memo-list" id="memoList-personal"><div class="loading-msg">로딩 중...</div></div>
       <div class="new-memo">
         <div class="nm-title">새 메모</div>
         <textarea class="nm-ta" id="nmText" placeholder="생각, 아이디어, 기록..."></textarea>
-        <div class="nm-opts">
-          <select class="nm-sel" id="nmArea"><option value="">영역 선택</option><option value="family">가정</option><option value="work">회사</option><option value="personal">개인</option></select>
-          <select class="nm-sel" id="nmProject" onchange="onProjectSelectChange(this,'nmProject')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
-          <label class="nm-pin"><input type="checkbox" id="nmPin"> 고정</label>
-          <label class="nm-pin"><input type="checkbox" id="nmDash"> 🏠 대시보드</label>
-          <button class="nm-save" onclick="saveMemo()">저장</button>
+        <div class="nm-opts" style="flex-direction:column;align-items:stretch;gap:0.5rem;">
+          <div style="display:flex;gap:0.5rem;">
+            <select class="nm-sel" id="nmArea" style="flex:1;"><option value="personal" selected>개인</option><option value="family">가정</option><option value="work">회사</option></select>
+            <select class="nm-sel" id="nmProject" onchange="onProjectSelectChange(this,'nmProject')" style="flex:1;"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <label class="nm-pin"><input type="checkbox" id="nmPin"> 📌 고정</label>
+            <label class="nm-pin"><input type="checkbox" id="nmDash"> 🏠 대시보드</label>
+            <button class="nm-save" style="margin-left:auto;" onclick="saveMemo()">저장</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1105,7 +1113,7 @@ function parseCalEvents(items){
 
 function setSS(s){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');if(s==='ok'){d.className='sync-dot ok';t.textContent='동기화 완료';}else if(s==='loading'){d.className='sync-dot';t.textContent='로딩 중...';}else{d.className='sync-dot';t.textContent='데모 모드';}}
 function demoData(){D.goals=[];D.invest=[];D.subs=[];D.memo=[];D.todo=[];setSS('err');render();}
-function render(){rHome();rGoalPage('family');rGoalPage('work');rGoalPage('personal');rInvest();rSubs();rMemo();rMemoArea('family');rMemoArea('work');rQuickMemoRecent();rTodoFull('family');rTodoFull('work');rTodoFull('personal');rProjectMain();}
+function render(){rHome();rGoalPage('family');rGoalPage('work');rGoalPage('personal');rInvest();rSubs();rMemoArea('personal');rMemoArea('family');rMemoArea('work');rQuickMemoRecent();rTodoFull('family');rTodoFull('work');rTodoFull('personal');rProjectMain();}
 function byGroup(g){return D.goals.filter(x=>(AMAP[x.area]?.g||'personal')===g&&x.status!=='완료');}
 function avg(arr){return arr.length?Math.round(arr.reduce((a,g)=>a+g.progress,0)/arr.length):0;}
 
@@ -1285,7 +1293,7 @@ async function saveMemo(){
   const showInDash=document.getElementById('nmDash').checked;
   const projectId=document.getElementById('nmProject').value;
   const m={id:'l'+Date.now(),content,area:document.getElementById('nmArea').value,pinned:document.getElementById('nmPin').checked,showInDash,projectId,createdAt:new Date().toISOString()};
-  D.memo.unshift(m);rMemo();rHome();
+  D.memo.unshift(m);rMemoArea('personal');rHome();
   document.getElementById('nmText').value='';document.getElementById('nmPin').checked=false;document.getElementById('nmDash').checked=false;document.getElementById('nmProject').value='';
   showToast('✅ 메모 저장 완료!','success');
   const props={Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash},...(projectId?{Project:{relation:[{id:projectId}]}}:{})};
@@ -1378,7 +1386,7 @@ async function saveMemoEdit(){
   const area=document.getElementById('meArea').value;const pinned=document.getElementById('mePin').checked;const showInDash=document.getElementById('meDash').checked;
   const projectId=document.getElementById('meProject').value;
   const idx=D.memo.findIndex(x=>x.id===id);if(idx>-1){D.memo[idx]={...D.memo[idx],content,area,pinned,showInDash,projectId};}
-  rMemo();rHome();closeModal('memoEditModal');showToast('✅ 메모 수정 완료!','success');
+  rMemoArea('personal');rMemoArea('family');rMemoArea('work');rHome();closeModal('memoEditModal');showToast('✅ 메모 수정 완료!','success');
   const props={Content:{title:[{text:{content}}]},Area:area?{select:{name:area}}:{select:null},Pinned:{checkbox:pinned},ShowInDash:{checkbox:showInDash},...(projectId?{Project:{relation:[{id:projectId}]}}:{Project:{relation:[]}})};
   if(cfg.token&&cfg.memo){nFetch(`pages/${id}`,'PATCH',{properties:props}).catch(e=>console.warn('memo edit failed:',e));}
 }
@@ -1386,7 +1394,7 @@ async function saveMemoEdit(){
 function confirmDelMemo(id,preview){if(!confirm(`"${preview}..." 메모를 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`))return;deleteMemo(id);}
 async function deleteMemo(id){
   D.memo=D.memo.filter(x=>x.id!==id);
-  rMemo();rMemoArea('family');rMemoArea('work');rHome();
+  rMemoArea('personal');rMemoArea('family');rMemoArea('work');rHome();
   showToast('🗑 메모가 삭제됐습니다.','success');
   if(cfg.token&&id&&!id.startsWith('l')){
     const nid=normalizeNotionId(id);
@@ -1619,8 +1627,10 @@ function rMemoArea(area){
   if(!list.length){el.innerHTML='<div class="empty-msg"><p>메모가 없습니다</p></div>';return;}
   el.innerHTML=list.map(m=>{
     const pinBadge=m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':'';
+    const proj=D.projects.find(p=>p.id===m.projectId);
+    const projBadge=proj?'<span style="display:inline-flex;align-items:center;font-size:0.38rem;color:var(--work-c);background:var(--work-bg);padding:0.1rem 0.4rem;border-radius:20px;white-space:nowrap;margin-right:0.25rem;">◈ '+esc(proj.name)+'</span>':'';
     const linkedBadge=m.linkedTodo?'<span style="display:inline-flex;align-items:center;gap:0.2rem;font-size:0.38rem;color:var(--text-m);background:var(--subtle);padding:0.1rem 0.4rem;border-radius:20px;max-width:8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+esc(m.linkedTodo)+'">📝 '+esc(m.linkedTodo)+'</span>':'';
-    return '<div class="memo-card '+(m.pinned?'pinned':'')+'"><div class="mc-top">'+pinBadge+linkedBadge+'<div style="margin-left:auto;display:flex;gap:0.25rem"><button class="inv-edit-btn" onclick="editMemoItem(\''+m.id+'\')">수정</button><button class="btn-del" onclick="confirmDelMemo(\''+m.id+'\',\''+esc(m.content).slice(0,15)+'\')">삭제</button></div></div><div class="mc-text">'+esc(m.content)+'</div><div class="mc-foot">'+fdt(m.createdAt)+'</div></div>';
+    return '<div class="memo-card '+(m.pinned?'pinned':'')+'"><div class="mc-top">'+pinBadge+projBadge+linkedBadge+'<div style="margin-left:auto;display:flex;gap:0.25rem"><button class="inv-edit-btn" onclick="editMemoItem(\''+m.id+'\')">수정</button><button class="btn-del" onclick="confirmDelMemo(\''+m.id+'\',\''+esc(m.content).slice(0,15)+'\')">삭제</button></div></div><div class="mc-text">'+esc(m.content)+'</div><div class="mc-foot">'+fdt(m.createdAt)+'</div></div>';
   }).join('');
 }
 
@@ -1668,6 +1678,7 @@ function showSub(id,btn){
   document.querySelectorAll('#page-personal .stab').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   if(id==='todo')rTodoFull('personal');
+  if(id==='memo')rMemoArea('personal');
 }
 function showFamilySub(id,btn){
   ['goals','todo','memo'].forEach(k=>{const el=document.getElementById('fsub-'+k);if(el)el.style.display=k===id?'':'none';});
