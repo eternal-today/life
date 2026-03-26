@@ -1381,7 +1381,11 @@ async function saveNewProject(){
   if(!cfg.token){showToast('❌ Token이 없어 Notion 저장 불가','error');return;}
   if(!cfg.projects){showToast('❌ Projects DB ID가 없어 Notion 저장 불가','error');return;}
   showToast('Notion에 저장 중...','');
-  const props={Title:{title:[{text:{content:title}}]},...(status?{Status:{status:{name:status}}}:{}),...(category?{Category:{select:{name:category}}}:{}),...(summary?{Summary:{rich_text:[{text:{content:summary}}]}}:{})};
+  const props={
+    Title:{title:[{text:{content:title}}]},
+    ...(category?{Category:{select:{name:category}}}:{}),
+    ...(summary?{Summary:{rich_text:[{text:{content:summary}}]}}:{})
+  };
   try{
     const page=await mkPage(cfg.projects,props);
     const idx=D.projects.findIndex(p=>p.id===tempId);
