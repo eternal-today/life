@@ -1060,15 +1060,13 @@ async function loadAll() {
     D.goals = g.map(p => ({id:p.id, title:gp(p,'Title','title'), area:(gp(p,'Area','select')||'growth').toLowerCase(), period:gp(p,'Period','select')||'월간', progress:gp(p,'Progress','number')||0, status:gp(p,'Status','select')||'진행중', due:gp(p,'Due','date'), desc:gp(p,'Description','text')}));
     D.invest = i.map(p => ({id:p.id, asset:gp(p,'Asset','title'), category:gp(p,'Category','select')||'기타', currency:gp(p,'Currency','select')||'KRW', qty:gp(p,'Qty','number')||1, costPrice:gp(p,'CostPrice','number')||0, currentPrice:gp(p,'CurrentPrice','number')||0, costRate:gp(p,'CostRate','number')||0, curRate:gp(p,'CurRate','number')||0, memo:gp(p,'Memo','text')||'', updatedAt:gp(p,'UpdatedAt','date')}));
     D.subs = s.map(p => ({id:p.id, service:gp(p,'Service','title'), category:gp(p,'Category','select')||'기타', fee:gp(p,'Fee','number')||0, currency:gp(p,'Currency','select')||'KRW', feeKrw:gp(p,'FeeKRW','number')||0, cycle:gp(p,'Cycle','select')||'월', renewDate:gp(p,'RenewDate','date'), memo:gp(p,'Memo','text')||'', alert:gp(p,'Alert','check')!==false, active:gp(p,'Active','check')!==false}));
-    D.memo = m.map(p => ({id:p.id, content:gp(p,'Content','title'), area:(gp(p,'Area','select')||'').toLowerCase(), pinned:gp(p,'Pinned','check')||false, showInDash:gp(p,'ShowInDash','check')!==false, linkedTodo:gp(p,'LinkedTodo','text')||'', projectId:p.properties?.Project?.relation?.[0]?.id||'', createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
+    D.memo = m.map(p => ({id:p.id, content:gp(p,'Content','title'), area:(gp(p,'Area','select')||'').toLowerCase(), pinned:gp(p,'Pinned','check')||false, showInDash:gp(p,'ShowInDash','check')!==false, linkedTodo:gp(p,'LinkedTodo','text')||'', projectRelId:p.properties?.Project?.relation?.[0]?.id||'', createdAt:p.created_time||new Date().toISOString()}));
     if (cfg.todo) {
       try { const td = await qDB(cfg.todo); D.todo = td.map(p => ({id:p.id, title:gp(p,'Title','title'), area:(gp(p,'Area','select')||'personal').toLowerCase(), due:gp(p,'Due','date'), done:gp(p,'Done','check')||false, priority:gp(p,'Priority','select')||'보통'})).filter(t=>!t.done).sort((a,b) => { if (!a.due&&!b.due) return 0; if (!a.due) return 1; if (!b.due) return -1; return a.due.localeCompare(b.due); }); } catch(e) { D.todo = []; }
     }
     if (cfg.projects) {
       try {
         const pj = await qDB(cfg.projects);
-        // 항목(Task/Memo)과 프로젝트 그룹 분리
-        // Project 컬럼이 있으면 항목, 없으면 프로젝트 그룹
         const groups = [], items = [];
         pj.forEach(p => {
           const title = gp(p,'Title','title');
@@ -1076,22 +1074,20 @@ async function loadAll() {
           const projectGroup = gp(p,'Project','select') || '';
           const type = gp(p,'Type','select') || '';
           if (projectGroup || type) {
-            // 항목(Task/Memo)
+            // Projects DB 항목(Task/Memo)
             items.push({
-              id: p.id,
-              title,
-              type: type || 'Memo',
-              projectGroup, // 어느 프로젝트 소속인지
+              id: p.id, title, type: type || 'Memo',
+              projectGroup,
               status: gp(p,'Status','select') || '시작전',
               due: gp(p,'Due','date') || '',
               body: gp(p,'Body','text') || '',
-              createdAt: gp(p,'CreatedAt','ctime') || new Date().toISOString()
+              createdAt: p.created_time || new Date().toISOString(),
+              source: 'projects'
             });
           } else {
             // 프로젝트 그룹
             groups.push({
-              id: p.id,
-              name: title,
+              id: p.id, name: title,
               status: gp(p,'Status','select') || '',
               category: gp(p,'Category','select') || '',
               summary: gp(p,'Summary','text') || ''
@@ -1099,7 +1095,22 @@ async function loadAll() {
           }
         });
         D.projects = groups;
-        D.projItems = items;
+        // Memo DB에서 Project Relation이 연결된 항목도 projItems에 합산
+        const memoLinked = D.memo
+          .filter(mm => mm.projectRelId)
+          .map(mm => {
+            const proj = groups.find(g => g.id === mm.projectRelId);
+            const firstLine = mm.content.split('\n')[0].slice(0, 100);
+            const rest = mm.content.includes('\n') ? mm.content.slice(mm.content.indexOf('\n')+1).trim() : '';
+            return {
+              id: mm.id, title: firstLine, type: 'Memo',
+              projectGroup: proj ? proj.name : '',
+              status: '', due: '', body: rest,
+              createdAt: mm.createdAt, source: 'memo'
+            };
+          })
+          .filter(mm => mm.projectGroup); // 프로젝트 그룹 매칭된 것만
+        D.projItems = [...items, ...memoLinked];
       } catch(e) { D.projects = []; D.projItems = []; }
     }
     setSS('ok'); render(); loadCalendars(); rProjectSelects();
@@ -1275,20 +1286,21 @@ function rProjectMain() {
     if (memos.length) html += `<span>📝 Memo ${memos.length}</span>`;
     if (!items.length) html += `<span>항목 없음</span>`;
     html += `</div></div>`;
-    html += `<div style="display:flex;align-items:center;gap:0.25rem;flex-shrink:0;">`;
-    html += `<button class="inv-edit-btn" onclick="event.stopPropagation();openEditProject('${p.id}')" style="font-size:0.38rem;">수정</button>`;
-    html += `<button class="btn-del" onclick="event.stopPropagation();confirmDelProject('${p.id}','${esc(p.name)}')" style="font-size:0.38rem;">삭제</button>`;
-    html += `<span style="font-size:0.55rem;color:var(--text-m);padding:0 0.2rem;">${isOpen?'▲':'▼'}</span>`;
+    html += `<div style="flex-shrink:0;padding:0 0.25rem;">`;
+    html += `<span style="font-size:0.55rem;color:var(--text-m);">${isOpen?'▲':'▼'}</span>`;
     html += `</div></div>`;
 
     // 펼쳐진 상태
     if (isOpen) {
       html += `<div style="padding:0.875rem 1.25rem;">`;
-      // 항목 추가 버튼
-      html += `<div style="display:flex;gap:0.375rem;margin-bottom:0.875rem;">`;
+      // 항목 추가 + 프로젝트 수정/삭제
+      html += `<div style="display:flex;gap:0.375rem;margin-bottom:0.875rem;align-items:center;">`;
       html += `<button class="btn-primary" style="font-size:0.46rem;padding:0.4rem 0.875rem;" onclick="openProjItemModal('${p.id}','${esc(p.name)}','Task')">+ Task</button>`;
       html += `<button class="btn-primary" style="font-size:0.46rem;padding:0.4rem 0.875rem;background:var(--personal-c);" onclick="openProjItemModal('${p.id}','${esc(p.name)}','Memo')">+ Memo</button>`;
-      html += `</div>`;
+      html += `<div style="margin-left:auto;display:flex;gap:0.25rem;">`;
+      html += `<button class="inv-edit-btn" onclick="openEditProject('${p.id}')" style="font-size:0.38rem;">수정</button>`;
+      html += `<button class="btn-del" onclick="confirmDelProject('${p.id}','${esc(p.name)}')" style="font-size:0.38rem;">삭제</button>`;
+      html += `</div></div>`;
 
       if (!items.length) {
         html += `<div style="font-size:0.5rem;color:var(--text-m);padding:0.5rem 0;text-align:center;">아직 항목이 없습니다</div>`;
@@ -1324,13 +1336,13 @@ function renderProjItem(item, statusColor, typeIcon) {
 
   let html = `<div style="border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:0.375rem;overflow:hidden;${isDone?'opacity:0.6':''}">`;
   // 항목 헤더
-  html += `<div style="padding:0.625rem 0.875rem;display:flex;align-items:center;gap:0.5rem;cursor:${hasBody?'pointer':'default'};" ${hasBody?`onclick="toggleItemDetail('${item.id}')"`:''}>`; 
+  html += `<div style="padding:0.625rem 0.875rem;display:flex;align-items:center;gap:0.5rem;cursor:pointer;" onclick="toggleItemDetail('${item.id}')">`;
   if (isTask) {
     html += `<div onclick="event.stopPropagation();completeProjTask('${item.id}')" style="width:0.875rem;height:0.875rem;border:1.5px solid ${isDone?'var(--primary)':'var(--border)'};border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:${isDone?'var(--primary)':'var(--surface)'};transition:all 0.15s;">`;
     if (isDone) html += `<span style="font-size:0.35rem;color:white;font-weight:700;">✓</span>`;
     html += `</div>`;
   } else {
-    html += `<span style="font-size:0.6rem;flex-shrink:0;">📝</span>`;
+    html += `<span style="font-size:0.6rem;flex-shrink:0;">${item.source==='memo'?'🔗':'📝'}</span>`;
   }
   html += `<div style="flex:1;min-width:0;">`;
   html += `<div style="font-size:0.56rem;font-weight:600;color:${isDone?'var(--text-m)':'var(--text-h)'};${isDone?'text-decoration:line-through;':''}overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(item.title)}</div>`;
@@ -1339,16 +1351,19 @@ function renderProjItem(item, statusColor, typeIcon) {
   if (item.due) html += `<span style="font-size:0.38rem;color:${overdue?'var(--danger)':isToday?'var(--work-c)':'var(--text-m)'};font-weight:${overdue||isToday?'700':'400'};">${overdue?'⚠ ':isToday?'오늘: ':''} ${fd(item.due)}</span>`;
   if (hasBody && !isOpen) html += `<span style="font-size:0.38rem;color:var(--text-m);">▸ 내용 있음</span>`;
   html += `</div></div>`;
-  html += `<div style="display:flex;align-items:center;gap:0.2rem;flex-shrink:0;">`;
-  html += `<button class="inv-edit-btn" onclick="event.stopPropagation();editProjItem('${item.id}')" style="font-size:0.36rem;padding:0.15rem 0.4rem;">수정</button>`;
-  html += `<button class="btn-del" onclick="event.stopPropagation();confirmDelProjItem('${item.id}','${esc(item.title)}')" style="font-size:0.36rem;padding:0.15rem 0.4rem;">삭제</button>`;
-  if (hasBody) html += `<span style="font-size:0.48rem;color:var(--text-m);">${isOpen?'▲':'▼'}</span>`;
+  html += `<div style="flex-shrink:0;padding:0 0.2rem;cursor:pointer;" onclick="toggleItemDetail('${item.id}')">`;
+  html += `<span style="font-size:0.48rem;color:var(--text-m);">${isOpen?'▲':'▼'}</span>`;
   html += `</div></div>`;
-  // 펼쳐진 본문
-  if (isOpen && hasBody) {
-    html += `<div style="padding:0.625rem 0.875rem 0.75rem;border-top:1px solid var(--border);background:var(--subtle);">`;
-    html += `<div style="font-size:0.52rem;color:var(--text-b);line-height:1.75;white-space:pre-wrap;word-break:break-word;">${esc(item.body)}</div>`;
-    html += `</div>`;
+  // 펼쳐진 본문 (내용 없어도 수정/삭제는 항상 표시)
+  if (isOpen) {
+    html += `<div style="border-top:1px solid var(--border);background:var(--subtle);">`;
+    if (hasBody) {
+      html += `<div style="padding:0.625rem 0.875rem 0.5rem;font-size:0.52rem;color:var(--text-b);line-height:1.75;white-space:pre-wrap;word-break:break-word;">${esc(item.body)}</div>`;
+    }
+    html += `<div style="padding:0.5rem 0.875rem 0.625rem;display:flex;gap:0.25rem;border-top:${hasBody?'1px solid var(--border)':'none'};">`;
+    html += `<button class="inv-edit-btn" onclick="editProjItem('${item.id}')" style="font-size:0.4rem;padding:0.25rem 0.625rem;">✎ 수정</button>`;
+    html += `<button class="btn-del" onclick="confirmDelProjItem('${item.id}','${esc(item.title)}')" style="font-size:0.4rem;padding:0.25rem 0.625rem;">🗑 삭제</button>`;
+    html += `</div></div>`;
   }
   html += `</div>`;
   return html;
@@ -1441,9 +1456,11 @@ async function saveProjItem() {
   closeModal('projItemModal'); btn.disabled = false; btn.textContent = '저장';
   rProjectMain(); showToast(`✅ ${type} ${editId?'수정':'저장'} 완료!`, 'success');
 
-  // Notion 저장
+  // Notion 저장 — DB 컬럼이 없으면 해당 속성만 건너뜀 (400 방어)
   if (!cfg.token || !cfg.projects) return;
-  const props = {
+
+  // 1차: 모든 컬럼 포함해서 시도
+  const propsAll = {
     Title: {title:[{text:{content:title}}]},
     Type: {select:{name:type}},
     ...(proj?.name ? {Project:{select:{name:proj.name}}} : {}),
@@ -1451,21 +1468,44 @@ async function saveProjItem() {
     ...(due ? {Due:{date:{start:due}}} : {}),
     ...(body ? {Body:{rich_text:[{text:{content:body}}]}} : {})
   };
-  try {
+  // 2차 fallback: Title만 (DB 컬럼 부족 시)
+  const propsMin = {Title: {title:[{text:{content:title}}]}};
+
+  const saveToNotion = async (props) => {
     if (editId && !editId.startsWith('l')) {
-      await nFetch(`pages/${editId}`, 'PATCH', {properties:props});
+      return nFetch(`pages/${editId}`, 'PATCH', {properties:props});
     } else {
       const page = await mkPage(cfg.projects, props);
       const idx = D.projItems.findIndex(i => i.id === item.id);
       if (idx > -1) D.projItems[idx].id = page.id;
       rProjectMain();
+      return page;
     }
-  } catch(e) { showToast(`❌ Notion 저장 실패: ${e.message}`, 'error'); }
+  };
+
+  try {
+    await saveToNotion(propsAll);
+  } catch(e) {
+    if (e.message === '400') {
+      // 컬럼 누락 가능성 — Title만으로 재시도
+      showToast('⚠ 일부 컬럼 없음, Title만 저장 중...', '');
+      try {
+        await saveToNotion(propsMin);
+        showToast('✅ 저장됐습니다 (Notion DB에 Type·Project·Body·Due 컬럼을 추가하면 전체 저장됩니다)', 'success');
+      } catch(e2) { showToast(`❌ Notion 저장 실패: ${e2.message}`, 'error'); }
+    } else { showToast(`❌ Notion 저장 실패: ${e.message}`, 'error'); }
+  }
 }
 
 function confirmDelProjItem(id, title) {
   if (!confirm(`"${title}" 항목을 삭제할까요?`)) return;
+  const item = D.projItems.find(i => i.id === id);
   D.projItems = D.projItems.filter(i => i.id !== id);
+  // Memo DB 출처면 D.memo에서도 제거
+  if (item?.source === 'memo') {
+    D.memo = D.memo.filter(m => m.id !== id);
+    rMemo(); rHome(); rQuickMemoRecent();
+  }
   rProjectMain(); showToast('🗑 항목이 삭제됐습니다.', 'success');
   if (cfg.token && !id.startsWith('l')) {
     nFetch(`pages/${id}`, 'PATCH', {archived:true}).catch(e => console.warn('del proj item failed:', e));
