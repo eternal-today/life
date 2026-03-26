@@ -465,10 +465,9 @@ input,select,textarea{font-family:inherit;}
       <span class="quick-memo-title">📝 빠른 메모</span>
       <div class="quick-memo-opts">
         <select class="quick-memo-sel" id="qmArea">
-          <option value="">영역 없음</option>
+          <option value="personal" selected>개인</option>
           <option value="family">가정</option>
           <option value="work">회사</option>
-          <option value="personal">개인</option>
         </select>
         <label class="quick-memo-pin"><input type="checkbox" id="qmPin"> 📌 고정</label>
         <label class="quick-memo-pin"><input type="checkbox" id="qmDash"> 🏠 대시보드</label>
@@ -1064,7 +1063,7 @@ async function loadAll(){
     D.memo=m.map(p=>({id:p.id,content:gp(p,'Content','title'),area:(gp(p,'Area','select')||'').toLowerCase(),pinned:gp(p,'Pinned','check')||false,showInDash:gp(p,'ShowInDash','check')!==false,linkedTodo:gp(p,'LinkedTodo','text')||'',projectId:p.properties?.Project?.relation?.[0]?.id||'',createdAt:gp(p,'CreatedAt','ctime')||new Date().toISOString()}));
     if(cfg.todo){try{const td=await qDB(cfg.todo);D.todo=td.map(p=>({id:p.id,title:gp(p,'Title','title'),area:(gp(p,'Area','select')||'personal').toLowerCase(),due:gp(p,'Due','date'),done:gp(p,'Done','check')||false,priority:gp(p,'Priority','select')||'보통'})).filter(t=>!t.done).sort((a,b)=>{if(!a.due&&!b.due)return 0;if(!a.due)return 1;if(!b.due)return -1;return a.due.localeCompare(b.due);});}catch(e){D.todo=[];}}
     // 프로젝트 목록 로드
-    if(cfg.projects){try{const pj=await qDB(cfg.projects);D.projects=pj.map(p=>({id:p.id,name:gp(p,'Title','title'),status:gp(p,'Status','select')||''})).filter(p=>p.name);}catch(e){D.projects=[];}}
+    if(cfg.projects){try{const pj=await qDB(cfg.projects);D.projects=pj.map(p=>({id:p.id,name:gp(p,'Title','title'),status:gp(p,'Status','select')||'',category:gp(p,'Category','select')||'',summary:gp(p,'Summary','text')||''})).filter(p=>p.name);}catch(e){D.projects=[];}}
     setSS('ok');render();loadCalendars();rProjectSelects();
   }catch(e){
     const msg=e?.message||String(e);
@@ -1299,7 +1298,7 @@ async function saveQuickMemo(){
   const area=document.getElementById('qmArea').value;const pinned=document.getElementById('qmPin').checked;const showInDash=document.getElementById('qmDash').checked;
   const m={id:'l'+Date.now(),content,area,pinned,showInDash,createdAt:new Date().toISOString()};
   D.memo.unshift(m);rMemo();rQuickMemoRecent();
-  document.getElementById('qmText').value='';document.getElementById('qmPin').checked=false;document.getElementById('qmDash').checked=false;
+  document.getElementById('qmText').value='';document.getElementById('qmPin').checked=false;document.getElementById('qmDash').checked=false;document.getElementById('qmArea').value='personal';
   btn.disabled=false;btn.textContent='저장';
   showToast('✅ 메모가 저장되었습니다!','success');
   const props={Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}};
@@ -1391,7 +1390,12 @@ async function deleteMemo(id){
   showToast('🗑 메모가 삭제됐습니다.','success');
   if(cfg.token&&id&&!id.startsWith('l')){
     const nid=normalizeNotionId(id);
-    nFetch(`pages/${nid}`,'PATCH',{archived:true}).catch(e=>console.warn('memo delete failed:',e));
+    // archived:true (구 방식) + in_trash:true (신 방식) 둘 다 시도
+    nFetch(`pages/${nid}`,'PATCH',{archived:true,in_trash:true})
+      .catch(e=>{
+        console.warn('memo delete failed:', e.message, 'id:', nid);
+        showToast(`⚠ Notion 삭제 실패 (${e.message})`,'error');
+      });
   }
 }
 
