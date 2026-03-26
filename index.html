@@ -920,6 +920,7 @@ let gF={family:'all',work:'all',personal:'all'};
 let _projectFilter = 'all';
 let _openProjectId = null;
 let _openItemId = null; // 항목 접기/펼치기
+let _projCategories = []; // Notion DB에서 읽은 카테고리 캐시
 
 // =====================================================================
 // 초기화
@@ -1114,6 +1115,8 @@ async function loadAll() {
       } catch(e) { D.projects = []; D.projItems = []; }
     }
     setSS('ok'); render(); loadCalendars(); rProjectSelects();
+    // Projects DB Category 옵션 동적 로드 (캐싱)
+    if (cfg.projects && cfg.token) { loadProjCategories(); }
   } catch(e) {
     const msg = e?.message || String(e);
     if (msg==='401') showToast('❌ Token 인증 실패 (401).', 'error');
@@ -1152,6 +1155,32 @@ function setSS(s) {
   else { d.className='sync-dot'; t.textContent='데모 모드'; }
 }
 function demoData() { D.goals=[]; D.invest=[]; D.subs=[]; D.memo=[]; D.todo=[]; D.projItems=[]; setSS('err'); render(); }
+
+// Projects DB에서 Category Select 옵션 동적 로드
+async function loadProjCategories() {
+  try {
+    const db = await nFetch(`databases/${cfg.projects}`);
+    const opts = db.properties?.Category?.select?.options || [];
+    _projCategories = opts.map(o => o.name).filter(Boolean);
+    rProjCategorySelects();
+  } catch(e) { console.warn('loadProjCategories failed:', e); }
+}
+
+function rProjCategorySelects() {
+  if (!_projCategories.length) return;
+  const baseOpt = '<option value="">카테고리 없음</option>';
+  const opts = baseOpt + _projCategories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  // 없음 표기가 다른 select도 동일하게
+  const optsAlt = '<option value="">없음</option>' + _projCategories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  ['npMainCategory'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    const cur = el.value; el.innerHTML = opts; if (cur) el.value = cur;
+  });
+  ['npCategory','epCategory'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    const cur = el.value; el.innerHTML = optsAlt; if (cur) el.value = cur;
+  });
+}
 
 // =====================================================================
 // 렌더링
@@ -1538,6 +1567,7 @@ function openNewProjectModalFor() {
 
 function openEditProject(id) {
   const p = D.projects.find(x => x.id===id); if (!p) return;
+  rProjCategorySelects(); // 최신 카테고리 반영
   document.getElementById('epId').value = p.id; document.getElementById('epTitle').value = p.name;
   document.getElementById('epCategory').value = p.category||''; document.getElementById('epStatus').value = p.status||'시작전';
   document.getElementById('epSummary').value = p.summary||'';
@@ -1566,7 +1596,7 @@ async function deleteProject(id) {
 function toggleNewProjectForm() {
   const el = document.getElementById('new-project-form'); if (!el) return;
   const isOpen = el.style.display !== 'none'; el.style.display = isOpen ? 'none' : '';
-  if (!isOpen) setTimeout(() => document.getElementById('npMainTitle')?.focus(), 100);
+  if (!isOpen) { rProjCategorySelects(); setTimeout(() => document.getElementById('npMainTitle')?.focus(), 100); }
 }
 
 // =====================================================================
@@ -1585,7 +1615,7 @@ function onProjectSelectChange(el, selectId) {
     el.value = '';
     document.getElementById('npReturnSelectId').value = selectId;
     ['npTitle','npSummary'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('npCategory').value = ''; document.getElementById('npStatus').value = '시작전';
+    rProjCategorySelects(); document.getElementById('npCategory').value = ''; document.getElementById('npStatus').value = '시작전';
     openModal('newProjectModal'); setTimeout(() => document.getElementById('npTitle').focus(), 300);
   }
 }
