@@ -496,6 +496,7 @@ input,select,textarea{font-family:inherit;}
     <button class="stab active" onclick="showFamilySub('goals',this)">목표</button>
     <button class="stab" onclick="showFamilySub('todo',this)">할 일</button>
     <button class="stab" onclick="showFamilySub('memo',this)">메모</button>
+    <button class="stab" onclick="showFamilySub('projects',this)">프로젝트</button>
   </div>
   <div id="fsub-goals">
     <div class="toolbar-scroll"><div class="toolbar">
@@ -528,6 +529,12 @@ input,select,textarea{font-family:inherit;}
       </div>
     </div>
   </div>
+  <div id="fsub-projects" style="display:none">
+    <div class="toolbar-scroll"><div class="toolbar">
+      <button class="btn-primary ml-auto" onclick="openNewProjectModalFor('family')">+ 새 프로젝트</button>
+    </div></div>
+    <div id="project-list-family"><div class="loading-msg">로딩 중...</div></div>
+  </div>
 </div></div>
 
 <!-- WORK -->
@@ -540,6 +547,7 @@ input,select,textarea{font-family:inherit;}
     <button class="stab active" onclick="showWorkSub('goals',this)">목표</button>
     <button class="stab" onclick="showWorkSub('todo',this)">할 일</button>
     <button class="stab" onclick="showWorkSub('memo',this)">메모</button>
+    <button class="stab" onclick="showWorkSub('projects',this)">프로젝트</button>
   </div>
   <div id="wsub-goals">
     <div class="toolbar-scroll"><div class="toolbar">
@@ -572,6 +580,12 @@ input,select,textarea{font-family:inherit;}
       </div>
     </div>
   </div>
+  <div id="wsub-projects" style="display:none">
+    <div class="toolbar-scroll"><div class="toolbar">
+      <button class="btn-primary ml-auto" onclick="openNewProjectModalFor('work')">+ 새 프로젝트</button>
+    </div></div>
+    <div id="project-list-work"><div class="loading-msg">로딩 중...</div></div>
+  </div>
 </div></div>
 
 <!-- PERSONAL -->
@@ -585,6 +599,7 @@ input,select,textarea{font-family:inherit;}
     <button class="stab" onclick="showSub('invest',this)">재테크</button>
     <button class="stab" onclick="showSub('subs',this)">정기지출</button>
     <button class="stab" onclick="showSub('memo',this)">메모</button>
+    <button class="stab" onclick="showSub('projects',this)">프로젝트</button>
   </div>
   <div id="sub-goals">
     <div class="toolbar-scroll"><div class="toolbar">
@@ -641,6 +656,12 @@ input,select,textarea{font-family:inherit;}
         </div>
       </div>
     </div>
+  </div>
+  <div id="sub-projects" style="display:none">
+    <div class="toolbar-scroll"><div class="toolbar">
+      <button class="btn-primary ml-auto" onclick="openNewProjectModalFor('personal')">+ 새 프로젝트</button>
+    </div></div>
+    <div id="project-list-personal"><div class="loading-msg">로딩 중...</div></div>
   </div>
 </div></div>
 
@@ -863,6 +884,37 @@ input,select,textarea{font-family:inherit;}
   </div>
 </div></div>
 
+<div class="m-wrap" id="editProjectModal"><div class="modal">
+  <div class="modal-handle"></div>
+  <div class="m-title">프로젝트 수정</div>
+  <input type="hidden" id="epId" value="">
+  <div class="m-fr"><label class="m-fl">프로젝트명</label><input class="m-fi" id="epTitle" placeholder="프로젝트명"></div>
+  <div class="m-row2" style="margin-bottom:0.75rem;">
+    <div><label class="m-fl">카테고리</label>
+      <select class="m-sel" id="epCategory">
+        <option value="">없음</option>
+        <option value="앱개발">앱개발</option>
+        <option value="육아">육아</option>
+        <option value="재테크">재테크</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <div><label class="m-fl">상태</label>
+      <select class="m-sel" id="epStatus">
+        <option value="시작전">시작전</option>
+        <option value="진행중">진행중</option>
+        <option value="보류">보류</option>
+        <option value="완료">완료</option>
+      </select>
+    </div>
+  </div>
+  <div class="m-fr"><label class="m-fl">한 줄 요약</label><input class="m-fi" id="epSummary" placeholder="왜 이 프로젝트를 하는가"></div>
+  <div class="m-acts">
+    <button class="m-cancel" onclick="closeModal('editProjectModal')">취소</button>
+    <button class="m-save" onclick="saveProjectEdit()">저장</button>
+  </div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1021,7 +1073,7 @@ function parseCalEvents(items){
 
 function setSS(s){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');if(s==='ok'){d.className='sync-dot ok';t.textContent='동기화 완료';}else if(s==='loading'){d.className='sync-dot';t.textContent='로딩 중...';}else{d.className='sync-dot';t.textContent='데모 모드';}}
 function demoData(){D.goals=[];D.invest=[];D.subs=[];D.memo=[];D.todo=[];setSS('err');render();}
-function render(){rHome();rGoalPage('family');rGoalPage('work');rGoalPage('personal');rInvest();rSubs();rMemo();rMemoArea('family');rMemoArea('work');rQuickMemoRecent();rTodoFull('family');rTodoFull('work');rTodoFull('personal');}
+function render(){rHome();rGoalPage('family');rGoalPage('work');rGoalPage('personal');rInvest();rSubs();rMemo();rMemoArea('family');rMemoArea('work');rQuickMemoRecent();rTodoFull('family');rTodoFull('work');rTodoFull('personal');['family','work','personal'].forEach(a=>rProjectList(a));}
 function byGroup(g){return D.goals.filter(x=>(AMAP[x.area]?.g||'personal')===g&&x.status!=='완료');}
 function avg(arr){return arr.length?Math.round(arr.reduce((a,g)=>a+g.progress,0)/arr.length):0;}
 
@@ -1301,7 +1353,16 @@ async function saveMemoEdit(){
 }
 
 function confirmDelMemo(id,preview){if(!confirm(`"${preview}..." 메모를 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`))return;deleteMemo(id);}
-async function deleteMemo(id){if(cfg.token){nFetch(`pages/${id}`,'PATCH',{archived:true}).catch(e=>console.warn('memo delete failed:',e));}D.memo=D.memo.filter(x=>x.id!==id);rMemo();rHome();showToast('🗑 메모가 삭제됐습니다.','success');}
+async function deleteMemo(id){
+  const m=D.memo.find(x=>x.id===id);
+  D.memo=D.memo.filter(x=>x.id!==id);
+  rMemo();rMemoArea('family');rMemoArea('work');rHome();
+  showToast('🗑 메모가 삭제됐습니다.','success');
+  // 임시 ID(l로 시작)는 Notion에 없으므로 스킵
+  if(cfg.token&&id&&!id.startsWith('l')){
+    nFetch(`pages/${id}`,'PATCH',{archived:true}).catch(e=>console.warn('memo delete failed:',e));
+  }
+}
 
 function editTodoItem(id){
   const t=D.todo.find(x=>x.id===id);if(!t)return;
@@ -1396,6 +1457,85 @@ async function saveNewProject(){
   }
 }
 
+function rProjectList(area){
+  // area별 필터 없이 전체 표시 (프로젝트는 영역 구분 없음)
+  const listId={family:'project-list-family',work:'project-list-work',personal:'project-list-personal'}[area];
+  const el=document.getElementById(listId);if(!el)return;
+  if(!D.projects.length){el.innerHTML='<div class="empty-msg"><p>프로젝트가 없습니다</p></div>';return;}
+  const statusColor={시작전:'var(--text-m)',진행중:'var(--work-c)',보류:'#f59e0b',완료:'var(--success)'};
+  el.innerHTML='<div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem">'+D.projects.map(p=>{
+    const memos=D.memo.filter(m=>m.projectId===p.id);
+    const sc=statusColor[p.status]||'var(--text-m)';
+    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem 1.25rem;box-shadow:var(--sh-sm)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex:1;min-width:0">
+          <span style="font-size:0.65rem;font-weight:700;color:var(--text-h);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name)}</span>
+          ${p.status?`<span style="font-size:0.4rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:20px;background:var(--subtle);color:${sc};white-space:nowrap">${esc(p.status)}</span>`:''}
+        </div>
+        <div style="display:flex;gap:0.25rem;flex-shrink:0;margin-left:0.5rem">
+          <button class="inv-edit-btn" onclick="openEditProject('${p.id}')">수정</button>
+          <button class="btn-del" onclick="confirmDelProject('${p.id}','${esc(p.name)}')">삭제</button>
+        </div>
+      </div>
+      ${p.summary?`<div style="font-size:0.5rem;color:var(--text-s);margin-bottom:0.5rem;line-height:1.5">${esc(p.summary)}</div>`:''}
+      <div style="font-size:0.44rem;color:var(--text-m)">연결된 메모 ${memos.length}개${memos.length?` · 최근: ${esc(memos[0].content.slice(0,20))}...`:''}</div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function openNewProjectModalFor(area){
+  document.getElementById('npReturnSelectId').value='';
+  document.getElementById('npTitle').value='';
+  document.getElementById('npCategory').value='';
+  document.getElementById('npStatus').value='시작전';
+  document.getElementById('npSummary').value='';
+  openModal('newProjectModal');
+  setTimeout(()=>document.getElementById('npTitle').focus(),300);
+}
+
+function openEditProject(id){
+  const p=D.projects.find(x=>x.id===id);if(!p)return;
+  document.getElementById('epId').value=p.id;
+  document.getElementById('epTitle').value=p.name;
+  document.getElementById('epCategory').value=p.category||'';
+  document.getElementById('epStatus').value=p.status||'시작전';
+  document.getElementById('epSummary').value=p.summary||'';
+  openModal('editProjectModal');
+}
+
+async function saveProjectEdit(){
+  const id=document.getElementById('epId').value;
+  const title=document.getElementById('epTitle').value.trim().slice(0,200);
+  if(!title){showToast('프로젝트명을 입력해주세요','error');return;}
+  const status=document.getElementById('epStatus').value;
+  const category=document.getElementById('epCategory').value;
+  const summary=document.getElementById('epSummary').value.trim().slice(0,500);
+  const idx=D.projects.findIndex(p=>p.id===id);
+  if(idx>-1){D.projects[idx]={...D.projects[idx],name:title,status,category,summary};}
+  rProjectSelects();
+  ['family','work','personal'].forEach(a=>rProjectList(a));
+  closeModal('editProjectModal');
+  showToast('✅ 프로젝트 수정 완료!','success');
+  if(cfg.token&&!id.startsWith('l')){
+    const props={Title:{title:[{text:{content:title}}]},...(status?{Status:{select:{name:status}}}:{}),...(category?{Category:{select:{name:category}}}:{}),...(summary?{Summary:{rich_text:[{text:{content:summary}}]}}:{})};
+    nFetch(`pages/${id}`,'PATCH',{properties:props}).catch(e=>console.warn('project edit failed:',e));
+  }
+}
+
+function confirmDelProject(id,name){
+  if(!confirm(`"${name}" 프로젝트를 삭제할까요?\nNotion에서는 휴지통으로 이동됩니다.`))return;
+  deleteProject(id);
+}
+async function deleteProject(id){
+  D.projects=D.projects.filter(p=>p.id!==id);
+  rProjectSelects();
+  ['family','work','personal'].forEach(a=>rProjectList(a));
+  showToast('🗑 프로젝트가 삭제됐습니다.','success');
+  if(cfg.token&&!id.startsWith('l')){
+    nFetch(`pages/${id}`,'PATCH',{archived:true}).catch(e=>console.warn('project delete failed:',e));
+  }
+}
+
 function rMemoArea(area){
   const elId='memoList-'+area;
   const el=document.getElementById(elId);if(!el)return;
@@ -1447,24 +1587,27 @@ function showPage(id,btn){
   window.scrollTo(0,0);
 }
 function showSub(id,btn){
-  ['goals','todo','invest','subs','memo'].forEach(k=>{const el=document.getElementById('sub-'+k);if(el)el.style.display=k===id?'':'none';});
+  ['goals','todo','invest','subs','memo','projects'].forEach(k=>{const el=document.getElementById('sub-'+k);if(el)el.style.display=k===id?'':'none';});
   document.querySelectorAll('#page-personal .stab').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   if(id==='todo')rTodoFull('personal');
+  if(id==='projects')rProjectList('personal');
 }
 function showFamilySub(id,btn){
-  ['goals','todo','memo'].forEach(k=>{const el=document.getElementById('fsub-'+k);if(el)el.style.display=k===id?'':'none';});
+  ['goals','todo','memo','projects'].forEach(k=>{const el=document.getElementById('fsub-'+k);if(el)el.style.display=k===id?'':'none';});
   document.querySelectorAll('#page-family .stab').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   if(id==='todo')rTodoFull('family');
   if(id==='memo')rMemoArea('family');
+  if(id==='projects')rProjectList('family');
 }
 function showWorkSub(id,btn){
-  ['goals','todo','memo'].forEach(k=>{const el=document.getElementById('wsub-'+k);if(el)el.style.display=k===id?'':'none';});
+  ['goals','todo','memo','projects'].forEach(k=>{const el=document.getElementById('wsub-'+k);if(el)el.style.display=k===id?'':'none';});
   document.querySelectorAll('#page-work .stab').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   if(id==='todo')rTodoFull('work');
   if(id==='memo')rMemoArea('work');
+  if(id==='projects')rProjectList('work');
 }
 function rTodoFull(group){
   const areaMap={family:'family',work:'work',personal:'personal',growth:'personal',health:'personal',side:'personal',finance:'personal'};
