@@ -435,15 +435,19 @@ input,select,textarea{font-family:inherit;}
   <div class="detail-head">
     <div class="area-dot detail-dot" style="background:var(--primary)"></div>
     <div class="detail-title">프로젝트</div>
+    <div style="margin-left:auto;display:flex;gap:0.375rem;">
+      <button class="btn-primary" onclick="toggleNewProjectForm()" style="font-size:0.5rem;padding:0.5rem 0.875rem;">+ 새 프로젝트</button>
+    </div>
   </div>
-  <div class="toolbar-scroll" style="margin-bottom:0.875rem;"><div class="toolbar">
+  <!-- 프로젝트 그룹 필터 -->
+  <div class="toolbar-scroll" style="margin-bottom:0.875rem;"><div class="toolbar" id="project-group-filter">
     <button class="fp active" onclick="filterProjects('all',this)">전체</button>
-    <button class="fp" onclick="filterProjects('시작전',this)">시작전</button>
     <button class="fp" onclick="filterProjects('진행중',this)">진행중</button>
+    <button class="fp" onclick="filterProjects('시작전',this)">시작전</button>
     <button class="fp" onclick="filterProjects('보류',this)">보류</button>
     <button class="fp" onclick="filterProjects('완료',this)">완료</button>
-    <button class="btn-primary ml-auto" onclick="toggleNewProjectForm()">+ 새 프로젝트</button>
   </div></div>
+  <!-- 새 프로젝트 그룹 폼 -->
   <div id="new-project-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem;box-shadow:var(--sh-sm);">
     <div style="font-size:0.65rem;font-weight:700;color:var(--text-h);margin-bottom:0.875rem;">새 프로젝트</div>
     <div style="margin-bottom:0.5rem;"><input class="m-fi" id="npMainTitle" placeholder="프로젝트명 (필수)"></div>
@@ -670,7 +674,7 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div class="d-sec">
     <div class="d-lbl">DB 컬럼 구조</div>
-    <div class="d-note"><b>Goals:</b> Title · Area · Period · Progress · Status · Due · Description<br><br><b>Investment:</b> Asset · Category · Currency · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo · UpdatedAt<br><br><b>Subscription:</b> Service · Category · Fee · Currency · FeeKRW · Cycle · RenewDate · Active · Memo<br><br><b>Todo:</b> Title · Area · Priority · Due · Done<br><br><b>Memo:</b> Content · Area · Pinned · ShowInDash · CreatedAt · LinkedTodo · Project(Relation)<br><br><b>Projects:</b> Title · Status · Category · StartDate · TargetDate · Summary · Budget · Result · Memo(Relation)</div>
+    <div class="d-note"><b>Goals:</b> Title · Area · Period · Progress · Status · Due · Description<br><br><b>Investment:</b> Asset · Category · Currency · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo · UpdatedAt<br><br><b>Subscription:</b> Service · Category · Fee · Currency · FeeKRW · Cycle · RenewDate · Active · Memo<br><br><b>Todo:</b> Title · Area · Priority · Due · Done<br><br><b>Memo:</b> Content · Area · Pinned · ShowInDash · CreatedAt · LinkedTodo · Project(Relation)<br><br><b>Projects (통합 DB):</b><br>— 프로젝트 그룹: Title · Status · Category · Summary<br>— Task/Memo 항목: Title · Type(Select: Task/Memo) · Project(Select: 프로젝트명) · Status · Due · Body(Text)<br><br>💡 같은 DB에 프로젝트 그룹과 항목을 함께 저장합니다. Project 컬럼이 있으면 항목, 없으면 그룹으로 구분됩니다.</div>
   </div>
 </div>
 
@@ -863,6 +867,35 @@ input,select,textarea{font-family:inherit;}
   </div>
 </div></div>
 
+<!-- 프로젝트 항목 추가/수정 모달 (Task + Memo 통합) -->
+<div class="m-wrap" id="projItemModal"><div class="modal">
+  <div class="modal-handle"></div>
+  <div class="m-title" id="projItemModalTitle">항목 추가</div>
+  <input type="hidden" id="piEditId" value="">
+  <input type="hidden" id="piProjectId" value="">
+  <!-- 타입 토글 -->
+  <div style="display:flex;gap:0.375rem;background:var(--subtle);border-radius:var(--r-md);padding:0.25rem;margin-bottom:0.875rem;">
+    <button id="piTypeTask" onclick="setProjItemType('Task')" style="flex:1;padding:0.5rem;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:0.56rem;font-weight:700;cursor:pointer;transition:all 0.15s;background:var(--primary);color:white;">✅ Task</button>
+    <button id="piTypeMemo" onclick="setProjItemType('Memo')" style="flex:1;padding:0.5rem;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:0.56rem;font-weight:700;cursor:pointer;transition:all 0.15s;background:transparent;color:var(--text-s);">📝 Memo</button>
+  </div>
+  <div class="m-fr"><label class="m-fl">제목</label><input class="m-fi" id="piTitle" placeholder="과업명 또는 메모 제목"></div>
+  <div class="m-fr"><label class="m-fl">내용 (선택)</label><textarea class="m-ta" id="piBody" placeholder="상세 내용, 아이디어, 링크 등..." rows="4"></textarea></div>
+  <div id="piTaskFields">
+    <div class="m-row2" style="margin-bottom:0.75rem;">
+      <div><label class="m-fl">상태</label>
+        <select class="m-sel" id="piStatus">
+          <option value="시작전">시작전</option><option value="진행중">진행중</option><option value="완료">완료</option><option value="보류">보류</option>
+        </select>
+      </div>
+      <div><label class="m-fl">마감일 (선택)</label><div class="date-wrap"><input class="m-fi" id="piDue" type="date"><button class="btn-today" onclick="setToday('piDue')">Today</button></div></div>
+    </div>
+  </div>
+  <div class="m-acts">
+    <button class="m-cancel" onclick="closeModal('projItemModal')">취소</button>
+    <button class="m-save" id="bSaveProjItem" onclick="saveProjItem()">저장</button>
+  </div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -880,12 +913,13 @@ const AMAP={
 };
 
 let cfg={token:'',goals:'',invest:'',subs:'',memo:'',todo:'',proxy:'',calFamily:'',calWork:'',calPersonal:'',projects:''};
-let D={goals:[],invest:[],subs:[],memo:[],todo:[],sched:{family:[],work:[],personal:[]},projects:[]};
+let D={goals:[],invest:[],subs:[],memo:[],todo:[],sched:{family:[],work:[],personal:[]},projects:[],projItems:[]};
 let gF={family:'all',work:'all',personal:'all'};
 
 // FIX: 전역 선언 누락 → 추가
 let _projectFilter = 'all';
 let _openProjectId = null;
+let _openItemId = null; // 항목 접기/펼치기
 
 // =====================================================================
 // 초기화
@@ -1031,7 +1065,42 @@ async function loadAll() {
       try { const td = await qDB(cfg.todo); D.todo = td.map(p => ({id:p.id, title:gp(p,'Title','title'), area:(gp(p,'Area','select')||'personal').toLowerCase(), due:gp(p,'Due','date'), done:gp(p,'Done','check')||false, priority:gp(p,'Priority','select')||'보통'})).filter(t=>!t.done).sort((a,b) => { if (!a.due&&!b.due) return 0; if (!a.due) return 1; if (!b.due) return -1; return a.due.localeCompare(b.due); }); } catch(e) { D.todo = []; }
     }
     if (cfg.projects) {
-      try { const pj = await qDB(cfg.projects); D.projects = pj.map(p => ({id:p.id, name:gp(p,'Title','title'), status:gp(p,'Status','select')||'', category:gp(p,'Category','select')||'', summary:gp(p,'Summary','text')||''})).filter(p=>p.name); } catch(e) { D.projects = []; }
+      try {
+        const pj = await qDB(cfg.projects);
+        // 항목(Task/Memo)과 프로젝트 그룹 분리
+        // Project 컬럼이 있으면 항목, 없으면 프로젝트 그룹
+        const groups = [], items = [];
+        pj.forEach(p => {
+          const title = gp(p,'Title','title');
+          if (!title) return;
+          const projectGroup = gp(p,'Project','select') || '';
+          const type = gp(p,'Type','select') || '';
+          if (projectGroup || type) {
+            // 항목(Task/Memo)
+            items.push({
+              id: p.id,
+              title,
+              type: type || 'Memo',
+              projectGroup, // 어느 프로젝트 소속인지
+              status: gp(p,'Status','select') || '시작전',
+              due: gp(p,'Due','date') || '',
+              body: gp(p,'Body','text') || '',
+              createdAt: gp(p,'CreatedAt','ctime') || new Date().toISOString()
+            });
+          } else {
+            // 프로젝트 그룹
+            groups.push({
+              id: p.id,
+              name: title,
+              status: gp(p,'Status','select') || '',
+              category: gp(p,'Category','select') || '',
+              summary: gp(p,'Summary','text') || ''
+            });
+          }
+        });
+        D.projects = groups;
+        D.projItems = items;
+      } catch(e) { D.projects = []; D.projItems = []; }
     }
     setSS('ok'); render(); loadCalendars(); rProjectSelects();
   } catch(e) {
@@ -1071,7 +1140,7 @@ function setSS(s) {
   else if (s==='loading') { d.className='sync-dot'; t.textContent='로딩 중...'; }
   else { d.className='sync-dot'; t.textContent='데모 모드'; }
 }
-function demoData() { D.goals=[]; D.invest=[]; D.subs=[]; D.memo=[]; D.todo=[]; setSS('err'); render(); }
+function demoData() { D.goals=[]; D.invest=[]; D.subs=[]; D.memo=[]; D.todo=[]; D.projItems=[]; setSS('err'); render(); }
 
 // =====================================================================
 // 렌더링
@@ -1142,82 +1211,264 @@ function rGoalPage(group) {
 }
 
 // =====================================================================
-// 프로젝트 — FIX: 이중선언 제거, 전역 함수로 분리
+// 프로젝트 — 2계층 구조 (Project Group → Items)
 // =====================================================================
 function filterProjects(val, btn) {
   _projectFilter = val;
-  document.querySelectorAll('#page-projects .fp').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#project-group-filter .fp').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   rProjectMain();
 }
 
 function toggleProjectDetail(id) {
   _openProjectId = (_openProjectId === id) ? null : id;
+  _openItemId = null;
+  rProjectMain();
+}
+
+function toggleItemDetail(id) {
+  _openItemId = (_openItemId === id) ? null : id;
   rProjectMain();
 }
 
 function rProjectMain() {
   const el = document.getElementById('project-list-main'); if (!el) return;
-  let list = D.projects;
-  if (_projectFilter !== 'all') list = list.filter(p => p.status === _projectFilter);
-  if (!list.length) { el.innerHTML = '<div class="empty-msg"><p>프로젝트가 없습니다</p></div>'; return; }
+  let groups = D.projects;
+  if (_projectFilter !== 'all') groups = groups.filter(p => p.status === _projectFilter);
+  if (!groups.length) {
+    el.innerHTML = '<div class="empty-msg"><p>프로젝트가 없습니다</p><span style="font-size:0.5rem;color:var(--text-m)">+ 새 프로젝트로 시작해보세요</span></div>';
+    return;
+  }
   const statusColor = {'시작전':'var(--text-m)','진행중':'var(--work-c)','보류':'#f59e0b','완료':'var(--success)'};
-  let html = '<div style="display:grid;grid-template-columns:1fr;gap:0.625rem;">';
-  list.forEach(p => {
-    const memos = D.memo.filter(m => m.projectId === p.id).sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
+  const typeIcon = {'Task':'✅','Memo':'📝'};
+  let html = '<div style="display:flex;flex-direction:column;gap:0.75rem;">';
+
+  groups.forEach(p => {
+    const items = D.projItems.filter(i => i.projectGroup === p.name)
+      .sort((a,b) => {
+        // Task 먼저, 그 안에서 마감일 순
+        if (a.type !== b.type) return a.type === 'Task' ? -1 : 1;
+        if (!a.due && !b.due) return new Date(b.createdAt)-new Date(a.createdAt);
+        if (!a.due) return 1; if (!b.due) return -1;
+        return a.due.localeCompare(b.due);
+      });
+    const tasks = items.filter(i => i.type === 'Task');
+    const memos = items.filter(i => i.type === 'Memo');
+    const doneTasks = tasks.filter(t => t.status === '완료').length;
     const sc = statusColor[p.status] || 'var(--text-m)';
     const isOpen = _openProjectId === p.id;
-    html += '<div class="goal-card" style="cursor:default;">';
-    html += `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;cursor:pointer;" onclick="toggleProjectDetail('${p.id}')">`;
-    html += '<div style="flex:1;min-width:0;">';
-    html += `<div style="font-size:0.65rem;font-weight:700;color:var(--text-h);margin-bottom:0.2rem;">${esc(p.name)}</div>`;
-    if (!isOpen && p.summary) html += `<div style="font-size:0.5rem;color:var(--text-s);line-height:1.5;">${esc(p.summary)}</div>`;
-    html += '</div>';
-    html += '<div style="display:flex;align-items:center;gap:0.375rem;flex-shrink:0;">';
-    if (p.status) html += `<span style="font-size:0.4rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:20px;background:var(--subtle);color:${sc}">${esc(p.status)}</span>`;
-    html += `<button class="inv-edit-btn" onclick="event.stopPropagation();openEditProject('${p.id}')">수정</button>`;
-    html += `<button class="btn-del" onclick="event.stopPropagation();confirmDelProject('${p.id}','${esc(p.name)}')">삭제</button>`;
-    html += `<span style="font-size:0.6rem;color:var(--text-m);padding:0 0.25rem;">${isOpen?'▲':'▼'}</span>`;
-    html += '</div></div>';
-    if (!isOpen) {
-      html += `<div style="font-size:0.42rem;color:var(--text-m);margin-top:0.375rem;">연결된 메모 ${memos.length}개</div>`;
-      if (memos[0]) html += `<div style="margin-top:0.5rem;padding:0.5rem 0.75rem;background:var(--subtle);border-radius:var(--r-sm);font-size:0.48rem;color:var(--text-s);line-height:1.5;cursor:pointer;" onclick="toggleProjectDetail('${p.id}')">${esc(memos[0].content.slice(0,80))}${memos[0].content.length>80?'..':''}</div>`;
-    }
+
+    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm);overflow:hidden;">`;
+
+    // 프로젝트 그룹 헤더
+    html += `<div style="padding:0.875rem 1.25rem;display:flex;align-items:center;gap:0.625rem;cursor:pointer;border-bottom:${isOpen?'1px solid var(--border)':'none'};" onclick="toggleProjectDetail('${p.id}')">`;
+    html += `<div style="flex:1;min-width:0;">`;
+    html += `<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">`;
+    html += `<span style="font-size:0.7rem;font-weight:700;color:var(--text-h);">${esc(p.name)}</span>`;
+    if (p.status) html += `<span style="font-size:0.38rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:20px;background:var(--subtle);color:${sc};flex-shrink:0;">${esc(p.status)}</span>`;
+    if (p.category) html += `<span style="font-size:0.38rem;color:var(--text-m);padding:0.1rem 0.45rem;border-radius:20px;background:var(--subtle);flex-shrink:0;">${esc(p.category)}</span>`;
+    html += `</div>`;
+    if (p.summary) html += `<div style="font-size:0.48rem;color:var(--text-s);margin-top:0.2rem;line-height:1.5;">${esc(p.summary)}</div>`;
+    // 미리보기 통계
+    html += `<div style="display:flex;gap:0.625rem;margin-top:0.375rem;font-size:0.42rem;color:var(--text-m);">`;
+    if (tasks.length) html += `<span>✅ Task ${doneTasks}/${tasks.length}</span>`;
+    if (memos.length) html += `<span>📝 Memo ${memos.length}</span>`;
+    if (!items.length) html += `<span>항목 없음</span>`;
+    html += `</div></div>`;
+    html += `<div style="display:flex;align-items:center;gap:0.25rem;flex-shrink:0;">`;
+    html += `<button class="inv-edit-btn" onclick="event.stopPropagation();openEditProject('${p.id}')" style="font-size:0.38rem;">수정</button>`;
+    html += `<button class="btn-del" onclick="event.stopPropagation();confirmDelProject('${p.id}','${esc(p.name)}')" style="font-size:0.38rem;">삭제</button>`;
+    html += `<span style="font-size:0.55rem;color:var(--text-m);padding:0 0.2rem;">${isOpen?'▲':'▼'}</span>`;
+    html += `</div></div>`;
+
+    // 펼쳐진 상태
     if (isOpen) {
-      html += '<div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;">';
-      if (p.summary) html += `<div style="font-size:0.5rem;color:var(--text-s);margin-bottom:0.75rem;line-height:1.6;padding:0.5rem 0.75rem;background:var(--subtle);border-radius:var(--r-sm);">📌 ${esc(p.summary)}</div>`;
-      html += `<div style="font-size:0.52rem;font-weight:700;color:var(--text-h);margin-bottom:0.5rem;">메모 작성</div>`;
-      html += `<textarea id="pm-ta-${p.id}" class="m-ta" placeholder="이 프로젝트 관련 아이디어, 자료, 링크 등을 기록하세요..." rows="4" style="width:100%;margin-bottom:0.5rem;"></textarea>`;
-      html += `<div style="display:flex;justify-content:flex-end;margin-bottom:1rem;"><button class="btn-primary" onclick="saveProjectMemo('${p.id}')">메모 저장</button></div>`;
-      html += `<div style="font-size:0.52rem;font-weight:700;color:var(--text-h);margin-bottom:0.5rem;">연결된 메모 (${memos.length}개)</div>`;
-      if (memos.length) {
-        memos.forEach(m => {
-          html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:0.75rem;margin-bottom:0.5rem;">';
-          html += `<div style="font-size:0.56rem;color:var(--text-b);line-height:1.7;white-space:pre-wrap;word-break:break-word;">${esc(m.content)}</div>`;
-          html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.375rem;">';
-          html += `<span style="font-size:0.42rem;color:var(--text-m);">${fdt(m.createdAt)}</span>`;
-          html += `<button class="btn-del" style="font-size:0.38rem;" onclick="confirmDelMemo('${m.id}','${esc(m.content).slice(0,15)}')">삭제</button>`;
-          html += '</div></div>';
-        });
-      } else { html += '<div style="font-size:0.5rem;color:var(--text-m);padding:0.5rem 0;">아직 메모가 없습니다</div>'; }
-      html += '</div>';
+      html += `<div style="padding:0.875rem 1.25rem;">`;
+      // 항목 추가 버튼
+      html += `<div style="display:flex;gap:0.375rem;margin-bottom:0.875rem;">`;
+      html += `<button class="btn-primary" style="font-size:0.46rem;padding:0.4rem 0.875rem;" onclick="openProjItemModal('${p.id}','${esc(p.name)}','Task')">+ Task</button>`;
+      html += `<button class="btn-primary" style="font-size:0.46rem;padding:0.4rem 0.875rem;background:var(--personal-c);" onclick="openProjItemModal('${p.id}','${esc(p.name)}','Memo')">+ Memo</button>`;
+      html += `</div>`;
+
+      if (!items.length) {
+        html += `<div style="font-size:0.5rem;color:var(--text-m);padding:0.5rem 0;text-align:center;">아직 항목이 없습니다</div>`;
+      } else {
+        // Task 섹션
+        if (tasks.length) {
+          html += `<div style="font-size:0.42rem;font-weight:700;color:var(--text-m);letter-spacing:.08em;text-transform:uppercase;margin-bottom:0.375rem;">Task</div>`;
+          tasks.forEach(item => { html += renderProjItem(item, statusColor, typeIcon); });
+        }
+        // Memo 섹션
+        if (memos.length) {
+          html += `<div style="font-size:0.42rem;font-weight:700;color:var(--text-m);letter-spacing:.08em;text-transform:uppercase;margin:0.75rem 0 0.375rem;">Memo</div>`;
+          memos.forEach(item => { html += renderProjItem(item, statusColor, typeIcon); });
+        }
+      }
+      html += `</div>`;
     }
-    html += '</div>';
+    html += `</div>`;
   });
   html += '</div>';
   el.innerHTML = html;
 }
 
-async function saveProjectMemo(projectId) {
-  const ta = document.getElementById('pm-ta-'+projectId); if (!ta) return;
-  const content = ta.value.trim().slice(0,3000); if (!content) { showToast('내용을 입력해주세요', 'error'); return; }
-  const area = 'personal';
-  const m = {id:'l'+Date.now(), content, area, pinned:false, showInDash:false, projectId, createdAt:new Date().toISOString()};
-  D.memo.unshift(m); ta.value = ''; rProjectMain(); showToast('✅ 메모가 저장됐습니다!', 'success');
-  if (cfg.token && cfg.memo) {
-    mkPage(cfg.memo, {Content:{title:[{text:{content}}]}, Area:{select:{name:area}}, Pinned:{checkbox:false}, ShowInDash:{checkbox:false}, Project:{relation:[{id:projectId}]}})
-      .then(page => { const idx = D.memo.findIndex(x => x.id === m.id); if (idx > -1) D.memo[idx].id = page.id; })
-      .catch(e => console.warn('saveProjectMemo failed:', e));
+function renderProjItem(item, statusColor, typeIcon) {
+  const isOpen = _openItemId === item.id;
+  const isTask = item.type === 'Task';
+  const isDone = item.status === '완료';
+  const sc = statusColor[item.status] || 'var(--text-m)';
+  const today = new Date().toISOString().slice(0,10);
+  const overdue = item.due && item.due < today && !isDone;
+  const isToday = item.due && item.due === today;
+  const hasBody = item.body && item.body.trim();
+
+  let html = `<div style="border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:0.375rem;overflow:hidden;${isDone?'opacity:0.6':''}">`;
+  // 항목 헤더
+  html += `<div style="padding:0.625rem 0.875rem;display:flex;align-items:center;gap:0.5rem;cursor:${hasBody?'pointer':'default'};" ${hasBody?`onclick="toggleItemDetail('${item.id}')"`:''}>`; 
+  if (isTask) {
+    html += `<div onclick="event.stopPropagation();completeProjTask('${item.id}')" style="width:0.875rem;height:0.875rem;border:1.5px solid ${isDone?'var(--primary)':'var(--border)'};border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:${isDone?'var(--primary)':'var(--surface)'};transition:all 0.15s;">`;
+    if (isDone) html += `<span style="font-size:0.35rem;color:white;font-weight:700;">✓</span>`;
+    html += `</div>`;
+  } else {
+    html += `<span style="font-size:0.6rem;flex-shrink:0;">📝</span>`;
+  }
+  html += `<div style="flex:1;min-width:0;">`;
+  html += `<div style="font-size:0.56rem;font-weight:600;color:${isDone?'var(--text-m)':'var(--text-h)'};${isDone?'text-decoration:line-through;':''}overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(item.title)}</div>`;
+  html += `<div style="display:flex;align-items:center;gap:0.375rem;margin-top:0.1rem;flex-wrap:wrap;">`;
+  if (isTask && item.status) html += `<span style="font-size:0.38rem;color:${sc};font-weight:700;">${esc(item.status)}</span>`;
+  if (item.due) html += `<span style="font-size:0.38rem;color:${overdue?'var(--danger)':isToday?'var(--work-c)':'var(--text-m)'};font-weight:${overdue||isToday?'700':'400'};">${overdue?'⚠ ':isToday?'오늘: ':''} ${fd(item.due)}</span>`;
+  if (hasBody && !isOpen) html += `<span style="font-size:0.38rem;color:var(--text-m);">▸ 내용 있음</span>`;
+  html += `</div></div>`;
+  html += `<div style="display:flex;align-items:center;gap:0.2rem;flex-shrink:0;">`;
+  html += `<button class="inv-edit-btn" onclick="event.stopPropagation();editProjItem('${item.id}')" style="font-size:0.36rem;padding:0.15rem 0.4rem;">수정</button>`;
+  html += `<button class="btn-del" onclick="event.stopPropagation();confirmDelProjItem('${item.id}','${esc(item.title)}')" style="font-size:0.36rem;padding:0.15rem 0.4rem;">삭제</button>`;
+  if (hasBody) html += `<span style="font-size:0.48rem;color:var(--text-m);">${isOpen?'▲':'▼'}</span>`;
+  html += `</div></div>`;
+  // 펼쳐진 본문
+  if (isOpen && hasBody) {
+    html += `<div style="padding:0.625rem 0.875rem 0.75rem;border-top:1px solid var(--border);background:var(--subtle);">`;
+    html += `<div style="font-size:0.52rem;color:var(--text-b);line-height:1.75;white-space:pre-wrap;word-break:break-word;">${esc(item.body)}</div>`;
+    html += `</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+// 프로젝트 항목 완료 처리
+async function completeProjTask(id) {
+  const item = D.projItems.find(i => i.id === id); if (!item || item.type !== 'Task') return;
+  item.status = item.status === '완료' ? '진행중' : '완료';
+  rProjectMain();
+  if (cfg.token && !id.startsWith('l')) {
+    nFetch(`pages/${id}`, 'PATCH', {properties:{Status:{select:{name:item.status}}}})
+      .catch(e => console.warn('completeProjTask failed:', e));
+  }
+}
+
+// 항목 추가 모달 열기
+function openProjItemModal(projectId, projectName, type='Task') {
+  document.getElementById('piEditId').value = '';
+  document.getElementById('piProjectId').value = projectId;
+  document.getElementById('projItemModalTitle').textContent = `${projectName} — 항목 추가`;
+  document.getElementById('piTitle').value = '';
+  document.getElementById('piBody').value = '';
+  document.getElementById('piDue').value = '';
+  document.getElementById('piStatus').value = '시작전';
+  setProjItemType(type);
+  openModal('projItemModal');
+  setTimeout(() => document.getElementById('piTitle').focus(), 300);
+}
+
+function setProjItemType(type) {
+  const taskBtn = document.getElementById('piTypeTask');
+  const memoBtn = document.getElementById('piTypeMemo');
+  const taskFields = document.getElementById('piTaskFields');
+  if (!taskBtn) return;
+  if (type === 'Task') {
+    taskBtn.style.background = 'var(--primary)'; taskBtn.style.color = 'white';
+    memoBtn.style.background = 'transparent'; memoBtn.style.color = 'var(--text-s)';
+    taskFields.style.display = '';
+  } else {
+    memoBtn.style.background = 'var(--personal-c)'; memoBtn.style.color = 'white';
+    taskBtn.style.background = 'transparent'; taskBtn.style.color = 'var(--text-s)';
+    taskFields.style.display = 'none';
+  }
+}
+
+function getCurrentProjItemType() {
+  const taskBtn = document.getElementById('piTypeTask');
+  return taskBtn && taskBtn.style.background.includes('var(--primary)') ? 'Task' : 'Memo';
+}
+
+function editProjItem(id) {
+  const item = D.projItems.find(i => i.id === id); if (!item) return;
+  const proj = D.projects.find(p => p.name === item.projectGroup);
+  document.getElementById('piEditId').value = item.id;
+  document.getElementById('piProjectId').value = proj?.id || '';
+  document.getElementById('projItemModalTitle').textContent = '항목 수정';
+  document.getElementById('piTitle').value = item.title;
+  document.getElementById('piBody').value = item.body || '';
+  document.getElementById('piDue').value = item.due || '';
+  document.getElementById('piStatus').value = item.status || '시작전';
+  setProjItemType(item.type || 'Task');
+  openModal('projItemModal');
+}
+
+async function saveProjItem() {
+  const title = document.getElementById('piTitle').value.trim().slice(0,200);
+  if (!title) { showToast('제목을 입력해주세요', 'error'); return; }
+  const editId = document.getElementById('piEditId').value;
+  const projectId = document.getElementById('piProjectId').value;
+  const proj = D.projects.find(p => p.id === projectId);
+  const type = getCurrentProjItemType();
+  const body = document.getElementById('piBody').value.trim().slice(0,3000);
+  const status = type === 'Task' ? document.getElementById('piStatus').value : '';
+  const due = type === 'Task' ? document.getElementById('piDue').value : '';
+  const btn = document.getElementById('bSaveProjItem'); btn.disabled = true; btn.textContent = '저장 중...';
+
+  const item = {
+    id: editId || 'l'+Date.now(),
+    title, type, projectGroup: proj?.name || '',
+    status, due, body, createdAt: new Date().toISOString()
+  };
+
+  if (editId) {
+    const idx = D.projItems.findIndex(i => i.id === editId);
+    if (idx > -1) D.projItems[idx] = {...D.projItems[idx], ...item};
+  } else {
+    D.projItems.unshift(item);
+  }
+  closeModal('projItemModal'); btn.disabled = false; btn.textContent = '저장';
+  rProjectMain(); showToast(`✅ ${type} ${editId?'수정':'저장'} 완료!`, 'success');
+
+  // Notion 저장
+  if (!cfg.token || !cfg.projects) return;
+  const props = {
+    Title: {title:[{text:{content:title}}]},
+    Type: {select:{name:type}},
+    ...(proj?.name ? {Project:{select:{name:proj.name}}} : {}),
+    ...(status ? {Status:{select:{name:status}}} : {}),
+    ...(due ? {Due:{date:{start:due}}} : {}),
+    ...(body ? {Body:{rich_text:[{text:{content:body}}]}} : {})
+  };
+  try {
+    if (editId && !editId.startsWith('l')) {
+      await nFetch(`pages/${editId}`, 'PATCH', {properties:props});
+    } else {
+      const page = await mkPage(cfg.projects, props);
+      const idx = D.projItems.findIndex(i => i.id === item.id);
+      if (idx > -1) D.projItems[idx].id = page.id;
+      rProjectMain();
+    }
+  } catch(e) { showToast(`❌ Notion 저장 실패: ${e.message}`, 'error'); }
+}
+
+function confirmDelProjItem(id, title) {
+  if (!confirm(`"${title}" 항목을 삭제할까요?`)) return;
+  D.projItems = D.projItems.filter(i => i.id !== id);
+  rProjectMain(); showToast('🗑 항목이 삭제됐습니다.', 'success');
+  if (cfg.token && !id.startsWith('l')) {
+    nFetch(`pages/${id}`, 'PATCH', {archived:true}).catch(e => console.warn('del proj item failed:', e));
   }
 }
 
@@ -1551,7 +1802,7 @@ async function saveMemoEdit() {
 
 function confirmDelMemo(id, preview) { if (!confirm(`"${preview}..." 메모를 삭제할까요?`)) return; deleteMemo(id); }
 async function deleteMemo(id) {
-  D.memo = D.memo.filter(x => x.id !== id); rMemo(); rHome(); showToast('🗑 메모가 삭제됐습니다.', 'success');
+  D.memo = D.memo.filter(x => x.id !== id); rMemo(); rHome(); rQuickMemoRecent(); showToast('🗑 메모가 삭제됐습니다.', 'success');
   if (cfg.token && id && !id.startsWith('l')) {
     const nid = normalizeNotionId(id);
     nFetch(`pages/${nid}`, 'PATCH', {archived:true, in_trash:true})
