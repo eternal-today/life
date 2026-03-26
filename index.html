@@ -389,9 +389,9 @@ input,select,textarea{font-family:inherit;}
     <button class="tab-btn" onclick="showPage('projects',this)">프로젝트</button>
     <div class="tab-date-wrap">
       <span class="ds-quote">"Live each day as if you will live forever."</span>
-      <span class="ds-sep">·</span>
+      <span class="ds-sep">•</span>
       <span class="ds-meta" id="todayMeta"></span>
-      <span class="ds-sep">·</span>
+      <span class="ds-sep">•</span>
       <span class="ds-date" id="todayDate">—</span>
     </div>
   </div>
@@ -488,39 +488,37 @@ input,select,textarea{font-family:inherit;}
     <div class="area-dot detail-dot" style="background:var(--primary)"></div>
     <div class="detail-title">프로젝트</div>
   </div>
-  <div class="toolbar-scroll" style="margin-bottom:0.875rem;"><div class="toolbar">
-    <button class="fp active" onclick="filterProjects('all',this)">전체</button>
-    <button class="fp" onclick="filterProjects('시작전',this)">시작전</button>
-    <button class="fp" onclick="filterProjects('진행중',this)">진행중</button>
-    <button class="fp" onclick="filterProjects('보류',this)">보류</button>
-    <button class="fp" onclick="filterProjects('완료',this)">완료</button>
-    <button class="btn-primary ml-auto" onclick="toggleNewProjectForm()">+ 새 프로젝트</button>
-  </div></div>
-  <!-- 새 프로젝트 입력창 — 기본 숨김 -->
-  <div id="new-project-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem;box-shadow:var(--sh-sm);">
-    <div style="font-size:0.65rem;font-weight:700;color:var(--text-h);margin-bottom:0.875rem;">새 프로젝트</div>
-    <div style="margin-bottom:0.5rem;"><input class="m-fi" id="npMainTitle" placeholder="프로젝트명 (필수)"></div>
-    <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
-      <select class="m-sel" id="npMainCategory" style="flex:1;">
-        <option value="">카테고리 없음</option>
-        <option value="앱개발">앱개발</option>
-        <option value="육아">육아</option>
-        <option value="재테크">재테크</option>
-        <option value="기타">기타</option>
-      </select>
-      <select class="m-sel" id="npMainStatus" style="flex:1;">
-        <option value="시작전">시작전</option>
-        <option value="진행중">진행중</option>
-        <option value="보류">보류</option>
-      </select>
+  <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;">
+    <div style="flex:1;min-width:0;">
+      <div class="toolbar-scroll" style="margin-bottom:0.875rem;"><div class="toolbar">
+        <button class="fp active" id="pf-all" onclick="filterProjects('all',this)">전체</button>
+        <button class="fp" onclick="filterProjects('시작전',this)">시작전</button>
+        <button class="fp" onclick="filterProjects('진행중',this)">진행중</button>
+        <button class="fp" onclick="filterProjects('보류',this)">보류</button>
+        <button class="fp" onclick="filterProjects('완료',this)">완료</button>
+      </div></div>
+      <div id="project-list-main"><div class="loading-msg">로딩 중...</div></div>
     </div>
-    <div style="margin-bottom:0.75rem;"><input class="m-fi" id="npMainSummary" placeholder="한 줄 요약 (선택)"></div>
-    <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
-      <button class="m-cancel" style="padding:0.625rem 1.25rem;" onclick="toggleNewProjectForm()">취소</button>
-      <button class="btn-primary" onclick="saveNewProjectMain()">만들기</button>
+    <div class="new-memo" style="width:16rem;flex-shrink:0;position:sticky;top:7rem;">
+      <div class="nm-title">새 프로젝트</div>
+      <input class="nm-ta" id="npMainTitle" placeholder="프로젝트명" style="min-height:auto;padding:0.75rem 1rem;margin-bottom:0.5rem;">
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
+        <select class="nm-sel" id="npMainCategory" style="flex:1;">
+          <option value="">카테고리</option>
+          <option value="앱개발">앱개발</option>
+          <option value="육아">육아</option>
+          <option value="재테크">재테크</option>
+          <option value="기타">기타</option>
+        </select>
+        <select class="nm-sel" id="npMainStatus" style="flex:1;">
+          <option value="시작전">시작전</option>
+          <option value="진행중">진행중</option>
+        </select>
+      </div>
+      <input class="nm-ta" id="npMainSummary" placeholder="한 줄 요약 (선택)" style="min-height:auto;padding:0.75rem 1rem;margin-bottom:0.5rem;">
+      <button class="nm-save" style="width:100%;" onclick="saveNewProjectMain()">만들기</button>
     </div>
   </div>
-  <div id="project-list-main"><div class="loading-msg">로딩 중...</div></div>
 </div></div>
 
 <!-- FAMILY -->
@@ -551,17 +549,21 @@ input,select,textarea{font-family:inherit;}
     <div id="todo-list-family"></div>
   </div>
   <div id="fsub-memo" style="display:none">
-    <div style="margin-bottom:0.875rem;"><button class="btn-primary" onclick="toggleMemoForm('family')">+ 새 메모</button></div>
-    <div id="memo-form-family" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem;box-shadow:var(--sh-sm);">
-      <textarea class="nm-ta" id="nmText-family" placeholder="가정 관련 메모..."></textarea>
-      <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.625rem;">
-        <label class="nm-pin"><input type="checkbox" id="nmPin-family"> 📌 고정</label>
-        <label class="nm-pin"><input type="checkbox" id="nmDash-family"> 🏠 대시보드</label>
-        <button class="m-cancel" style="padding:0.4rem 0.875rem;" onclick="toggleMemoForm('family')">취소</button>
-        <button class="btn-primary" style="margin-left:auto;" onclick="saveMemoArea('family')">저장</button>
+    <div class="memo-layout">
+      <div class="memo-list" id="memoList-family"><div class="loading-msg">로딩 중...</div></div>
+      <div class="new-memo">
+        <div class="nm-title">새 메모</div>
+        <textarea class="nm-ta" id="nmText-family" placeholder="가정 관련 메모..."></textarea>
+        <div class="nm-opts" style="flex-direction:column;align-items:stretch;gap:0.5rem;">
+          <select class="nm-sel" id="nmProject-family" onchange="onProjectSelectChange(this,'nmProject-family')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <label class="nm-pin"><input type="checkbox" id="nmPin-family"> 📌 고정</label>
+            <label class="nm-pin"><input type="checkbox" id="nmDash-family"> 🏠 대시보드</label>
+            <button class="nm-save" style="margin-left:auto;" onclick="saveMemoArea('family')">저장</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="memo-list" id="memoList-family"><div class="loading-msg">로딩 중...</div></div>
   </div>
   <div id="fsub-projects" style="display:none">
     <div class="toolbar-scroll"><div class="toolbar">
@@ -599,17 +601,21 @@ input,select,textarea{font-family:inherit;}
     <div id="todo-list-work"></div>
   </div>
   <div id="wsub-memo" style="display:none">
-    <div style="margin-bottom:0.875rem;"><button class="btn-primary" onclick="toggleMemoForm('work')">+ 새 메모</button></div>
-    <div id="memo-form-work" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem;box-shadow:var(--sh-sm);">
-      <textarea class="nm-ta" id="nmText-work" placeholder="업무 관련 메모..."></textarea>
-      <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.625rem;">
-        <label class="nm-pin"><input type="checkbox" id="nmPin-work"> 📌 고정</label>
-        <label class="nm-pin"><input type="checkbox" id="nmDash-work"> 🏠 대시보드</label>
-        <button class="m-cancel" style="padding:0.4rem 0.875rem;" onclick="toggleMemoForm('work')">취소</button>
-        <button class="btn-primary" style="margin-left:auto;" onclick="saveMemoArea('work')">저장</button>
+    <div class="memo-layout">
+      <div class="memo-list" id="memoList-work"><div class="loading-msg">로딩 중...</div></div>
+      <div class="new-memo">
+        <div class="nm-title">새 메모</div>
+        <textarea class="nm-ta" id="nmText-work" placeholder="업무 관련 메모..."></textarea>
+        <div class="nm-opts" style="flex-direction:column;align-items:stretch;gap:0.5rem;">
+          <select class="nm-sel" id="nmProject-work" onchange="onProjectSelectChange(this,'nmProject-work')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <label class="nm-pin"><input type="checkbox" id="nmPin-work"> 📌 고정</label>
+            <label class="nm-pin"><input type="checkbox" id="nmDash-work"> 🏠 대시보드</label>
+            <button class="nm-save" style="margin-left:auto;" onclick="saveMemoArea('work')">저장</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="memo-list" id="memoList-work"><div class="loading-msg">로딩 중...</div></div>
   </div>
   <div id="wsub-projects" style="display:none">
     <div class="toolbar-scroll"><div class="toolbar">
@@ -672,18 +678,24 @@ input,select,textarea{font-family:inherit;}
     <div class="sub-cards" id="subCards"><div class="loading-msg">로딩 중...</div></div>
   </div>
   <div id="sub-memo" style="display:none">
-    <div style="margin-bottom:0.875rem;"><button class="btn-primary" onclick="toggleMemoForm('personal')">+ 새 메모</button></div>
-    <div id="memo-form-personal" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem;box-shadow:var(--sh-sm);">
-      <textarea class="nm-ta" id="nmText" placeholder="생각, 아이디어, 기록..."></textarea>
-      <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.625rem;flex-wrap:wrap;">
-        <select class="nm-sel" id="nmArea" style="width:auto;"><option value="personal" selected>개인</option><option value="family">가정</option><option value="work">회사</option></select>
-        <label class="nm-pin"><input type="checkbox" id="nmPin"> 📌 고정</label>
-        <label class="nm-pin"><input type="checkbox" id="nmDash"> 🏠 대시보드</label>
-        <button class="m-cancel" style="padding:0.4rem 0.875rem;" onclick="toggleMemoForm('personal')">취소</button>
-        <button class="btn-primary" style="margin-left:auto;" onclick="saveMemo()">저장</button>
+    <div class="memo-layout">
+      <div class="memo-list" id="memoList-personal"><div class="loading-msg">로딩 중...</div></div>
+      <div class="new-memo">
+        <div class="nm-title">새 메모</div>
+        <textarea class="nm-ta" id="nmText" placeholder="생각, 아이디어, 기록..."></textarea>
+        <div class="nm-opts" style="flex-direction:column;align-items:stretch;gap:0.5rem;">
+          <div style="display:flex;gap:0.5rem;">
+            <select class="nm-sel" id="nmArea" style="flex:1;"><option value="personal" selected>개인</option><option value="family">가정</option><option value="work">회사</option></select>
+            <select class="nm-sel" id="nmProject" onchange="onProjectSelectChange(this,'nmProject')" style="flex:1;"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <label class="nm-pin"><input type="checkbox" id="nmPin"> 📌 고정</label>
+            <label class="nm-pin"><input type="checkbox" id="nmDash"> 🏠 대시보드</label>
+            <button class="nm-save" style="margin-left:auto;" onclick="saveMemo()">저장</button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="memo-list" id="memoList-personal"><div class="loading-msg">로딩 중...</div></div>
   </div>
   <div id="sub-projects" style="display:none">
     <div class="toolbar-scroll"><div class="toolbar">
@@ -736,7 +748,7 @@ input,select,textarea{font-family:inherit;}
   </div>
   <div class="d-sec">
     <div class="d-lbl">DB 컬럼 구조</div>
-    <div class="d-note"><b>Goals:</b> Title · Area(family/work/growth/health/side/finance) · Period(연간/분기/월간) · Progress(Number 0-100) · Status(진행중/완료) · Due(Date) · Description(Text)<br><br><b>Investment:</b> Asset · Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타/주택담보대출/신용대출/마이너스통장/기타대출) · Currency(KRW/USD/EUR/JPY/GBP) · Qty · CostPrice · CurrentPrice · CostRate · CurRate · Memo(Text) · UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service · Category · Fee · Currency · FeeKRW · Cycle(월/연) · RenewDate(Date) · Active(Checkbox) · Memo(Text)<br><br><b>Todo:</b> Title · Area(select: family/work/personal) · Priority(select: 높음/보통/낮음) · Due(Date) · Done(Checkbox)<br><br><b>Memo:</b> Content · Area(Select) · Pinned(Checkbox) · ShowInDash(Checkbox) · CreatedAt(Created time) · LinkedTodo(Text) · <b>Project(Relation → Projects DB) ← 프로젝트 연결</b><br><br><b>Projects:</b> Title · Status(시작전/진행중/보류/완료) · Category(Select) · StartDate(Date) · TargetDate(Date) · Summary(Text) · Budget(Number) · Result(Text) · Memo(Relation → Memo DB)</div>
+    <div class="d-note"><b>Goals:</b> Title • Area(family/work/growth/health/side/finance) • Period(연간/분기/월간) • Progress(Number 0-100) • Status(진행중/완료) • Due(Date) • Description(Text)<br><br><b>Investment:</b> Asset • Category(주식/ETF/예금/적금/펀드/부동산/암호화폐/기타/주택담보대출/신용대출/마이너스통장/기타대출) • Currency(KRW/USD/EUR/JPY/GBP) • Qty • CostPrice • CurrentPrice • CostRate • CurRate • Memo(Text) • UpdatedAt(Date)<br><br><b>Subscription (정기지출):</b> Service • Category • Fee • Currency • FeeKRW • Cycle(월/연) • RenewDate(Date) • Active(Checkbox) • Memo(Text)<br><br><b>Todo:</b> Title • Area(select: family/work/personal) • Priority(select: 높음/보통/낮음) • Due(Date) • Done(Checkbox)<br><br><b>Memo:</b> Content • Area(Select) • Pinned(Checkbox) • ShowInDash(Checkbox) • CreatedAt(Created time) • LinkedTodo(Text) • <b>Project(Relation → Projects DB) ← 프로젝트 연결</b><br><br><b>Projects:</b> Title • Status(시작전/진행중/보류/완료) • Category(Select) • StartDate(Date) • TargetDate(Date) • Summary(Text) • Budget(Number) • Result(Text) • Memo(Relation → Memo DB)</div>
   </div>
 </div>
 
@@ -956,7 +968,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   await loadCfg();
   initDate();
   loadAll();
-  setInterval(()=>{ if(document.visibilityState!=='hidden') syncNow(false); }, 30*60*1000);
+  setInterval(()=>{ if(document.visibilityState!=='hidden') syncNow(false); }, 5*60*1000);
   // 결과 기록 버튼 — 이벤트 위임으로 처리 (동적 생성 요소)
   document.body.addEventListener('click',e=>{
     const btn=e.target.closest('.todo-log-btn');
@@ -1107,9 +1119,9 @@ function avg(arr){return arr.length?Math.round(arr.reduce((a,g)=>a+g.progress,0)
 
 function rHome(){
   const fam=byGroup('family'),wrk=byGroup('work'),per=byGroup('personal');
-  document.getElementById('badge-family').textContent=`${fam.length}개 · ${avg(fam)}%`;
-  document.getElementById('badge-work').textContent=`${wrk.length}개 · ${avg(wrk)}%`;
-  document.getElementById('badge-personal').textContent=`${per.length}개 · ${avg(per)}%`;
+  document.getElementById('badge-family').textContent=`${fam.length}개 • ${avg(fam)}%`;
+  document.getElementById('badge-work').textContent=`${wrk.length}개 • ${avg(wrk)}%`;
+  document.getElementById('badge-personal').textContent=`${per.length}개 • ${avg(per)}%`;
   rSched('home-family-sched','family');
   rSched('home-work-sched','work');
   rSched('home-personal-sched','personal');
@@ -1162,7 +1174,7 @@ function rGoalPage(group){
   const f=gF[group];let list=D.goals.filter(g=>(AMAP[g.area]?.g||'personal')===group);
   if(f!=='all'){if(['연간','분기','월간'].includes(f))list=list.filter(g=>g.period===f);else list=list.filter(g=>g.area===f);}
   const metaId={family:'meta-family',work:'meta-work',personal:null}[group];
-  if(metaId){const all=D.goals.filter(g=>(AMAP[g.area]?.g||'personal')===group);document.getElementById(metaId).textContent=`${all.length}개 · 평균 ${avg(all)}%`;}
+  if(metaId){const all=D.goals.filter(g=>(AMAP[g.area]?.g||'personal')===group);document.getElementById(metaId).textContent=`${all.length}개 • 평균 ${avg(all)}%`;}
   const grid=document.getElementById('grid-'+group);
   if(!list.length){grid.innerHTML='<div class="empty-msg" style="grid-column:1/-1"><p>목표가 없습니다</p><span>+ 목표 추가로 시작해보세요</span></div>';return;}
   grid.innerHTML=list.map(g=>{const a=AMAP[g.area]||AMAP.growth;return`<div class="goal-card"><div class="gc-stripe" style="background:${a.c}"></div><div class="gc-top"><span class="gc-tag tag" style="background:${a.bg};color:${a.c}">${a.l}</span><span class="gc-period">${g.period}</span></div><div class="gc-title">${esc(g.title)}</div>${g.desc?`<div class="gc-desc">${esc(g.desc)}</div>`:''}<div class="gc-pw"><div class="gc-pf" style="width:${g.progress}%;background:${a.c}"></div></div><div class="gc-foot"><span>${g.progress}% 달성</span><span>${g.due?fd(g.due):'—'}</span></div></div>`;}).join('');}
@@ -1204,7 +1216,7 @@ function rInvest(){
 
 function renderInvCard(i,sym,isDebtCard){
   const qty=i.qty||1;const costKrw=toKrw(i,'cost');const curKrw=toKrw(i,'cur');const totalCurKrw=curKrw*qty;const totalCostKrw=costKrw*qty;const rate=calcReturn(costKrw,curKrw);const profit=totalCurKrw-totalCostKrw;const isFx=i.currency&&i.currency!=='KRW';const curDisp=isFx?`${sym(i)}${i.currentPrice.toLocaleString()}`:fkrw(i.currentPrice)+'원';const bg=isDebtCard?'background:#fef9f9;border-color:#fecaca;':'';const nameColor=isDebtCard?'color:var(--danger);':'';
-  return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:0.75rem;${bg}"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.375rem"><div><div style="font-weight:700;font-size:0.58rem;${nameColor}">${esc(i.asset)}</div>${i.memo?`<div style="font-size:0.42rem;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</div><span class="tag" style="background:${isDebtCard?'#fee2e2':'var(--subtle)'};color:${isDebtCard?'var(--danger)':'var(--text-s)'};flex-shrink:0;margin-left:0.5rem">${esc(i.category)}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:0.25rem 0.5rem;font-size:0.48rem;margin-bottom:0.5rem"><div><span style="color:var(--text-m)">수량 </span>${qty.toLocaleString()} · ${i.currency||'KRW'}</div><div><span style="color:var(--text-m)">기준일 </span>${fd(i.updatedAt)}</div>${!isDebtCard&&i.costPrice?`<div><span style="color:var(--text-m)">취득단가 </span>${isFx?sym(i):''}${fkrw(i.costPrice)}</div>`:''}<div><span style="color:var(--text-m)">${isDebtCard?'잔액 ':'현재단가 '}</span><span style="${isDebtCard?'color:var(--danger);font-weight:700':''}">${isDebtCard?'-':''} ${curDisp}</span></div>${totalCostKrw&&!isDebtCard?`<div><span style="color:var(--text-m)">총취득 </span>${fkrw(totalCostKrw)}원</div>`:''}<div><span style="color:var(--text-m)">${isDebtCard?'총부채 ':'현재총액 '}</span><span style="font-weight:700;${isDebtCard?'color:var(--danger)':''}">${isDebtCard?'-':''}${fkrw(totalCurKrw)}원</span></div>${!isDebtCard&&costKrw?`<div style="grid-column:1/-1"><span style="color:var(--text-m)">수익률 </span><span class="${rate>=0?'pos':'neg'}">${rate>=0?'+':''}${rate}% (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)</span></div>`:''}</div><div class="item-actions"><button class="btn-ord" onclick="moveInv('${i.id}',-1)">↑</button><button class="btn-ord" onclick="moveInv('${i.id}',1)">↓</button><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button><button class="btn-del" onclick="confirmDelInv('${i.id}','${esc(i.asset)}')">삭제</button></div></div>`;
+  return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:0.75rem;${bg}"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.375rem"><div><div style="font-weight:700;font-size:0.58rem;${nameColor}">${esc(i.asset)}</div>${i.memo?`<div style="font-size:0.42rem;color:var(--text-m);margin-top:0.1rem">${esc(i.memo)}</div>`:''}</div><span class="tag" style="background:${isDebtCard?'#fee2e2':'var(--subtle)'};color:${isDebtCard?'var(--danger)':'var(--text-s)'};flex-shrink:0;margin-left:0.5rem">${esc(i.category)}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:0.25rem 0.5rem;font-size:0.48rem;margin-bottom:0.5rem"><div><span style="color:var(--text-m)">수량 </span>${qty.toLocaleString()} • ${i.currency||'KRW'}</div><div><span style="color:var(--text-m)">기준일 </span>${fd(i.updatedAt)}</div>${!isDebtCard&&i.costPrice?`<div><span style="color:var(--text-m)">취득단가 </span>${isFx?sym(i):''}${fkrw(i.costPrice)}</div>`:''}<div><span style="color:var(--text-m)">${isDebtCard?'잔액 ':'현재단가 '}</span><span style="${isDebtCard?'color:var(--danger);font-weight:700':''}">${isDebtCard?'-':''} ${curDisp}</span></div>${totalCostKrw&&!isDebtCard?`<div><span style="color:var(--text-m)">총취득 </span>${fkrw(totalCostKrw)}원</div>`:''}<div><span style="color:var(--text-m)">${isDebtCard?'총부채 ':'현재총액 '}</span><span style="font-weight:700;${isDebtCard?'color:var(--danger)':''}">${isDebtCard?'-':''}${fkrw(totalCurKrw)}원</span></div>${!isDebtCard&&costKrw?`<div style="grid-column:1/-1"><span style="color:var(--text-m)">수익률 </span><span class="${rate>=0?'pos':'neg'}">${rate>=0?'+':''}${rate}% (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)</span></div>`:''}</div><div class="item-actions"><button class="btn-ord" onclick="moveInv('${i.id}',-1)">↑</button><button class="btn-ord" onclick="moveInv('${i.id}',1)">↓</button><button class="inv-edit-btn" onclick="editInv('${i.id}')">수정</button><button class="btn-del" onclick="confirmDelInv('${i.id}','${esc(i.asset)}')">삭제</button></div></div>`;
 }
 
 function renderInvRow(i,sym){
@@ -1253,7 +1265,7 @@ function updateInvPreview(){
   const cat=document.getElementById('iCat')?.value||'';const isDebt=isDebtCat(cat);const curSel=document.getElementById('iCurrency')?.value||'KRW';const isFx=curSel&&curSel!=='KRW';const qty=Math.min(Math.max(parseFloat(document.getElementById('iQty')?.value)||1,0.000001),1000000000);const el=document.getElementById('iCalcPreview');
   if(isDebt){const bal=safeFloat(document.getElementById('iDebtAmt')?.value)||safeFloat(document.getElementById('iCurrent')?.value)||0;if(!bal){el.textContent='현재 잔액을 입력해주세요.';return;}el.innerHTML='';const s=document.createElement('span');s.style.cssText='color:var(--danger);font-weight:700;';s.textContent=`부채 잔액: -${fkrw(bal*qty)}원`;el.appendChild(s);return;}
   const cost=safeFloat(document.getElementById('iCost').value);const curP=safeFloat(document.getElementById('iCurrent').value);const costRate=safeFloat(document.getElementById('iCostRate')?.value)||0;const curRate=safeFloat(document.getElementById('iCurRate')?.value)||0;
-  if(!cost&&!curP){el.textContent='취득단가·현재단가 입력 시 수익률이 자동 계산됩니다.';return;}
+  if(!cost&&!curP){el.textContent='취득단가•현재단가 입력 시 수익률이 자동 계산됩니다.';return;}
   const costKrw=isFx?(costRate?cost*costRate:0):cost;const curKrw=isFx?(curRate?curP*curRate:0):curP;const totalCostKrw=costKrw*qty;const totalCurKrw=curKrw*qty;const rate=calcReturn(costKrw,curKrw);const profit=totalCurKrw-totalCostKrw;
   el.innerHTML='';const span=document.createElement('span');span.className=`calc-rate ${rate>=0?'pos':'neg'}`;
   if(isFx&&(!costRate||!curRate)){span.textContent='환율을 입력하면 원화 수익률이 계산됩니다.';}else{span.textContent=`₩${fkrw(totalCostKrw)} → ₩${fkrw(totalCurKrw)}   ${rate>=0?'+':''}${rate}%  (${profit>=0?'+':''}${fkrw(Math.abs(profit))}원)`;}
@@ -1282,8 +1294,7 @@ async function saveMemo(){
   const projectId=document.getElementById('nmProject').value;
   const m={id:'l'+Date.now(),content,area:document.getElementById('nmArea').value,pinned:document.getElementById('nmPin').checked,showInDash,projectId,createdAt:new Date().toISOString()};
   D.memo.unshift(m);rMemoArea('personal');rHome();
-  document.getElementById('nmText').value='';document.getElementById('nmPin').checked=false;document.getElementById('nmDash').checked=false;
-  const nmForm=document.getElementById('memo-form-personal');if(nmForm)nmForm.style.display='none';
+  document.getElementById('nmText').value='';document.getElementById('nmPin').checked=false;document.getElementById('nmDash').checked=false;document.getElementById('nmProject').value='';
   showToast('✅ 메모 저장 완료!','success');
   const props={Content:{title:[{text:{content:m.content}}]},Area:m.area?{select:{name:m.area}}:{select:null},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash},...(projectId?{Project:{relation:[{id:projectId}]}}:{})};
   if(cfg.token&&cfg.memo){mkPage(cfg.memo,props).catch(e=>console.warn('saveMemo failed:',e));}
@@ -1331,7 +1342,7 @@ function rSubs(){
   if(!act.length){g.innerHTML='<div class="loading-msg">정기 지출을 추가해보세요</div>';return;}
   g.innerHTML=act.map((s,idx)=>{
     const d=dUntil(s.renewDate),soon=d<=7&&s.renewDate;const sym=csym[s.currency||'KRW']||'₩';const feeDisplay=(!s.currency||s.currency==='KRW')?`${fkrw(s.fee)}원`:`${sym}${s.fee.toLocaleString()}`;const krwNote=(s.currency&&s.currency!=='KRW'&&s.feeKrw)?` <span style="font-size:0.4rem;color:var(--text-m)">(≈${fkrw(s.feeKrw)}원)</span>`:'';const renewBadge=s.renewDate?`<span class="sub-rb" style="background:${soon?'#fef2f2':'var(--subtle)'};color:${soon?'var(--danger)':'var(--text-m)'}">${d<=0?'오늘':d+'일 후'}</span>`:'';
-    return`<div class="sub-card"><div class="sub-ico">${icons[s.category]||'○'}</div><div style="flex:1;min-width:0"><div class="sub-cn">${esc(s.service)}</div><div class="sub-cf">${feeDisplay}${krwNote} / ${s.cycle}간</div><div class="sub-cc">${esc(s.category)}${s.memo?` · ${esc(s.memo)}`:''}</div></div><div class="sub-cr"><div class="sub-rd">${fd(s.renewDate)}</div>${renewBadge}<div class="item-actions"><button class="btn-ord" onclick="moveSub(${idx},-1)" ${idx===0?'disabled':''} title="위로">↑</button><button class="btn-ord" onclick="moveSub(${idx},1)" ${idx===act.length-1?'disabled':''} title="아래로">↓</button><button class="inv-edit-btn" onclick="editSub('${s.id}')">수정</button><button class="btn-del" onclick="confirmDelSub('${s.id}','${esc(s.service)}')">삭제</button></div></div></div>`;
+    return`<div class="sub-card"><div class="sub-ico">${icons[s.category]||'○'}</div><div style="flex:1;min-width:0"><div class="sub-cn">${esc(s.service)}</div><div class="sub-cf">${feeDisplay}${krwNote} / ${s.cycle}간</div><div class="sub-cc">${esc(s.category)}${s.memo?` • ${esc(s.memo)}`:''}</div></div><div class="sub-cr"><div class="sub-rd">${fd(s.renewDate)}</div>${renewBadge}<div class="item-actions"><button class="btn-ord" onclick="moveSub(${idx},-1)" ${idx===0?'disabled':''} title="위로">↑</button><button class="btn-ord" onclick="moveSub(${idx},1)" ${idx===act.length-1?'disabled':''} title="아래로">↓</button><button class="inv-edit-btn" onclick="editSub('${s.id}')">수정</button><button class="btn-del" onclick="confirmDelSub('${s.id}','${esc(s.service)}')">삭제</button></div></div></div>`;
   }).join('');
 }
 
@@ -1489,120 +1500,39 @@ async function saveNewProject(){
   }
 }
 
-function toggleNewProjectForm(){
-  const el=document.getElementById('new-project-form');
-  if(!el)return;
-  const isOpen=el.style.display!=='none';
-  el.style.display=isOpen?'none':'';
-  if(!isOpen)setTimeout(()=>document.getElementById('npMainTitle')?.focus(),100);
-}
-function toggleMemoForm(area){
-  const el=document.getElementById('memo-form-'+area);
-  if(!el)return;
-  const isOpen=el.style.display!=='none';
-  el.style.display=isOpen?'none':'';
-  if(!isOpen){
-    const taId={personal:'nmText',family:'nmText-family',work:'nmText-work'}[area];
-    setTimeout(()=>document.getElementById(taId)?.focus(),100);
-  }
-}
-
-function rProjectMain(){
-
+let _projectFilter='all';
 function filterProjects(val,btn){
   _projectFilter=val;
   document.querySelectorAll('#page-projects .fp').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   rProjectMain();
 }
-
-function toggleProjectDetail(id){
-  _openProjectId=(_openProjectId===id)?null:id;
-  rProjectMain();
-}
-
 function rProjectMain(){
   const el=document.getElementById('project-list-main');if(!el)return;
   let list=D.projects;
   if(_projectFilter!=='all')list=list.filter(p=>p.status===_projectFilter);
   if(!list.length){el.innerHTML='<div class="empty-msg"><p>프로젝트가 없습니다</p></div>';return;}
-  const statusColor={'시작전':'var(--text-m)','진행중':'var(--work-c)','보류':'#f59e0b','완료':'var(--success)'};
-  let html='<div style="display:grid;grid-template-columns:1fr;gap:0.625rem;">';
-  list.forEach(p=>{
-    const memos=D.memo.filter(m=>m.projectId===p.id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const statusColor={시작전:'var(--text-m)',진행중:'var(--work-c)',보류:'#f59e0b',완료:'var(--success)'};
+  el.innerHTML='<div style="display:grid;grid-template-columns:1fr;gap:0.625rem;">'+list.map(p=>{
+    const memos=D.memo.filter(m=>m.projectId===p.id);
     const sc=statusColor[p.status]||'var(--text-m)';
-    const isOpen=_openProjectId===p.id;
-    html+='<div class="goal-card" style="cursor:default;">';
-    // 카드 헤더
-    html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;cursor:pointer;" onclick="toggleProjectDetail(\''+p.id+'\')">';
-    html+='<div style="flex:1;min-width:0;">';
-    html+='<div style="font-size:0.65rem;font-weight:700;color:var(--text-h);margin-bottom:0.2rem;">'+esc(p.name)+'</div>';
-    if(!isOpen&&p.summary)html+='<div style="font-size:0.5rem;color:var(--text-s);line-height:1.5;">'+esc(p.summary)+'</div>';
-    html+='</div>';
-    html+='<div style="display:flex;align-items:center;gap:0.375rem;flex-shrink:0;">';
-    if(p.status)html+='<span style="font-size:0.4rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:20px;background:var(--subtle);color:'+sc+'">'+esc(p.status)+'</span>';
-    html+='<button class="inv-edit-btn" onclick="event.stopPropagation();openEditProject(\''+p.id+'\')">수정</button>';
-    html+='<button class="btn-del" onclick="event.stopPropagation();confirmDelProject(\''+p.id+'\',\''+esc(p.name)+'\')">삭제</button>';
-    html+='<span style="font-size:0.6rem;color:var(--text-m);padding:0 0.25rem;">'+(isOpen?'▲':'▼')+'</span>';
-    html+='</div></div>';
-    // 닫힌 상태 미리보기
-    if(!isOpen){
-      html+='<div style="font-size:0.42rem;color:var(--text-m);margin-top:0.375rem;">연결된 메모 '+memos.length+'개</div>';
-      if(memos[0])html+='<div style="margin-top:0.5rem;padding:0.5rem 0.75rem;background:var(--subtle);border-radius:var(--r-sm);font-size:0.48rem;color:var(--text-s);line-height:1.5;cursor:pointer;" onclick="toggleProjectDetail(\''+p.id+'\')">'+esc(memos[0].content.slice(0,80))+(memos[0].content.length>80?'..':'')+'</div>';
-    }
-    // 열린 상태 상세
-    if(isOpen){
-      html+='<div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;">';
-      if(p.summary)html+='<div style="font-size:0.5rem;color:var(--text-s);margin-bottom:0.75rem;line-height:1.6;padding:0.5rem 0.75rem;background:var(--subtle);border-radius:var(--r-sm);">📌 '+esc(p.summary)+'</div>';
-      html+='<div style="font-size:0.52rem;font-weight:700;color:var(--text-h);margin-bottom:0.5rem;">메모 작성</div>';
-      html+='<textarea id="pm-ta-'+p.id+'" class="m-ta" placeholder="이 프로젝트 관련 아이디어, 자료, 링크 등을 기록하세요..." rows="4" style="width:100%;margin-bottom:0.5rem;"></textarea>';
-      html+='<div style="display:flex;justify-content:flex-end;margin-bottom:1rem;"><button class="btn-primary" onclick="saveProjectMemo(\''+p.id+'\')">메모 저장</button></div>';
-      html+='<div style="font-size:0.52rem;font-weight:700;color:var(--text-h);margin-bottom:0.5rem;">연결된 메모 ('+memos.length+'개)</div>';
-      if(memos.length){
-        memos.forEach(m=>{
-          html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:0.75rem;margin-bottom:0.5rem;">';
-          html+='<div style="font-size:0.56rem;color:var(--text-b);line-height:1.7;white-space:pre-wrap;word-break:break-word;">'+esc(m.content)+'</div>';
-          html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.375rem;">';
-          html+='<span style="font-size:0.42rem;color:var(--text-m);">'+fdt(m.createdAt)+'</span>';
-          html+='<button class="btn-del" style="font-size:0.38rem;" onclick="confirmDelMemo(\''+m.id+'\',\''+esc(m.content).slice(0,15)+'\')">삭제</button>';
-          html+='</div></div>';
-        });
-      } else {
-        html+='<div style="font-size:0.5rem;color:var(--text-m);padding:0.5rem 0;">아직 메모가 없습니다</div>';
-      }
-      html+='</div>';
-    }
-    html+='</div>';
-  });
-  html+='</div>';
-  el.innerHTML=html;
-}
-
-async function saveProjectMemo(projectId){
-  const ta=document.getElementById('pm-ta-'+projectId);
-  if(!ta)return;
-  const content=ta.value.trim().slice(0,3000);
-  if(!content){showToast('내용을 입력해주세요','error');return;}
-  const p=D.projects.find(x=>x.id===projectId);
-  const areaMap={family:'family',work:'work'};
-  const area='personal'; // 프로젝트 메모는 기본 personal
-  const m={id:'l'+Date.now(),content,area,pinned:false,showInDash:false,projectId,createdAt:new Date().toISOString()};
-  D.memo.unshift(m);
-  ta.value='';
-  rProjectMain();
-  showToast('✅ 메모가 저장됐습니다!','success');
-  if(cfg.token&&cfg.memo){
-    mkPage(cfg.memo,{
-      Content:{title:[{text:{content}}]},
-      Area:{select:{name:area}},
-      Pinned:{checkbox:false},
-      ShowInDash:{checkbox:false},
-      Project:{relation:[{id:projectId}]}
-    }).then(page=>{
-      const idx=D.memo.findIndex(x=>x.id===m.id);
-      if(idx>-1)D.memo[idx].id=page.id;
-    }).catch(e=>console.warn('saveProjectMemo failed:',e));
-  }
+    const recentMemo=memos[0]?`<div style="margin-top:0.5rem;padding:0.5rem 0.75rem;background:var(--subtle);border-radius:var(--r-sm);font-size:0.48rem;color:var(--text-s);line-height:1.5;">${esc(memos[0].content.slice(0,60))}${memos[0].content.length>60?'...':''}</div>`:'';
+    return`<div class="goal-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.375rem;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.65rem;font-weight:700;color:var(--text-h);margin-bottom:0.25rem;">${esc(p.name)}</div>
+          ${p.summary?`<div style="font-size:0.5rem;color:var(--text-s);line-height:1.5;">${esc(p.summary)}</div>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:0.375rem;flex-shrink:0;">
+          ${p.status?`<span style="font-size:0.4rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:20px;background:var(--subtle);color:${sc}">${esc(p.status)}</span>`:''}
+          <button class="inv-edit-btn" onclick="openEditProject('${p.id}')">수정</button>
+          <button class="btn-del" onclick="confirmDelProject('${p.id}','${esc(p.name)}')">삭제</button>
+        </div>
+      </div>
+      <div style="font-size:0.42rem;color:var(--text-m);">연결된 메모 ${memos.length}개</div>
+      ${recentMemo}
+    </div>`;
+  }).join('')+'</div>';
 }
 async function saveNewProjectMain(){
   const title=document.getElementById('npMainTitle').value.trim().slice(0,200);
@@ -1617,8 +1547,6 @@ async function saveNewProjectMain(){
   document.getElementById('npMainCategory').value='';
   document.getElementById('npMainStatus').value='시작전';
   document.getElementById('npMainSummary').value='';
-  const npForm=document.getElementById('new-project-form');
-  if(npForm)npForm.style.display='none';
   showToast('Notion에 저장 중...','');
   if(!cfg.token||!cfg.projects){showToast('❌ Token 또는 Projects DB ID 없음','error');return;}
   const props={Title:{title:[{text:{content:title}}]},...(status?{Status:{select:{name:status}}}:{}),...(category?{Category:{select:{name:category}}}:{}),...(summary?{Summary:{rich_text:[{text:{content:summary}}]}}:{})};
@@ -1707,20 +1635,17 @@ function rMemoArea(area){
 }
 
 async function saveMemoArea(area){
-  const taId='nmText-'+area;const pinId='nmPin-'+area;const dashId='nmDash-'+area;
+  const taId='nmText-'+area;const pinId='nmPin-'+area;const dashId='nmDash-'+area;const projId='nmProject-'+area;
   const content=document.getElementById(taId).value.trim().slice(0,3000);if(!content)return;
   const pinned=document.getElementById(pinId).checked;
   const showInDash=document.getElementById(dashId).checked;
-  const m={id:'l'+Date.now(),content,area,pinned,showInDash,createdAt:new Date().toISOString()};
+  const projectId=document.getElementById(projId)?.value||'';
+  const m={id:'l'+Date.now(),content,area,pinned,showInDash,projectId,createdAt:new Date().toISOString()};
   D.memo.unshift(m);rMemoArea(area);rHome();
-  document.getElementById(taId).value='';
-  document.getElementById(pinId).checked=false;
-  document.getElementById(dashId).checked=false;
-  // 폼 닫기
-  const form=document.getElementById('memo-form-'+area);
-  if(form)form.style.display='none';
+  document.getElementById(taId).value='';document.getElementById(pinId).checked=false;document.getElementById(dashId).checked=false;
+  if(document.getElementById(projId))document.getElementById(projId).value='';
   showToast('✅ 메모 저장 완료!','success');
-  const props={Content:{title:[{text:{content:m.content}}]},Area:{select:{name:area}},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}};
+  const props={Content:{title:[{text:{content:m.content}}]},Area:{select:{name:area}},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash},...(projectId?{Project:{relation:[{id:projectId}]}}:{})};
   if(cfg.token&&cfg.memo){mkPage(cfg.memo,props).catch(e=>console.warn('saveMemoArea failed:',e));}
 }
 
