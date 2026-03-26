@@ -472,8 +472,9 @@ input,select,textarea{font-family:inherit;}
           <option value="side">사이드</option>
           <option value="finance">재테크</option>
         </select>
-        <select class="quick-memo-sel" id="qmProject" style="max-width:7rem;">
+        <select class="quick-memo-sel" id="qmProject" style="max-width:7rem;" onchange="onProjectSelectChange(this,'qmProject')">
           <option value="">프로젝트 없음</option>
+          <option value="__new__">+ 새 프로젝트</option>
         </select>
         <label class="quick-memo-pin"><input type="checkbox" id="qmPin"> 📌 고정</label>
         <label class="quick-memo-pin"><input type="checkbox" id="qmDash"> 🏠 대시보드</label>
@@ -634,7 +635,7 @@ input,select,textarea{font-family:inherit;}
         <textarea class="nm-ta" id="nmText" placeholder="생각, 아이디어, 기록..."></textarea>
         <div class="nm-opts">
           <select class="nm-sel" id="nmArea"><option value="">영역 선택</option><option value="family">가정</option><option value="work">회사</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
-          <select class="nm-sel" id="nmProject"><option value="">프로젝트 없음</option></select>
+          <select class="nm-sel" id="nmProject" onchange="onProjectSelectChange(this,'nmProject')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
           <label class="nm-pin"><input type="checkbox" id="nmPin"> 고정</label>
           <label class="nm-pin"><input type="checkbox" id="nmDash"> 🏠 대시보드</label>
           <button class="nm-save" onclick="saveMemo()">저장</button>
@@ -806,7 +807,7 @@ input,select,textarea{font-family:inherit;}
       <select class="m-sel" id="meArea"><option value="">영역 없음</option><option value="family">가정</option><option value="work">회사</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
     </div>
     <div><label class="m-fl">프로젝트</label>
-      <select class="m-sel" id="meProject"><option value="">프로젝트 없음</option></select>
+      <select class="m-sel" id="meProject" onchange="onProjectSelectChange(this,'meProject')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
     </div>
     <div style="display:flex;gap:0.75rem;align-items:center;padding-top:1rem">
       <label class="nm-pin"><input type="checkbox" id="mePin"> 📌 고정</label>
@@ -831,6 +832,35 @@ input,select,textarea{font-family:inherit;}
     <button class="m-cancel" onclick="cancelCompleteTodo()">↩ 완료 취소</button>
     <button class="m-cancel" onclick="closeModal('todoLogModal')" style="flex:1;">나중에</button>
     <button class="m-save" id="bSaveTodoLog" onclick="saveTodoLog()" style="flex:2;">기록 저장</button>
+  </div>
+</div></div>
+
+<div class="m-wrap" id="newProjectModal"><div class="modal">
+  <div class="modal-handle"></div>
+  <div class="m-title">새 프로젝트</div>
+  <input type="hidden" id="npReturnSelectId" value="">
+  <div class="m-fr"><label class="m-fl">프로젝트명</label><input class="m-fi" id="npTitle" placeholder="예: 오늘 뭐 먹지? 앱"></div>
+  <div class="m-row2" style="margin-bottom:0.75rem;">
+    <div><label class="m-fl">카테고리</label>
+      <select class="m-sel" id="npCategory">
+        <option value="">없음</option>
+        <option value="앱개발">앱개발</option>
+        <option value="육아">육아</option>
+        <option value="재테크">재테크</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <div><label class="m-fl">상태</label>
+      <select class="m-sel" id="npStatus">
+        <option value="시작전">시작전</option>
+        <option value="진행중">진행중</option>
+      </select>
+    </div>
+  </div>
+  <div class="m-fr"><label class="m-fl">한 줄 요약 (선택)</label><input class="m-fi" id="npSummary" placeholder="왜 이 프로젝트를 하는가"></div>
+  <div class="m-acts">
+    <button class="m-cancel" onclick="closeNewProjectModal()">취소</button>
+    <button class="m-save" id="bSaveNewProject" onclick="saveNewProject()">만들기</button>
   </div>
 </div></div>
 
@@ -1312,8 +1342,56 @@ async function completeTodo(id){
 }
 
 function rProjectSelects(){
-  const opts='<option value="">프로젝트 없음</option>'+D.projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
-  ['qmProject','nmProject','meProject'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=opts;el.value=cur;}});
+  const baseOpts='<option value="">프로젝트 없음</option>'+D.projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')+'<option value="__new__">+ 새 프로젝트</option>';
+  ['qmProject','nmProject','meProject'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=baseOpts;if(cur&&cur!=='__new__')el.value=cur;}});
+}
+
+function onProjectSelectChange(el, selectId){
+  if(el.value==='__new__'){
+    el.value=''; // 선택 초기화
+    document.getElementById('npReturnSelectId').value=selectId;
+    document.getElementById('npTitle').value='';
+    document.getElementById('npCategory').value='';
+    document.getElementById('npStatus').value='시작전';
+    document.getElementById('npSummary').value='';
+    openModal('newProjectModal');
+    setTimeout(()=>document.getElementById('npTitle').focus(),300);
+  }
+}
+function closeNewProjectModal(){
+  closeModal('newProjectModal');
+}
+async function saveNewProject(){
+  const title=document.getElementById('npTitle').value.trim().slice(0,200);
+  if(!title){showToast('프로젝트명을 입력해주세요','error');return;}
+  const btn=document.getElementById('bSaveNewProject');btn.disabled=true;btn.textContent='만드는 중...';
+  const category=document.getElementById('npCategory').value;
+  const status=document.getElementById('npStatus').value;
+  const summary=document.getElementById('npSummary').value.trim().slice(0,500);
+  const returnSelectId=document.getElementById('npReturnSelectId').value;
+  // 로컬에 먼저 추가 (임시 ID)
+  const tempId='l'+Date.now();
+  const newProj={id:tempId,name:title,status};
+  D.projects.push(newProj);
+  rProjectSelects();
+  // 반환 select에 새 프로젝트 자동 선택
+  const returnEl=document.getElementById(returnSelectId);
+  if(returnEl)returnEl.value=tempId;
+  closeModal('newProjectModal');
+  btn.disabled=false;btn.textContent='만들기';
+  showToast('✅ 프로젝트가 생성됐습니다!','success');
+  // 백그라운드 Notion 저장
+  if(cfg.token&&cfg.projects){
+    const props={Title:{title:[{text:{content:title}}]},...(status?{Status:{status:{name:status}}}:{}),...(category?{Category:{select:{name:category}}}:{}),...(summary?{Summary:{rich_text:[{text:{content:summary}}]}}:{})};
+    mkPage(cfg.projects,props).then(page=>{
+      // 임시 ID를 실제 Notion ID로 교체
+      const idx=D.projects.findIndex(p=>p.id===tempId);
+      if(idx>-1){D.projects[idx].id=page.id;}
+      rProjectSelects();
+      // 반환 select도 실제 ID로 업데이트
+      if(returnEl&&returnEl.value===tempId)returnEl.value=page.id;
+    }).catch(e=>console.warn('saveNewProject failed:',e));
+  }
 }
 
 function rMemoArea(area){
