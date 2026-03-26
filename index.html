@@ -324,7 +324,7 @@ input,select,textarea{font-family:inherit;}
 .quick-memo-wrap{margin-top:0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem 1.25rem;box-shadow:var(--sh-sm);}
 .quick-memo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.625rem;flex-wrap:wrap;gap:0.5rem;}
 .quick-memo-title{font-size:0.6rem;font-weight:700;color:var(--text-h);}
-.quick-memo-opts{display:flex;align-items:center;gap:0.625rem;}
+.quick-memo-opts{display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;}
 .quick-memo-sel{background:var(--subtle);border:1px solid var(--border);border-radius:var(--r-sm);padding:0.3rem 0.625rem;font-family:inherit;font-size:0.52rem;color:var(--text-b);outline:none;transition:border-color var(--ease);}
 .quick-memo-sel:focus{border-color:var(--primary);}
 .quick-memo-pin{display:flex;align-items:center;gap:0.3rem;font-size:0.52rem;color:var(--text-s);cursor:pointer;white-space:nowrap;}
@@ -467,10 +467,7 @@ input,select,textarea{font-family:inherit;}
           <option value="">영역 없음</option>
           <option value="family">가정</option>
           <option value="work">회사</option>
-          <option value="growth">개인 성장</option>
-          <option value="health">건강</option>
-          <option value="side">사이드</option>
-          <option value="finance">재테크</option>
+          <option value="personal">개인</option>
         </select>
         <select class="quick-memo-sel" id="qmProject" style="max-width:7rem;" onchange="onProjectSelectChange(this,'qmProject')">
           <option value="">프로젝트 없음</option>
@@ -523,6 +520,7 @@ input,select,textarea{font-family:inherit;}
         <div class="nm-title">새 메모</div>
         <textarea class="nm-ta" id="nmText-family" placeholder="가정 관련 메모..."></textarea>
         <div class="nm-opts">
+          <select class="nm-sel" id="nmProject-family" onchange="onProjectSelectChange(this,'nmProject-family')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
           <label class="nm-pin"><input type="checkbox" id="nmPin-family"> 고정</label>
           <label class="nm-pin"><input type="checkbox" id="nmDash-family"> 🏠 대시보드</label>
           <button class="nm-save" onclick="saveMemoArea('family')">저장</button>
@@ -566,6 +564,7 @@ input,select,textarea{font-family:inherit;}
         <div class="nm-title">새 메모</div>
         <textarea class="nm-ta" id="nmText-work" placeholder="업무 관련 메모..."></textarea>
         <div class="nm-opts">
+          <select class="nm-sel" id="nmProject-work" onchange="onProjectSelectChange(this,'nmProject-work')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
           <label class="nm-pin"><input type="checkbox" id="nmPin-work"> 고정</label>
           <label class="nm-pin"><input type="checkbox" id="nmDash-work"> 🏠 대시보드</label>
           <button class="nm-save" onclick="saveMemoArea('work')">저장</button>
@@ -634,7 +633,7 @@ input,select,textarea{font-family:inherit;}
         <div class="nm-title">새 메모</div>
         <textarea class="nm-ta" id="nmText" placeholder="생각, 아이디어, 기록..."></textarea>
         <div class="nm-opts">
-          <select class="nm-sel" id="nmArea"><option value="">영역 선택</option><option value="family">가정</option><option value="work">회사</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
+          <select class="nm-sel" id="nmArea"><option value="">영역 선택</option><option value="family">가정</option><option value="work">회사</option><option value="personal">개인</option></select>
           <select class="nm-sel" id="nmProject" onchange="onProjectSelectChange(this,'nmProject')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
           <label class="nm-pin"><input type="checkbox" id="nmPin"> 고정</label>
           <label class="nm-pin"><input type="checkbox" id="nmDash"> 🏠 대시보드</label>
@@ -804,7 +803,7 @@ input,select,textarea{font-family:inherit;}
   <div class="m-fr"><textarea class="m-ta" id="meText" placeholder="메모 내용..."></textarea></div>
   <div class="m-row2" style="margin-bottom:0.75rem;align-items:center">
     <div><label class="m-fl">영역</label>
-      <select class="m-sel" id="meArea"><option value="">영역 없음</option><option value="family">가정</option><option value="work">회사</option><option value="growth">개인 성장</option><option value="health">건강</option><option value="side">사이드</option><option value="finance">재테크</option></select>
+      <select class="m-sel" id="meArea"><option value="">영역 없음</option><option value="family">가정</option><option value="work">회사</option><option value="personal">개인</option></select>
     </div>
     <div><label class="m-fl">프로젝트</label>
       <select class="m-sel" id="meProject" onchange="onProjectSelectChange(this,'meProject')"><option value="">프로젝트 없음</option><option value="__new__">+ 새 프로젝트</option></select>
@@ -867,7 +866,7 @@ input,select,textarea{font-family:inherit;}
 <div class="toast" id="toast"></div>
 
 <script>
-const AMAP={family:{l:'가정/가족',c:'var(--family-c)',bg:'var(--family-bg)',g:'family'},work:{l:'회사/업무',c:'var(--work-c)',bg:'var(--work-bg)',g:'work'},growth:{l:'개인 성장',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},health:{l:'건강/운동',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},side:{l:'사이드',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},finance:{l:'재테크',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'}};
+const AMAP={family:{l:'가정',c:'var(--family-c)',bg:'var(--family-bg)',g:'family'},work:{l:'회사',c:'var(--work-c)',bg:'var(--work-bg)',g:'work'},personal:{l:'개인',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},growth:{l:'개인 성장',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},health:{l:'건강/운동',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},side:{l:'사이드',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'},finance:{l:'재테크',c:'var(--personal-c)',bg:'var(--personal-bg)',g:'personal'}};
 const DS={family:[],work:[],personal:[]};
 let cfg={token:'',goals:'',invest:'',subs:'',memo:'',todo:'',proxy:'',calFamily:'',calWork:'',calPersonal:'',projects:''};
 let D={goals:[],invest:[],subs:[],memo:[],todo:[],sched:{family:[],work:[],personal:[]},projects:[]};
@@ -1343,7 +1342,7 @@ async function completeTodo(id){
 
 function rProjectSelects(){
   const baseOpts='<option value="">프로젝트 없음</option>'+D.projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')+'<option value="__new__">+ 새 프로젝트</option>';
-  ['qmProject','nmProject','meProject'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=baseOpts;if(cur&&cur!=='__new__')el.value=cur;}});
+  ['qmProject','nmProject','meProject','nmProject-family','nmProject-work'].forEach(id=>{const el=document.getElementById(id);if(el){const cur=el.value;el.innerHTML=baseOpts;if(cur&&cur!=='__new__')el.value=cur;}});
 }
 
 function onProjectSelectChange(el, selectId){
@@ -1382,10 +1381,7 @@ async function saveNewProject(){
   if(!cfg.projects){showToast('❌ Projects DB ID가 없어 Notion 저장 불가','error');return;}
   showToast('Notion에 저장 중...','');
   const props={
-    Title:{title:[{text:{content:title}}]},
-    ...(status?{Status:{select:{name:status}}}:{}),
-    ...(category?{Category:{select:{name:category}}}:{}),
-    ...(summary?{Summary:{rich_text:[{text:{content:summary}}]}}:{})
+    Title:{title:[{text:{content:title}}]}
   };
   try{
     const page=await mkPage(cfg.projects,props);
@@ -1413,17 +1409,18 @@ function rMemoArea(area){
 }
 
 async function saveMemoArea(area){
-  const taId='nmText-'+area;const pinId='nmPin-'+area;const dashId='nmDash-'+area;
+  const taId='nmText-'+area;const pinId='nmPin-'+area;const dashId='nmDash-'+area;const projId='nmProject-'+area;
   const content=document.getElementById(taId).value.trim().slice(0,3000);if(!content)return;
   const pinned=document.getElementById(pinId).checked;
   const showInDash=document.getElementById(dashId).checked;
-  const m={id:'l'+Date.now(),content,area,pinned,showInDash,createdAt:new Date().toISOString()};
-  // Optimistic Update
+  const projectId=document.getElementById(projId)?.value||'';
+  const m={id:'l'+Date.now(),content,area,pinned,showInDash,projectId,createdAt:new Date().toISOString()};
   D.memo.unshift(m);rMemoArea(area);rHome();
   document.getElementById(taId).value='';document.getElementById(pinId).checked=false;document.getElementById(dashId).checked=false;
+  if(document.getElementById(projId))document.getElementById(projId).value='';
   showToast('✅ 메모 저장 완료!','success');
-  // 백그라운드 Notion 저장
-  if(cfg.token&&cfg.memo){mkPage(cfg.memo,{Content:{title:[{text:{content:m.content}}]},Area:{select:{name:area}},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash}}).catch(e=>console.warn('saveMemoArea failed:',e));}
+  const props={Content:{title:[{text:{content:m.content}}]},Area:{select:{name:area}},Pinned:{checkbox:m.pinned},ShowInDash:{checkbox:m.showInDash},...(projectId?{Project:{relation:[{id:projectId}]}}:{})};
+  if(cfg.token&&cfg.memo){mkPage(cfg.memo,props).catch(e=>console.warn('saveMemoArea failed:',e));}
 }
 
 function rMemo(){
