@@ -1369,28 +1369,29 @@ async function saveNewProject(){
   const status=document.getElementById('npStatus').value;
   const summary=document.getElementById('npSummary').value.trim().slice(0,500);
   const returnSelectId=document.getElementById('npReturnSelectId').value;
-  // 로컬에 먼저 추가 (임시 ID)
   const tempId='l'+Date.now();
   const newProj={id:tempId,name:title,status};
   D.projects.push(newProj);
   rProjectSelects();
-  // 반환 select에 새 프로젝트 자동 선택
   const returnEl=document.getElementById(returnSelectId);
   if(returnEl)returnEl.value=tempId;
   closeModal('newProjectModal');
   btn.disabled=false;btn.textContent='만들기';
-  showToast('✅ 프로젝트가 생성됐습니다!','success');
-  // 백그라운드 Notion 저장
-  if(cfg.token&&cfg.projects){
-    const props={Title:{title:[{text:{content:title}}]},...(status?{Status:{status:{name:status}}}:{}),...(category?{Category:{select:{name:category}}}:{}),...(summary?{Summary:{rich_text:[{text:{content:summary}}]}}:{})};
-    mkPage(cfg.projects,props).then(page=>{
-      // 임시 ID를 실제 Notion ID로 교체
-      const idx=D.projects.findIndex(p=>p.id===tempId);
-      if(idx>-1){D.projects[idx].id=page.id;}
-      rProjectSelects();
-      // 반환 select도 실제 ID로 업데이트
-      if(returnEl&&returnEl.value===tempId)returnEl.value=page.id;
-    }).catch(e=>console.warn('saveNewProject failed:',e));
+  // Notion 저장
+  if(!cfg.token){showToast('❌ Token이 없어 Notion 저장 불가','error');return;}
+  if(!cfg.projects){showToast('❌ Projects DB ID가 없어 Notion 저장 불가','error');return;}
+  showToast('Notion에 저장 중...','');
+  const props={Title:{title:[{text:{content:title}}]},...(status?{Status:{status:{name:status}}}:{}),...(category?{Category:{select:{name:category}}}:{}),...(summary?{Summary:{rich_text:[{text:{content:summary}}]}}:{})};
+  try{
+    const page=await mkPage(cfg.projects,props);
+    const idx=D.projects.findIndex(p=>p.id===tempId);
+    if(idx>-1){D.projects[idx].id=page.id;}
+    rProjectSelects();
+    if(returnEl&&returnEl.value===tempId)returnEl.value=page.id;
+    showToast('✅ 프로젝트가 생성됐습니다!','success');
+  }catch(e){
+    showToast(`❌ Notion 저장 실패: ${e.message}`,'error');
+    console.error('saveNewProject failed:',e);
   }
 }
 
