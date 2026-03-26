@@ -1383,6 +1383,7 @@ async function saveNewProject(){
   showToast('Notion에 저장 중...','');
   const props={
     Title:{title:[{text:{content:title}}]},
+    ...(status?{Status:{select:{name:status}}}:{}),
     ...(category?{Category:{select:{name:category}}}:{}),
     ...(summary?{Summary:{rich_text:[{text:{content:summary}}]}}:{})
   };
