@@ -1649,20 +1649,8 @@ async function saveMemoArea(area){
   if(cfg.token&&cfg.memo){mkPage(cfg.memo,props).catch(e=>console.warn('saveMemoArea failed:',e));}
 }
 
-function rMemo(){
-  const list=[...D.memo].sort((a,b)=>(b.pinned-a.pinned)||(new Date(b.createdAt)-new Date(a.createdAt)));
-  const el=document.getElementById('memoList');
-  if(!list.length){el.innerHTML='<div class="empty-msg"><p>메모가 없습니다</p></div>';return;}
-  el.innerHTML=list.map(m=>{
-    const a=AMAP[m.area];
-    const pinBadge=m.pinned?'<span style="font-size:0.7rem;color:var(--personal-c)">📌</span>':'';
-    const areaBadge=a?'<span class="tag" style="background:'+a.bg+';color:'+a.c+'">'+a.l+'</span>':'';
-    const proj=D.projects.find(p=>p.id===m.projectId);
-    const projBadge=proj?'<span style="display:inline-flex;align-items:center;font-size:0.38rem;color:var(--work-c);background:var(--work-bg);padding:0.1rem 0.4rem;border-radius:20px;white-space:nowrap;">◈ '+esc(proj.name)+'</span>':'';
-    const linkedBadge=m.linkedTodo?'<span style="display:inline-flex;align-items:center;gap:0.2rem;font-size:0.38rem;color:var(--text-m);background:var(--subtle);padding:0.1rem 0.4rem;border-radius:20px;max-width:8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+esc(m.linkedTodo)+'">📝 '+esc(m.linkedTodo)+'</span>':'';
-    return '<div class="memo-card '+(m.pinned?'pinned':'')+'"><div class="mc-top">'+pinBadge+areaBadge+projBadge+linkedBadge+'<div style="margin-left:auto;display:flex;gap:0.25rem"><button class="inv-edit-btn" onclick="editMemoItem(\''+m.id+'\')">수정</button><button class="btn-del" onclick="confirmDelMemo(\''+m.id+'\',\''+esc(m.content).slice(0,15)+'\')">삭제</button></div></div><div class="mc-text">'+esc(m.content)+'</div><div class="mc-foot">'+fdt(m.createdAt)+'</div></div>';
-  }).join('');
-}
+function rMemoAll(){rMemoArea('personal');rMemoArea('family');rMemoArea('work');}
+function rMemo(){rMemoAll();}
 
 function showPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
